@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>四式 · 游戏场</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand-mark" href="#home" data-nav="home">四式</a>
+    <span class="topbar-hint">选一种玩法，立刻开局</span>
+  </header>
+
+  <main>
+    <!-- Home / hero -->
+    <section id="home" class="panel panel-home is-active" data-panel="home">
+      <div class="hero-plane" aria-hidden="true">
+        <div class="hero-grid"></div>
+        <div class="hero-orb hero-orb-a"></div>
+        <div class="hero-orb hero-orb-b"></div>
+        <div class="hero-token hero-token-1">⚡</div>
+        <div class="hero-token hero-token-2">◆</div>
+        <div class="hero-token hero-token-3">◎</div>
+      </div>
+
+      <div class="hero-copy">
+        <p class="brand">四式</p>
+        <h1>一种场子，四种打法</h1>
+        <p class="lead">点下面任一按钮，进入对应游戏形式。</p>
+
+        <div class="mode-cta" role="group" aria-label="选择游戏形式">
+          <button type="button" class="mode-btn" data-open="quiz">
+            <span class="mode-num">01</span>
+            <span class="mode-name">快问快答</span>
+          </button>
+          <button type="button" class="mode-btn" data-open="memory">
+            <span class="mode-num">02</span>
+            <span class="mode-name">翻牌记忆</span>
+          </button>
+          <button type="button" class="mode-btn" data-open="sprint">
+            <span class="mode-num">03</span>
+            <span class="mode-name">限时冲刺</span>
+          </button>
+          <button type="button" class="mode-btn" data-open="versus">
+            <span class="mode-num">04</span>
+            <span class="mode-name">双人对决</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quiz -->
+    <section id="quiz" class="panel panel-game" data-panel="quiz" hidden>
+      <div class="game-shell">
+        <button type="button" class="back-btn" data-nav="home">← 返回</button>
+        <header class="game-head">
+          <p class="game-label">形式 01</p>
+          <h2>快问快答</h2>
+          <p class="game-desc">连续题库，答对得分。选错不扣分，但会前进一题。</p>
+        </header>
+        <div class="stat-row">
+          <span>得分 <strong id="quiz-score">0</strong></span>
+          <span>进度 <strong id="quiz-progress">1/5</strong></span>
+        </div>
+        <p class="quiz-q" id="quiz-question">准备开始？</p>
+        <div class="quiz-options" id="quiz-options"></div>
+        <button type="button" class="action-btn" id="quiz-start">开始作答</button>
+        <p class="game-feedback" id="quiz-feedback" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- Memory -->
+    <section id="memory" class="panel panel-game" data-panel="memory" hidden>
+      <div class="game-shell">
+        <button type="button" class="back-btn" data-nav="home">← 返回</button>
+        <header class="game-head">
+          <p class="game-label">形式 02</p>
+          <h2>翻牌记忆</h2>
+          <p class="game-desc">翻开两张牌，配对相同符号即消除。用尽量少的步数清空棋盘。</p>
+        </header>
+        <div class="stat-row">
+          <span>步数 <strong id="memory-moves">0</strong></span>
+          <span>配对 <strong id="memory-pairs">0/8</strong></span>
+        </div>
+        <div class="memory-board" id="memory-board"></div>
+        <button type="button" class="action-btn" id="memory-reset">重新开局</button>
+        <p class="game-feedback" id="memory-feedback" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- Sprint -->
+    <section id="sprint" class="panel panel-game" data-panel="sprint" hidden>
+      <div class="game-shell">
+        <button type="button" class="back-btn" data-nav="home">← 返回</button>
+        <header class="game-head">
+          <p class="game-label">形式 03</p>
+          <h2>限时冲刺</h2>
+          <p class="game-desc">15 秒内尽可能多地点击目标。目标会跳动位置，手速决定分数。</p>
+        </header>
+        <div class="stat-row">
+          <span>倒计时 <strong id="sprint-time">15</strong>s</span>
+          <span>得分 <strong id="sprint-score">0</strong></span>
+        </div>
+        <div class="sprint-arena" id="sprint-arena">
+          <button type="button" class="sprint-target" id="sprint-target" hidden>点我</button>
+          <p class="sprint-idle" id="sprint-idle">按下开始，目标会出现</p>
+        </div>
+        <button type="button" class="action-btn" id="sprint-start">开始冲刺</button>
+        <p class="game-feedback" id="sprint-feedback" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- Versus -->
+    <section id="versus" class="panel panel-game" data-panel="versus" hidden>
+      <div class="game-shell">
+        <button type="button" class="back-btn" data-nav="home">← 返回</button>
+        <header class="game-head">
+          <p class="game-label">形式 04</p>
+          <h2>双人对决</h2>
+          <p class="game-desc">A / D 与 ← / →。两人同时按键推进进度条，先到终点者胜。</p>
+        </header>
+        <div class="versus-lanes">
+          <div class="lane">
+            <div class="lane-meta">
+              <span>选手 A</span>
+              <kbd>A</kbd> / <kbd>D</kbd>
+            </div>
+            <div class="track"><div class="racer" id="racer-a"></div></div>
+          </div>
+          <div class="lane">
+            <div class="lane-meta">
+              <span>选手 B</span>
+              <kbd>←</kbd> / <kbd>→</kbd>
+            </div>
+            <div class="track"><div class="racer racer-b" id="racer-b"></div></div>
+          </div>
+        </div>
+        <button type="button" class="action-btn" id="versus-start">准备开战</button>
+        <p class="game-feedback" id="versus-feedback" aria-live="polite">点击开始后，双方一起狂按键盘。</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
