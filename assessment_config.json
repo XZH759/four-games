@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "constitution": "question-layer identical across arms; shell-layer may differ between items only",
+  "domains": {
+    "Engaging": { "zone": "信号塔区", "motif": "天线/电波/信息流" },
+    "Creating": { "zone": "创作工坊", "motif": "齿轮/画笔/音符" },
+    "Managing": { "zone": "指挥室", "motif": "仪表盘/开关" },
+    "Designing": { "zone": "核心实验室", "motif": "芯片/电路" }
+  },
+  "levels": [
+    {
+      "id": "L1",
+      "zone": "信号塔·入口",
+      "domain": "Engaging",
+      "items": ["E-1-Q1", "E-2-Q1", "E-3-Q1"]
+    },
+    {
+      "id": "L2",
+      "zone": "信号塔·塔顶",
+      "domain": "Engaging",
+      "items": ["E-4-Q1", "E-5-Q1", "E-7-Q1"]
+    },
+    {
+      "id": "L3",
+      "zone": "创作工坊",
+      "domain": "Creating",
+      "items": ["C-1-Q1", "C-3-Q1", "C-4-Q1"]
+    },
+    {
+      "id": "L4",
+      "zone": "指挥室",
+      "domain": "Managing",
+      "items": ["M-1-Q1", "E-6-Q1", "E-3-Q2"]
+    },
+    {
+      "id": "L5",
+      "zone": "核心实验室",
+      "domain": "Designing",
+      "items": ["D-2-Q1", "D-4-Q1", "D-5-Q1"]
+    }
+  ],
+  "arms": {
+    "plain": {
+      "label": "问卷基线",
+      "shell": false,
+      "progressLabel": "page"
+    },
+    "stages": {
+      "label": "基础积分 / 闯关",
+      "shell": "map+dial",
+      "copy": "提交即接通，与对错无关"
+    },
+    "collect": {
+      "label": "养成型",
+      "shell": "accessory-tree",
+      "unlockEvery": 2,
+      "growthNodes": ["L1", "L3", "L5"],
+      "branches": ["外观", "装备", "伙伴"]
+    },
+    "race": {
+      "label": "比赛 + 排行榜",
+      "shell": "circuit-race",
+      "rankBy": "itemsAnswered",
+      "ethicsFlagDefault": false,
+      "peerLabel": "07号"
+    }
+  },
+  "shared": {
+    "ending": "robot-boot-ceremony",
+    "exitResumeNeutral": true
+  }
+}
