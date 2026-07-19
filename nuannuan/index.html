@@ -3,26 +3,584 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>奇迹暖暖 · nuannuan</title>
+  <title>奇迹暖暖 · 服饰商城</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #e8c883;
+      --gold-deep: #c9a256;
+      --ink: #fdf6e9;
+      --muted: #b9a8c9;
+      --plum: #2a1f3d;
+      --plum-deep: #1d1430;
+      --card: #3a2c52;
+      --ok: #7ce0a3;
+      --font-title: "Noto Serif SC", serif;
+      --font-body: "Noto Sans SC", sans-serif;
+    }
+
+    * , *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(120, 90, 180, 0.45), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 100%, rgba(90, 60, 140, 0.35), transparent 60%),
+        linear-gradient(170deg, #241a38 0%, #1d1430 55%, #251530 100%);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 30;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.65rem 1rem;
+      background: rgba(29, 20, 48, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(232, 200, 131, 0.25);
+    }
+
+    .back-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+    }
+    .back-link:hover { color: var(--gold); }
+
+    .wallet {
+      display: flex; align-items: center; gap: 0.55rem;
+      flex-wrap: wrap;
+    }
+    .diamonds {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(232, 200, 131, 0.4);
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .diamonds.shake { animation: shake 0.4s; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .signin-btn {
+      appearance: none; border: 1px solid rgba(232, 200, 131, 0.5);
+      background: linear-gradient(160deg, #4a3568, #35244f);
+      color: var(--gold);
+      border-radius: 999px;
+      padding: 0.3rem 0.8rem;
+      font: inherit; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .signin-btn:disabled { opacity: 0.45; cursor: default; }
+    .signin-btn:not(:disabled):hover { filter: brightness(1.15); }
+
+    .shop-head {
+      text-align: center;
+      padding: 1.6rem 1rem 0.4rem;
+    }
+    .shop-title {
+      margin: 0;
+      font-family: var(--font-title);
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-indent: 0.35em;
+      color: var(--gold);
+      text-shadow: 0 2px 18px rgba(232, 200, 131, 0.35);
+    }
+    .shop-title::before, .shop-title::after { content: " ✦ "; font-size: 0.7em; vertical-align: middle; }
+    .shop-sub {
+      display: inline-block;
+      margin: 0.7rem 0 0;
+      padding: 0.3rem 1.1rem;
+      border: 1px solid rgba(232, 200, 131, 0.5);
+      border-radius: 999px;
+      color: var(--gold);
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      text-indent: 0.25em;
+    }
+
+    .filter-row {
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem;
+      padding: 1.1rem 1rem 0.4rem;
+    }
+    .filter-btn {
+      appearance: none; border: 1px solid rgba(185, 168, 201, 0.35);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.32rem 1rem;
+      font: inherit; font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn.is-on {
+      color: var(--plum-deep);
+      background: linear-gradient(160deg, var(--gold), var(--gold-deep));
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 0.9rem;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1rem 1rem 2rem;
+    }
+
+    .outfit-card {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(175deg, #443062, #302145);
+      border: 1px solid rgba(232, 200, 131, 0.35);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+    }
+    .outfit-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(232, 200, 131, 0.3);
+    }
+    .outfit-card.is-hidden { display: none; }
+
+    .art {
+      position: relative;
+      aspect-ratio: 197 / 245;
+      overflow: hidden;
+    }
+    .art img {
+      position: absolute;
+      width: 519.8%;
+      height: auto;
+      max-width: none;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .owned-ribbon {
+      position: absolute;
+      top: 10px; right: -34px;
+      transform: rotate(45deg);
+      background: linear-gradient(90deg, #58c98b, #35a56b);
+      color: #0c2b1a;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 2.4rem;
+      pointer-events: none;
+      display: none;
+    }
+    .outfit-card.owned .owned-ribbon { display: block; }
+
+    .card-info {
+      padding: 0.6rem 0.65rem 0.7rem;
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .card-row-1 {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;
+    }
+    .outfit-name {
+      margin: 0;
+      font-family: var(--font-title);
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .type-chip {
+      flex: 0 0 auto;
+      font-size: 0.68rem;
+      padding: 0.12rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(232, 200, 131, 0.55);
+      color: var(--gold);
+    }
+
+    .tag-row { display: flex; gap: 0.3rem; }
+    .tag {
+      font-size: 0.66rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+    }
+
+    .card-row-2 {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+    }
+    .price {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .buy-btn {
+      appearance: none; border: 0;
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      font: inherit; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(160deg, #f4dfae, var(--gold-deep));
+      color: #3a2a10;
+      box-shadow: 0 4px 12px rgba(201, 162, 86, 0.4);
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .buy-btn:hover { filter: brightness(1.08); }
+    .buy-btn:active { transform: scale(0.96); }
+    .buy-btn.owned {
+      background: rgba(124, 224, 163, 0.16);
+      color: var(--ok);
+      box-shadow: none;
+      cursor: default;
+      border: 1px solid rgba(124, 224, 163, 0.4);
+    }
+
+    .shop-foot {
+      text-align: center;
+      padding: 0 1rem 2.2rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+    }
+    .shop-foot .dot { color: var(--gold); margin: 0 0.5rem; }
+
+    /* ——— modal ——— */
+    .modal {
+      position: fixed; inset: 0; z-index: 50;
+      display: grid; place-items: center;
+      background: rgba(10, 6, 20, 0.72);
+      backdrop-filter: blur(4px);
+      padding: 1rem;
+    }
+    .modal[hidden] { display: none !important; }
+
+    .modal-card {
+      width: min(420px, 94vw);
+      max-height: 92vh;
+      overflow: auto;
+      border-radius: 20px;
+      background: linear-gradient(175deg, #443062, #2b1d40);
+      border: 1px solid rgba(232, 200, 131, 0.5);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-art {
+      position: relative;
+      aspect-ratio: 197 / 245;
+      overflow: hidden;
+      border-radius: 20px 20px 0 0;
+    }
+    .modal-art img {
+      position: absolute;
+      width: 519.8%;
+      height: auto;
+      max-width: none;
+      pointer-events: none;
+    }
+
+    .modal-body { padding: 1rem 1.1rem 1.2rem; }
+    .modal-body h2 {
+      margin: 0 0 0.4rem;
+      font-family: var(--font-title);
+      color: var(--gold);
+      font-size: 1.3rem;
+    }
+    .modal-tags { display: flex; gap: 0.35rem; margin-bottom: 0.6rem; }
+    .modal-price {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 0.6rem 0 0.9rem;
+    }
+    .modal-price .price { font-size: 1.15rem; }
+
+    .modal-actions { display: flex; gap: 0.55rem; }
+    .modal-actions .buy-btn { flex: 1; padding: 0.65rem 1rem; font-size: 0.95rem; }
+    .close-btn {
+      appearance: none;
+      border: 1px solid rgba(185, 168, 201, 0.4);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.65rem 1.1rem;
+      font: inherit; font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .close-btn:hover { color: var(--ink); }
+
+    /* ——— toast ——— */
+    .toast {
+      position: fixed;
+      left: 50%; bottom: 9vh;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 90;
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      background: rgba(20, 12, 36, 0.95);
+      border: 1px solid rgba(232, 200, 131, 0.5);
+      color: var(--gold);
+      font-size: 0.9rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
 </head>
 <body>
-  <div class="bg" aria-hidden="true"></div>
   <header class="topbar">
-    <a class="brand" href="/">
-      <img src="/assets/bot-buddy.png" width="36" height="36" alt="" />
-      <span>AI世界修复计划</span>
-    </a>
-    <p class="top-note">/nuannuan</p>
+    <a class="back-link" href="/">← 返回大厅</a>
+    <div class="wallet">
+      <a class="signin-btn" id="profile-btn" href="/nuannuan/create">👤 个人信息</a>
+      <button type="button" class="signin-btn" id="signin-btn">每日签到 +600</button>
+      <span class="diamonds" id="diamond-box">💎 <span id="diamond-num">0</span></span>
+    </div>
   </header>
-  <main class="game-stub">
-    <p class="stub-path">/nuannuan</p>
-    <h1>奇迹暖暖</h1>
-    <p>游戏逻辑稍后接入。当前仅完成路由跳转。</p>
-    <a class="primary" href="/">返回大厅</a>
-  </main>
+
+  <div class="shop-head">
+    <h1 class="shop-title">奇迹暖暖 · 全新服饰上架</h1>
+    <p class="shop-sub">精美服饰，限时上架</p>
+  </div>
+
+  <div class="filter-row" id="filter-row">
+    <button type="button" class="filter-btn is-on" data-filter="全部">全部</button>
+    <button type="button" class="filter-btn" data-filter="礼服">礼服</button>
+    <button type="button" class="filter-btn" data-filter="套装">套装</button>
+    <button type="button" class="filter-btn" data-filter="连衣裙">连衣裙</button>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <p class="shop-foot">
+    <span>✦ 所有服饰均可使用钻石购买</span>
+    <span class="dot">·</span>
+    <span>限时上架：05月24日 - 06月23日 ✦</span>
+  </p>
+
+  <!-- detail modal -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card">
+      <div class="modal-art" id="modal-art"><img src="/assets/nuannuan-shop.png" alt="" /></div>
+      <div class="modal-body">
+        <h2 id="modal-name"></h2>
+        <div class="modal-tags" id="modal-tags"></div>
+        <div class="modal-price">
+          <span class="type-chip" id="modal-type"></span>
+          <span class="price">💎 <span id="modal-price"></span></span>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="buy-btn" id="modal-buy">购买</button>
+          <button type="button" class="close-btn" id="modal-close">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (() => {
+      /* 未创建角色 → 先去初始形象创建页 */
+      const PROFILE_KEY = "nn_profile_v1";
+      let profile = null;
+      try { profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null"); } catch { profile = null; }
+      if (!profile) {
+        location.replace("/nuannuan/create");
+        return;
+      }
+      const profileBtn = document.getElementById("profile-btn");
+      profileBtn.textContent = `👗 ${profile.name}`;
+
+      const SHEET = "/assets/nuannuan-shop.png";
+      const CARD_W = 197;
+      const COLS = [10, 213, 416, 618, 821];
+      const ROWS = [90, 435];
+
+      const OUTFITS = [
+        { id: 1,  name: "星海花冠",   type: "礼服",   price: 1680, tags: ["华丽", "优雅"] },
+        { id: 2,  name: "夜泉之翼",   type: "套装",   price: 1480, tags: ["帅气", "成熟"] },
+        { id: 3,  name: "甜心游园会", type: "连衣裙", price: 980,  tags: ["可爱", "清纯"] },
+        { id: 4,  name: "竹影清荷",   type: "连衣裙", price: 1280, tags: ["清新", "优雅"] },
+        { id: 5,  name: "雪域长歌",   type: "套装",   price: 1680, tags: ["华丽", "成熟"] },
+        { id: 6,  name: "阳光小橘子", type: "连衣裙", price: 680,  tags: ["可爱", "活泼"] },
+        { id: 7,  name: "街头律动",   type: "套装",   price: 1080, tags: ["帅气", "活泼"] },
+        { id: 8,  name: "星月幻梦",   type: "连衣裙", price: 1380, tags: ["华丽", "优雅"] },
+        { id: 9,  name: "暗夜玫瑰",   type: "连衣裙", price: 1280, tags: ["性感", "成熟"] },
+        { id: 10, name: "海风少年志", type: "套装",   price: 880,  tags: ["清新", "活泼"] },
+      ];
+
+      const KEY = "nn_shop_v1";
+      const state = load();
+
+      function load() {
+        try {
+          const s = JSON.parse(localStorage.getItem(KEY) || "{}");
+          return { diamonds: 5000, owned: [], lastSign: "", ...s };
+        } catch {
+          return { diamonds: 5000, owned: [], lastSign: "" };
+        }
+      }
+      function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+
+      function artOffset(idx) {
+        const col = idx % 5;
+        const row = Math.floor(idx / 5);
+        return {
+          left: -(COLS[col] / CARD_W) * 100,
+          top: -(ROWS[row] / 245) * 100,
+        };
+      }
+
+      const grid = document.getElementById("grid");
+      OUTFITS.forEach((o, idx) => {
+        const { left, top } = artOffset(idx);
+        const card = document.createElement("article");
+        card.className = "outfit-card";
+        card.dataset.type = o.type;
+        card.dataset.id = o.id;
+        card.innerHTML = `
+          <div class="art">
+            <img src="${SHEET}" alt="${o.name}" style="left:${left}%;top:${top}%" />
+            <span class="owned-ribbon">已拥有</span>
+          </div>
+          <div class="card-info">
+            <div class="card-row-1">
+              <h3 class="outfit-name">${String(o.id).padStart(2, "0")} ${o.name}</h3>
+              <span class="type-chip">${o.type}</span>
+            </div>
+            <div class="tag-row">${o.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>
+            <div class="card-row-2">
+              <span class="price">💎 ${o.price}</span>
+              <button type="button" class="buy-btn" data-buy="${o.id}">购买</button>
+            </div>
+          </div>`;
+        card.addEventListener("click", (e) => {
+          if (e.target.closest("[data-buy]")) return;
+          openModal(o, idx);
+        });
+        card.querySelector("[data-buy]").addEventListener("click", () => buy(o));
+        grid.appendChild(card);
+      });
+
+      const diamondNum = document.getElementById("diamond-num");
+      const diamondBox = document.getElementById("diamond-box");
+      const signinBtn = document.getElementById("signin-btn");
+
+      function paintWallet() {
+        diamondNum.textContent = state.diamonds.toLocaleString();
+        const today = new Date().toDateString();
+        signinBtn.disabled = state.lastSign === today;
+        signinBtn.textContent = signinBtn.disabled ? "今日已签到" : "每日签到 +600";
+      }
+
+      signinBtn.addEventListener("click", () => {
+        state.lastSign = new Date().toDateString();
+        state.diamonds += 600;
+        save();
+        paintWallet();
+        toast("签到成功，钻石 +600");
+      });
+
+      function buy(o) {
+        if (state.owned.includes(o.id)) return;
+        if (state.diamonds < o.price) {
+          diamondBox.classList.remove("shake");
+          void diamondBox.offsetWidth;
+          diamondBox.classList.add("shake");
+          toast("钻石不足，先去签到吧");
+          return;
+        }
+        state.diamonds -= o.price;
+        state.owned.push(o.id);
+        save();
+        paintWallet();
+        paintOwned();
+        toast(`已购入「${o.name}」`);
+      }
+
+      function paintOwned() {
+        document.querySelectorAll(".outfit-card").forEach((card) => {
+          const id = Number(card.dataset.id);
+          const owned = state.owned.includes(id);
+          card.classList.toggle("owned", owned);
+          const btn = card.querySelector("[data-buy]");
+          btn.textContent = owned ? "已拥有" : "购买";
+          btn.classList.toggle("owned", owned);
+        });
+      }
+
+      document.getElementById("filter-row").addEventListener("click", (e) => {
+        const btn = e.target.closest(".filter-btn");
+        if (!btn) return;
+        document.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("is-on", b === btn));
+        const f = btn.dataset.filter;
+        document.querySelectorAll(".outfit-card").forEach((card) => {
+          card.classList.toggle("is-hidden", f !== "全部" && card.dataset.type !== f);
+        });
+      });
+
+      const modal = document.getElementById("modal");
+      let modalOutfit = null;
+
+      function openModal(o, idx) {
+        modalOutfit = o;
+        const { left, top } = artOffset(idx);
+        const img = document.querySelector("#modal-art img");
+        img.style.left = left + "%";
+        img.style.top = top + "%";
+        document.getElementById("modal-name").textContent = `${String(o.id).padStart(2, "0")} ${o.name}`;
+        document.getElementById("modal-type").textContent = o.type;
+        document.getElementById("modal-price").textContent = o.price;
+        document.getElementById("modal-tags").innerHTML =
+          o.tags.map((t) => `<span class="tag">${t}</span>`).join("");
+        paintModalBuy();
+        modal.hidden = false;
+      }
+
+      function paintModalBuy() {
+        const btn = document.getElementById("modal-buy");
+        const owned = modalOutfit && state.owned.includes(modalOutfit.id);
+        btn.textContent = owned ? "已拥有" : "购买";
+        btn.classList.toggle("owned", owned);
+      }
+
+      document.getElementById("modal-buy").addEventListener("click", () => {
+        if (!modalOutfit) return;
+        buy(modalOutfit);
+        paintModalBuy();
+      });
+      document.getElementById("modal-close").addEventListener("click", () => { modal.hidden = true; });
+      modal.addEventListener("click", (e) => { if (e.target === modal) modal.hidden = true; });
+      window.addEventListener("keydown", (e) => { if (e.key === "Escape") modal.hidden = true; });
+
+      let toastTimer = null;
+      function toast(msg) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
+      }
+
+      paintWallet();
+      paintOwned();
+    })();
+  </script>
 </body>
 </html>
