@@ -407,7 +407,7 @@
       const EYE_COLORS = [
         { n: "紫罗兰", iris: "#9678e0", rim: "#5c4699" },
         { n: "湖水蓝", iris: "#66a4e6", rim: "#3a6cab" },
-        { n: "琥珀金", iris: "#deA845", rim: "#9c7127" },
+        { n: "琥珀金", iris: "#dea845", rim: "#9c7127" },
         { n: "樱桃红", iris: "#de7386", rim: "#a04352" },
         { n: "翡翠绿", iris: "#57c493", rim: "#31855f" },
       ];
@@ -415,11 +415,11 @@
       const FACES = ["标准", "圆润", "尖俏"];
       const ACCS = ["蝴蝶结", "蕾丝发带", "星星发夹", "无配饰"];
 
-      /* 体型：只改人物身体参数，背景不动 */
+      /* 体型：只改身体骨架参数（肩/腰/臀/四肢/腿长），背景与头部不动 */
       const BODY_TYPES = [
-        { n: "纤细型", p: { sh: 27, waist: 18, hip: 26, armW: 11, legW: 15, legLen: 505, bust: 0 } },
-        { n: "标准型", p: { sh: 31, waist: 22, hip: 31, armW: 13, legW: 18, legLen: 500, bust: 2 } },
-        { n: "活泼型", p: { sh: 35, waist: 27, hip: 36, armW: 15, legW: 21, legLen: 488, bust: 4 } },
+        { n: "纤细型", p: { sh: 26, waist: 17, hip: 25, armW: 9,    legW: 13, legLen: 500, bust: 0 } },
+        { n: "标准型", p: { sh: 30, waist: 21, hip: 30, armW: 10.5, legW: 16, legLen: 494, bust: 2 } },
+        { n: "活泼型", p: { sh: 34, waist: 26, hip: 35, armW: 12,   legW: 19, legLen: 482, bust: 4 } },
       ];
 
       const OUTFITS = [
@@ -432,209 +432,243 @@
 
       const sel = { hair: 0, hairColor: 0, skin: 1, eyes: 0, face: 0, acc: 0, body: 1, outfit: 0 };
 
-      /* ═══════════ SVG 娃娃渲染器 ═══════════ */
-      /* 画布 300 × 620；头部中心 x=150，脸 y≈40-185，肩 y≈215，腰 y≈265，臀 y≈292 */
+      /* ═══════════ SVG 娃娃渲染器（暖暖风格头身比） ═══════════ */
+      /* 画布 300 × 620；脸 y≈43-155，眼睛 y≈110，肩 y≈188，腰 y≈236，臀 y≈268 */
 
       function facePath(i) {
         if (i === 1) { /* 圆润：脸颊更饱满 */
-          return "M100,94 Q99,144 121,168 Q136,184 150,185 Q164,184 179,168 Q201,144 200,94 Q198,46 150,40 Q102,46 100,94 Z";
+          return "M105,88 Q105,126 122,142 Q136,155 150,156 Q164,155 178,142 Q195,126 195,88 Q193,46 150,41 Q107,46 105,88 Z";
         }
         if (i === 2) { /* 尖俏：下巴收尖 */
-          return "M104,90 Q102,138 126,160 Q140,172 150,184 Q160,172 174,160 Q198,138 196,90 Q196,46 150,40 Q104,46 104,90 Z";
+          return "M108,84 Q106,120 126,138 Q140,148 150,157 Q160,148 174,138 Q194,120 192,84 Q192,46 150,41 Q108,46 108,84 Z";
         }
-        return "M103,92 Q101,140 122,165 Q136,181 150,182 Q164,181 178,165 Q199,140 197,92 Q197,47 150,41 Q103,47 103,92 Z";
+        return "M108,86 Q107,122 123,139 Q136,152 150,153 Q164,152 177,139 Q193,122 192,86 Q192,48 150,43 Q108,48 108,86 Z";
       }
 
+      /* 大眼睛：眼白/虹膜渐变/上眼睑阴影/瞳孔/双高光/睫毛/卧蚕 */
       function eyes(uid, E, faceIdx) {
-        /* 眼睛画在眼眶位置：中心 (127,122) / (173,122)，瞳色即选项色 */
-        const ry = faceIdx === 1 ? 15 : 14;
-        const one = (cx) => `
-          <path d="M${cx - 13},116 Q${cx},${104} ${cx + 13},116" fill="none" stroke="#3a2b33" stroke-width="3.4" stroke-linecap="round"/>
-          <ellipse cx="${cx}" cy="123" rx="11" ry="${ry}" fill="#fff" stroke="#c9b8c4" stroke-width="0.8"/>
-          <circle cx="${cx}" cy="124" r="8.6" fill="url(#iris-${uid})" stroke="${E.rim}" stroke-width="1.2"/>
-          <circle cx="${cx}" cy="124" r="4" fill="#241a22"/>
-          <circle cx="${cx - 3}" cy="119.5" r="2.8" fill="#fff" opacity="0.95"/>
-          <circle cx="${cx + 3.4}" cy="127" r="1.5" fill="#fff" opacity="0.8"/>
-          <path d="M${cx - 9},136 Q${cx},140 ${cx + 9},136" fill="none" stroke="#c9a8b4" stroke-width="1.2" opacity="0.7"/>`;
-        return one(127) + one(173);
+        const ry = faceIdx === 1 ? 12.8 : 12;
+        const one = (cx, f) => `
+          <path d="M${cx + f * 9},96 Q${cx},92 ${cx - f * 8},95.5" fill="none" stroke="#caa4b2" stroke-width="1.1" opacity="0.8"/>
+          <ellipse cx="${cx}" cy="110" rx="10" ry="${ry}" fill="#fff" stroke="#decfda" stroke-width="0.6"/>
+          <ellipse cx="${cx}" cy="111" rx="8" ry="10.5" fill="url(#iris-${uid})"/>
+          <ellipse cx="${cx}" cy="105" rx="8" ry="5" fill="${E.rim}" opacity="0.45"/>
+          <ellipse cx="${cx}" cy="112" rx="3.8" ry="5" fill="#221623"/>
+          <ellipse cx="${cx}" cy="117" rx="4.4" ry="2" fill="${E.iris}" opacity="0.55"/>
+          <circle cx="${cx - 3}" cy="104.5" r="3" fill="#fff" opacity="0.95"/>
+          <circle cx="${cx + 3.4}" cy="115" r="1.8" fill="#fff" opacity="0.85"/>
+          <path d="M${cx + f * 12},104 Q${cx},94.5 ${cx - f * 10},102" fill="none" stroke="#2c1f28" stroke-width="3.6" stroke-linecap="round"/>
+          <path d="M${cx + f * 11.6},104.4 Q${cx + f * 15},101 ${cx + f * 16.4},96.8" fill="none" stroke="#2c1f28" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M${cx + f * 11.2},107 Q${cx + f * 15.4},106.4 ${cx + f * 17.6},104" fill="none" stroke="#2c1f28" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M${cx + f * 8},121.5 Q${cx},124.5 ${cx - f * 7},122.5" fill="none" stroke="#b895a8" stroke-width="1.3" opacity="0.8"/>`;
+        return one(130, -1) + one(170, 1);
       }
 
-      function browsAndMouth(H, faceIdx) {
-        const blush = faceIdx === 1 ? 0.55 : faceIdx === 2 ? 0.2 : 0.32;
+      function browsAndMouth(H, S, faceIdx) {
+        const blush = faceIdx === 1 ? 0.5 : faceIdx === 2 ? 0.22 : 0.32;
         return `
-          <path d="M114,102 Q127,95 139,101" fill="none" stroke="${H.dark}" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M161,101 Q173,95 186,102" fill="none" stroke="${H.dark}" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M148,146 Q150,148 152,146" fill="none" stroke="#d8a090" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M141,160 Q150,168 159,160" fill="none" stroke="#c06a76" stroke-width="2.6" stroke-linecap="round"/>
-          <ellipse cx="117" cy="147" rx="8.5" ry="4.5" fill="#f7a8b8" opacity="${blush}"/>
-          <ellipse cx="183" cy="147" rx="8.5" ry="4.5" fill="#f7a8b8" opacity="${blush}"/>`;
+          <path d="M119,88.5 Q130,83.5 139,87" fill="none" stroke="${H.dark}" stroke-width="2" stroke-linecap="round"/>
+          <path d="M161,87 Q170,83.5 181,88.5" fill="none" stroke="${H.dark}" stroke-width="2" stroke-linecap="round"/>
+          <path d="M150.5,123 q1.6,2 0,3.8" fill="none" stroke="${S.shade}" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M144.5,135 Q150,139.8 155.5,135" fill="none" stroke="#c26875" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M147,141 Q150,142.6 153,141" fill="none" stroke="#e8b8c0" stroke-width="1" opacity="0.7"/>
+          <ellipse cx="122" cy="123" rx="7" ry="3.6" fill="#f7a8b8" opacity="${blush}"/>
+          <ellipse cx="178" cy="123" rx="7" ry="3.6" fill="#f7a8b8" opacity="${blush}"/>`;
       }
 
-      /* 发型：back（身后）+ front（刘海，最上层） */
+      /* 发型：back（身后）+ front（刘海，最上层），含发丝线与高光 */
       function hairSet(styleIdx, uid, H) {
         const g = `url(#hair-${uid})`;
-        const cap = `<path d="M95,105 Q88,36 150,30 Q212,36 205,105 Q202,72 150,60 Q98,72 95,105 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>`;
+        const cap = `<path d="M104,98 Q95,34 150,28 Q205,34 196,98 Q192,64 150,54 Q108,64 104,98 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>`;
         const bangs = `
-          <path d="M97,100 Q98,52 150,46 Q202,52 203,100 Q193,90 184,100 Q176,76 163,96 Q154,74 145,95 Q133,74 122,98 Q112,88 97,100 Z"
-                fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>
-          <path d="M118,64 Q150,54 182,64" fill="none" stroke="${H.light}" stroke-width="2.2" stroke-linecap="round" opacity="0.5"/>`;
+          <path d="M104,94 Q104,48 150,42 Q196,48 196,94 Q189,84 181,92 Q175,66 163,87 Q154,64 146,87 Q135,66 125,91 Q113,83 104,94 Z"
+                fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+          <path d="M128,58 Q123,74 121,86 M150,54 Q149,68 148,80 M172,58 Q177,74 179,86" fill="none" stroke="${H.dark}" stroke-width="1.1" opacity="0.35"/>
+          <path d="M120,60 Q150,50 180,60" fill="none" stroke="${H.light}" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>`;
 
         let back = "";
         if (styleIdx === 0) { /* 波浪长发 */
           back = `
-            <path d="M96,86 Q70,150 82,215 Q66,280 84,345 Q70,410 92,462 Q104,470 110,458 Q96,400 110,345 Q98,282 112,220 Q104,150 118,92 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>
-            <path d="M204,86 Q230,150 218,215 Q234,280 216,345 Q230,410 208,462 Q196,470 190,458 Q204,400 190,345 Q202,282 188,220 Q196,150 182,92 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>`;
+            <path d="M104,78 Q78,140 88,205 Q74,268 90,330 Q78,392 96,442 Q108,452 114,438 Q100,386 112,330 Q100,270 114,210 Q104,144 118,84 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            <path d="M196,78 Q222,140 212,205 Q226,268 210,330 Q222,392 204,442 Q192,452 186,438 Q200,386 188,330 Q200,270 186,210 Q196,144 182,84 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            <path d="M98,150 Q90,230 100,310 M202,150 Q210,230 200,310" fill="none" stroke="${H.dark}" stroke-width="1.2" opacity="0.3"/>`;
         } else if (styleIdx === 1) { /* 公主卷 */
-          const curl = (cx, cy, r, flip) => `
-            <circle cx="${cx}" cy="${cy}" r="${r}" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <circle cx="${cx + (flip ? 3 : -3)}" cy="${cy + r * 0.55}" r="${r * 0.62}" fill="${g}" stroke="${H.dark}" stroke-width="1.2"/>
-            <circle cx="${cx + (flip ? -1 : 1)}" cy="${cy + r}" r="${r * 0.36}" fill="${H.light}" opacity="0.9"/>`;
+          const curl = (cx) => `
+            <circle cx="${cx}" cy="316" r="13" fill="${g}" stroke="${H.dark}" stroke-width="1.2"/>
+            <circle cx="${cx + 3}" cy="336" r="10" fill="${g}" stroke="${H.dark}" stroke-width="1.1"/>
+            <circle cx="${cx}" cy="352" r="7" fill="${g}" stroke="${H.dark}" stroke-width="1"/>
+            <circle cx="${cx - 3}" cy="332" r="3.4" fill="${H.light}" opacity="0.9"/>`;
           back = `
-            <path d="M97,88 Q76,160 88,250 Q80,310 94,352 L118,340 Q104,290 114,230 Q106,160 118,94 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>
-            <path d="M203,88 Q224,160 212,250 Q220,310 206,352 L182,340 Q196,290 186,230 Q194,160 182,94 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>
-            ${curl(96, 360, 15, false)} ${curl(204, 360, 15, true)}`;
+            <path d="M104,82 Q86,150 94,225 Q88,272 98,306 L120,296 Q110,255 116,205 Q108,148 118,86 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            <path d="M196,82 Q214,150 206,225 Q212,272 202,306 L180,296 Q190,255 184,205 Q192,148 182,86 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            ${curl(100)} ${curl(200)}`;
         } else if (styleIdx === 2) { /* 双马尾 */
           back = `
-            <circle cx="103" cy="72" r="9" fill="${H.dark}"/>
-            <circle cx="197" cy="72" r="9" fill="${H.dark}"/>
-            <path d="M100,74 Q62,140 74,220 Q60,290 82,352 Q94,362 100,348 Q86,290 98,225 Q90,150 112,84 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>
-            <path d="M200,74 Q238,140 226,220 Q240,290 218,352 Q206,362 200,348 Q214,290 202,225 Q210,150 188,84 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>`;
+            <path d="M106,66 Q64,130 76,205 Q62,272 84,330 Q96,340 102,326 Q88,274 100,214 Q92,142 116,74 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            <path d="M194,66 Q236,130 224,205 Q238,272 216,330 Q204,340 198,326 Q212,274 200,214 Q208,142 184,74 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            <path d="M88,140 Q80,220 92,290 M212,140 Q220,220 208,290" fill="none" stroke="${H.dark}" stroke-width="1.1" opacity="0.3"/>
+            <circle cx="108" cy="63" r="6.5" fill="#e88ab0" stroke="#c94f82" stroke-width="1.2"/>
+            <circle cx="192" cy="63" r="6.5" fill="#e88ab0" stroke="#c94f82" stroke-width="1.2"/>`;
         } else if (styleIdx === 3) { /* 齐肩短发 */
           back = `
-            <path d="M96,90 Q84,150 92,196 Q100,220 120,212 Q108,170 112,110 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>
-            <path d="M204,90 Q216,150 208,196 Q200,220 180,212 Q192,170 188,110 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>`;
+            <path d="M118,160 Q150,178 182,160 L182,180 Q150,196 118,180 Z" fill="${g}"/>
+            <path d="M104,80 Q92,134 98,172 Q102,190 122,184 Q112,154 114,100 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            <path d="M196,80 Q208,134 202,172 Q198,190 178,184 Q188,154 186,100 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>`;
         } else if (styleIdx === 4) { /* 侧编发 */
-          const bead = (cy, r) => `<ellipse cx="${104 - (cy - 200) * 0.05}" cy="${cy}" rx="${r}" ry="${r * 0.8}" fill="${g}" stroke="${H.dark}" stroke-width="1.2"/>`;
+          const bead = (cy, r) => `<ellipse cx="${108 - (cy - 165) * 0.08}" cy="${cy}" rx="${r}" ry="${r * 0.82}" fill="${g}" stroke="${H.dark}" stroke-width="1.1"/>`;
           back = `
-            <path d="M204,88 Q216,140 208,186 Q198,206 184,198 Q192,160 188,108 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>
-            <path d="M96,88 Q86,140 96,190 L116,182 Q106,150 112,104 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>
-            ${bead(205, 13)} ${bead(228, 12)} ${bead(250, 11)} ${bead(271, 10)} ${bead(291, 9)} ${bead(309, 8)}
-            <path d="M97,320 L93,336 M100,320 L104,335" stroke="${H.dark}" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="99" cy="318" r="5" fill="#e26a9a"/>`;
+            <path d="M196,80 Q206,130 200,166 Q194,182 180,176 Q188,148 184,98 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            <path d="M104,80 Q96,126 102,164 L120,156 Q112,128 114,96 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            ${bead(172, 11)} ${bead(192, 10.5)} ${bead(211, 10)} ${bead(229, 9)} ${bead(246, 8)} ${bead(262, 7)}
+            <path d="M99,272 L95,286 M102,272 L106,285" stroke="${H.dark}" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="100" cy="269" r="4.5" fill="#e26a9a"/>`;
         } else { /* 高马尾 */
           back = `
-            <ellipse cx="150" cy="34" rx="26" ry="15" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <path d="M168,34 Q214,90 206,170 Q220,240 198,310 Q188,322 182,308 Q198,240 186,175 Q192,105 158,48 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.4"/>
-            <path d="M150,26 Q160,18 168,26 Q160,34 150,26 Z" fill="#e26a9a" stroke="#c94f82" stroke-width="1"/>`;
+            <ellipse cx="150" cy="26" rx="22" ry="12" fill="${g}" stroke="${H.dark}" stroke-width="1.2"/>
+            <path d="M162,30 Q208,74 200,145 Q214,205 194,266 Q184,278 178,264 Q192,208 180,152 Q188,92 152,40 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
+            <path d="M192,90 Q200,160 190,230" fill="none" stroke="${H.dark}" stroke-width="1.1" opacity="0.3"/>
+            <path d="M158,26 Q166,18 174,26 Q166,34 158,26 Z" fill="#e26a9a" stroke="#c94f82" stroke-width="1"/>`;
         }
         return { back: back + cap, front: bangs };
       }
 
-      /* 服装：behind（裙身，画在手臂之前）+ over（袖口/手套，画在手臂之后）+ shoes */
-      function outfitSet(idx, P, B, pal) {
-        const w = B.waist;
-        const sh = B.sh;
-        const hip = B.hip;
+      /* 波浪裙边：从 (xL,y) 起向右画 n 个圆弧 */
+      function scallop(xL, xR, y, n, d) {
+        const wd = (xR - xL) / n;
+        let p = "";
+        for (let i = 0; i < n; i++) {
+          p += ` Q${xL + wd * (i + 0.5)},${y + d} ${xL + wd * (i + 1)},${y}`;
+        }
+        return p;
+      }
 
-        if (idx === 0) { /* 星辉花嫁：及膝蓬蓬裙 */
-          const hem = 415;
+      /* 服装：behind（画在手臂前）+ over（袖/手套，画在手臂后）+ shoes */
+      function outfitSet(idx, uid, B, pal) {
+        const w = B.waist, sh = B.sh, hip = B.hip, L = B.legLen;
+        const cxL = 150 - hip * 0.42, cxR = 150 + hip * 0.42;
+        const exd = (d) => 150 + d * (sh + 13);   /* 肘 x */
+        const hxd = (d) => 150 + d * (sh + 7);    /* 手 x */
+        const bustArcs = `
+          <path d="M${150 - 14 - B.bust},205 q7,6 14,0 M${150 + B.bust},205 q7,6 14,0" fill="none" stroke="${pal.deep}" stroke-width="1.2" opacity="0.45"/>`;
+
+        if (idx === 0) { /* 星辉花嫁：渐变蓬蓬裙 + 高跟鞋 */
+          const pump = (cx) => `
+            <path d="M${cx - 7},${L - 5} Q${cx},${L - 10} ${cx + 7},${L - 5} Q${cx + 10},${L + 5} ${cx},${L + 9} Q${cx - 10},${L + 5} ${cx - 7},${L - 5} Z" fill="${pal.main}" stroke="${pal.deep}" stroke-width="1.2"/>
+            <path d="M${cx - 7},${L - 3} Q${cx},${L} ${cx + 7},${L - 3}" fill="none" stroke="${pal.deep}" stroke-width="1.3"/>
+            <circle cx="${cx}" cy="${L + 2.5}" r="2" fill="${pal.accent}"/>
+            <rect x="${cx - 1.6}" y="${L + 8}" width="3.4" height="7" rx="1.4" fill="${pal.deep}"/>`;
           return {
-            shoes: `
-              <path d="M${137 - hip * 0.4},${B.legLen - 38} h${B.legW + 4} v30 q0,10 -${(B.legW + 4) / 2},10 h-${B.legW + 4} q-4,-16 ${-(B.legW + 4) / 4},-40 Z" transform="translate(-2,0)" fill="${pal.main}" stroke="${pal.deep}" stroke-width="1.4"/>
-              <path d="M${163 + hip * 0.4 - B.legW},${B.legLen - 38} h${B.legW + 4} q4,24 ${(B.legW + 4) / 4},40 h-${B.legW + 4} q-${(B.legW + 4) / 2},0 -${(B.legW + 4) / 2},-10 Z" transform="translate(2,0)" fill="${pal.main}" stroke="${pal.deep}" stroke-width="1.4"/>`,
+            shoes: pump(cxL) + pump(cxR),
             behind: `
-              <path d="M${150 - w - 6},262 C ${150 - 66},310 ${150 - 88},368 ${150 - 92},${hem + 14}
-                       Q ${150 - 60},${hem + 30} ${150 - 30},${hem + 20} Q 150,${hem + 34} ${150 + 30},${hem + 20} Q ${150 + 60},${hem + 30} ${150 + 92},${hem + 14}
-                       C ${150 + 88},368 ${150 + 66},310 ${150 + w + 6},262 Z" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.2"/>
-              <path d="M${150 - w - 4},260 C ${150 - 58},304 ${150 - 78},352 ${150 - 82},${hem - 12}
-                       Q ${150 - 52},${hem + 4} ${150 - 26},${hem - 8} Q 150,${hem + 8} ${150 + 26},${hem - 8} Q ${150 + 52},${hem + 4} ${150 + 82},${hem - 12}
-                       C ${150 + 78},352 ${150 + 58},304 ${150 + w + 4},260 Z" fill="${pal.main}" stroke="${pal.deep}" stroke-width="1.3"/>
-              <path d="M${150 - 40},330 Q150,344 ${150 + 40},330 M${150 - 56},368 Q150,384 ${150 + 56},368" fill="none" stroke="${pal.trim}" stroke-width="2.4" opacity="0.9"/>
-              <path d="M${150 - sh},214 Q150,206 ${150 + sh},214 L${150 + w},262 L${150 - w},262 Z" fill="${pal.main}" stroke="${pal.deep}" stroke-width="1.3"/>
-              <path d="M${150 - 12},218 L${150 + 12},218 L${150 + 9},260 L${150 - 9},260 Z" fill="${pal.light}"/>
-              <circle cx="150" cy="228" r="2.4" fill="${pal.accent}"/><circle cx="150" cy="240" r="2.4" fill="${pal.accent}"/><circle cx="150" cy="252" r="2.4" fill="${pal.accent}"/>
-              <path d="M${150 - 14},214 Q150,224 ${150 + 14},214 L${150 + 10},210 Q150,218 ${150 - 10},210 Z" fill="${pal.trim}"/>
-              <g transform="translate(${150 + w + 2},268) rotate(12)">
-                <path d="M0,0 Q-14,-10 -6,-18 Q2,-12 0,0 Q14,-10 6,-18 Q-2,-12 0,0 Z" fill="${pal.accent}" stroke="#8f6cc0" stroke-width="1"/>
-                <circle r="3.4" fill="#8f6cc0"/>
-                <path d="M-2,2 L-7,20 M2,2 L8,22" stroke="${pal.accent}" stroke-width="2.6" stroke-linecap="round"/>
+              <path d="M${150 - w - 2},240 C${150 - 56},282 ${150 - 76},330 ${150 - 80},404 ${scallop(150 - 80, 150 + 80, 404, 7, 11)} C${150 + 76},330 ${150 + 56},282 ${150 + w + 2},240 Z" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1"/>
+              <circle cx="${150 - 44}" cy="392" r="1.8" fill="#fff"/><circle cx="150" cy="398" r="1.8" fill="#fff"/><circle cx="${150 + 44}" cy="392" r="1.8" fill="#fff"/>
+              <path d="M${150 - w - 1},238 C${150 - 50},276 ${150 - 66},318 ${150 - 70},378 ${scallop(150 - 70, 150 + 70, 378, 6, 13)} C${150 + 66},318 ${150 + 50},276 ${150 + w + 1},238 Z" fill="url(#skirt-${uid})" stroke="${pal.deep}" stroke-width="1.2"/>
+              <path d="M${150 - 60},306 Q150,332 ${150 + 60},306" fill="none" stroke="${pal.trim}" stroke-width="2.4" opacity="0.95"/>
+              <circle cx="${150 - 60}" cy="306" r="3.2" fill="${pal.accent}"/><circle cx="${150 + 60}" cy="306" r="3.2" fill="${pal.accent}"/>
+              <circle cx="${150 - 26}" cy="350" r="1.6" fill="#fff" opacity="0.9"/><circle cx="${150 + 32}" cy="342" r="1.8" fill="#fff" opacity="0.9"/><circle cx="150" cy="362" r="1.5" fill="#fff" opacity="0.85"/>
+              <path d="M${150 - sh + 4},188 Q150,182 ${150 + sh - 4},188 L${150 + w + 1},238 L${150 - w - 1},238 Z" fill="${pal.main}" stroke="${pal.deep}" stroke-width="1.2"/>
+              ${bustArcs}
+              <path d="M${150 - 8},190 L${150 + 8},190 L${150 + 6},236 L${150 - 6},236 Z" fill="${pal.light}"/>
+              <circle cx="150" cy="200" r="2.2" fill="${pal.accent}"/><circle cx="150" cy="212" r="2.2" fill="${pal.accent}"/><circle cx="150" cy="224" r="2.2" fill="${pal.accent}"/>
+              <path d="M${150 - sh + 4},188 Q150,182 ${150 + sh - 4},188" fill="none" stroke="${pal.trim}" stroke-width="3" stroke-dasharray="0.5 5" stroke-linecap="round"/>
+              <path d="M${150 - w - 1},232 L${150 + w + 1},232 L${150 + w - 1},240 L${150 - w + 1},240 Z" fill="${pal.accent}"/>
+              <g transform="translate(${150 + w + 3},246) rotate(12)">
+                <path d="M0,0 Q-13,-9 -6,-17 Q2,-11 0,0 Q13,-9 6,-17 Q-2,-11 0,0 Z" fill="${pal.accent}" stroke="#8f6cc0" stroke-width="1"/>
+                <circle r="3" fill="#8f6cc0"/>
+                <path d="M-2,2 L-6,18 M2,2 L7,19" stroke="${pal.accent}" stroke-width="2.4" stroke-linecap="round"/>
               </g>`,
             over: `
-              <circle cx="${150 - sh - 2}" cy="222" r="12" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.2"/>
-              <circle cx="${150 + sh + 2}" cy="222" r="12" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.2"/>`,
+              <ellipse cx="${150 - sh}" cy="194" rx="12" ry="10" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.1"/>
+              <ellipse cx="${150 + sh}" cy="194" rx="12" ry="10" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.1"/>
+              <path d="M${150 - sh - 9},198 q9,6 18,0 M${150 + sh - 9},198 q9,6 18,0" fill="none" stroke="${pal.trim}" stroke-width="1.6" opacity="0.9"/>
+              <circle cx="${hxd(-1)}" cy="291" r="${B.armW * 0.55 + 2}" fill="none" stroke="${pal.trim}" stroke-width="1.8" opacity="0.9"/>
+              <circle cx="${hxd(1)}" cy="291" r="${B.armW * 0.55 + 2}" fill="none" stroke="${pal.trim}" stroke-width="1.8" opacity="0.9"/>`,
           };
         }
 
-        if (idx === 1) { /* 月纱之约：及地长礼服 + 手套 */
-          const hem = 560;
+        if (idx === 1) { /* 月纱之约：及地渐变礼服 + 长手套 + 纱层 */
           return {
             shoes: "",
             behind: `
-              <path d="M${150 - w - 4},260 C ${150 - 70},330 ${150 - 96},440 ${150 - 100},${hem - 16}
-                       Q 150,${hem + 10} ${150 + 100},${hem - 16}
-                       C ${150 + 96},440 ${150 + 70},330 ${150 + w + 4},260 Z" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.2"/>
-              <path d="M${150 - w},258 C ${150 - 52},330 ${150 - 66},430 ${150 - 62},${hem - 40} Q 150,${hem - 20} ${150 + 62},${hem - 40} C ${150 + 66},430 ${150 + 52},330 ${150 + w},258 Z" fill="${pal.main}" opacity="0.75"/>
-              <path d="M${150 - 34},340 Q150,356 ${150 + 34},340 M${150 - 48},420 Q150,438 ${150 + 48},420 M${150 - 58},500 Q150,518 ${150 + 58},500" fill="none" stroke="${pal.accent}" stroke-width="1.6" opacity="0.55"/>
-              <circle cx="${150 - 40}" cy="380" r="2" fill="#fff" opacity="0.9"/><circle cx="${150 + 46}" cy="452" r="2.4" fill="#fff" opacity="0.9"/><circle cx="${150 + 22}" cy="330" r="1.6" fill="#fff" opacity="0.8"/><circle cx="${150 - 30}" cy="490" r="2" fill="#fff" opacity="0.85"/>
-              <path d="M${150 - sh},216 Q150,207 ${150 + sh},216 L${150 + w},262 L${150 - w},262 Z" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.2"/>
-              <path d="M${150 - sh},216 Q150,230 ${150 + sh},216 L${150 + sh - 4},224 Q150,238 ${150 - sh + 4},224 Z" fill="${pal.trim}"/>
-              <g transform="translate(150,240)">
-                <path d="M0,0 Q-16,-11 -7,-20 Q3,-13 0,0 Q16,-11 7,-20 Q-3,-13 0,0 Z" fill="${pal.accent}" stroke="#5f7fc0" stroke-width="1"/>
-                <circle r="3.6" fill="#5f7fc0"/>
-                <path d="M-2,3 L-8,26 M2,3 L9,28" stroke="${pal.accent}" stroke-width="2.6" stroke-linecap="round"/>
+              <path d="M${150 - w},240 Q${150 - 108},380 ${150 - 72},545 Q150,560 ${150 + 72},545 Q${150 + 108},380 ${150 + w},240 Z" fill="${pal.accent}" opacity="0.16"/>
+              <path d="M${150 - w - 1},238 C${150 - 54},320 ${150 - 70},440 ${150 - 76},546 Q150,564 ${150 + 76},546 C${150 + 70},440 ${150 + 54},320 ${150 + w + 1},238 Z" fill="url(#skirt-${uid})" stroke="${pal.deep}" stroke-width="1.1"/>
+              <path d="M150,252 Q${150 - 38},400 ${150 - 32},536 Q150,552 ${150 + 32},536 Q${150 + 38},400 150,252 Z" fill="${pal.light}" opacity="0.85" stroke="${pal.trim}" stroke-width="1"/>
+              <path d="M${150 - 70},520 Q${150 - 35},532 150,520 Q${150 + 35},532 ${150 + 70},520" fill="none" stroke="${pal.accent}" stroke-width="1.6" opacity="0.6"/>
+              <path d="M${150 - 62},490 Q${150 - 31},500 150,490 Q${150 + 31},500 ${150 + 62},490" fill="none" stroke="${pal.accent}" stroke-width="1.3" opacity="0.45"/>
+              <circle cx="${150 - 42}" cy="380" r="2" fill="#fff" opacity="0.9"/><circle cx="${150 + 48}" cy="452" r="2.4" fill="#fff" opacity="0.9"/><circle cx="${150 + 24}" cy="330" r="1.6" fill="#fff" opacity="0.8"/><circle cx="${150 - 34}" cy="470" r="2" fill="#fff" opacity="0.85"/>
+              <text x="${150 + 40}" y="392" font-size="11" fill="#cfe0ff" opacity="0.9">✦</text>
+              <text x="${150 - 56}" y="440" font-size="9" fill="#cfe0ff" opacity="0.8">✦</text>
+              <path d="M${150 - sh - 3},196 Q150,187 ${150 + sh + 3},196 L${150 + w + 1},238 L${150 - w - 1},238 Z" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.1"/>
+              ${bustArcs}
+              <path d="M${150 - sh - 3},196 Q150,208 ${150 + sh + 3},196 L${150 + sh - 1},205 Q150,217 ${150 - sh + 1},205 Z" fill="${pal.trim}"/>
+              <path d="M${150 - w - 1},233 L${150 + w + 1},233 L${150 + w},238 L${150 - w},238 Z" fill="${pal.accent}" opacity="0.8"/>
+              <g transform="translate(150,222)">
+                <path d="M0,0 Q-14,-10 -6,-18 Q2,-12 0,0 Q14,-10 6,-18 Q-2,-12 0,0 Z" fill="${pal.accent}" stroke="#5f7fc0" stroke-width="1"/>
+                <circle r="3.2" fill="#5f7fc0"/>
+                <path d="M-2,3 L-7,22 M2,3 L8,24" stroke="${pal.accent}" stroke-width="2.4" stroke-linecap="round"/>
               </g>`,
             over: `
-              <path d="M${150 - sh},220 Q${150 - sh - 16},262 ${150 - sh - 8},318" fill="none" stroke="${pal.light}" stroke-width="${B.armW + 1}" stroke-linecap="round" pathLength="100" stroke-dasharray="55 45" stroke-dashoffset="55"/>
-              <path d="M${150 + sh},220 Q${150 + sh + 16},262 ${150 + sh + 8},318" fill="none" stroke="${pal.light}" stroke-width="${B.armW + 1}" stroke-linecap="round" pathLength="100" stroke-dasharray="55 45" stroke-dashoffset="55"/>
-              <circle cx="${150 - sh - 8}" cy="322" r="${B.armW * 0.72 + 0.6}" fill="${pal.light}"/>
-              <circle cx="${150 + sh + 8}" cy="322" r="${B.armW * 0.72 + 0.6}" fill="${pal.light}"/>
-              <circle cx="${150 - sh - 2}" cy="221" r="10" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1"/>
-              <circle cx="${150 + sh + 2}" cy="221" r="10" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1"/>`,
+              <ellipse cx="${150 - sh - 2}" cy="198" rx="10" ry="8" fill="#fff" opacity="0.6" stroke="${pal.trim}" stroke-width="1"/>
+              <ellipse cx="${150 + sh + 2}" cy="198" rx="10" ry="8" fill="#fff" opacity="0.6" stroke="${pal.trim}" stroke-width="1"/>
+              <path d="M${exd(-1)},243 Q${150 - (sh + 13)},270 ${hxd(-1)},294" fill="none" stroke="${pal.light}" stroke-width="${B.armW * 0.82 + 1.5}" stroke-linecap="round"/>
+              <path d="M${exd(1)},243 Q${150 + (sh + 13)},270 ${hxd(1)},294" fill="none" stroke="${pal.light}" stroke-width="${B.armW * 0.82 + 1.5}" stroke-linecap="round"/>
+              <ellipse cx="${hxd(-1)}" cy="298" rx="${B.armW * 0.5 + 1}" ry="${B.armW * 0.62 + 1}" fill="${pal.light}"/>
+              <ellipse cx="${hxd(1)}" cy="298" rx="${B.armW * 0.5 + 1}" ry="${B.armW * 0.62 + 1}" fill="${pal.light}"/>
+              <path d="M${exd(-1) - 5},244 q5,-3 10,0 M${exd(1) - 5},244 q5,-3 10,0" fill="none" stroke="${pal.accent}" stroke-width="1.4" opacity="0.7"/>`,
           };
         }
 
-        /* 暗夜蔷薇：层叠哥特裙 + 长靴 */
-        const t1 = 340, t2 = 392, t3 = 445;
-        const zig = (y, half) => {
-          let d = `M${150 - half},${y}`;
-          const step = (half * 2) / 8;
-          for (let i = 0; i < 8; i++) {
-            d += ` L${150 - half + step * (i + 0.5)},${y + 14} L${150 - half + step * (i + 1)},${y}`;
-          }
-          return d;
-        };
+        /* 暗夜蔷薇：三层波浪哥特裙 + 系带长靴 + 露肩袖 */
+        const tier = (yBot, halfBot, fill, n, op) => `
+          <path d="M${150 - w - 1},238 C${150 - halfBot + 8},264 ${150 - halfBot},${yBot - 30} ${150 - halfBot},${yBot} ${scallop(150 - halfBot, 150 + halfBot, yBot, n, 10)} C${150 + halfBot},${yBot - 30} ${150 + halfBot - 8},264 ${150 + w + 1},238 Z" fill="${fill}" stroke="#151020" stroke-width="1.1" opacity="${op}"/>`;
+        const boot = (cx) => `
+          <path d="M${cx - 7.5},${L - 78} L${cx + 7.5},${L - 78} Q${cx + 9},${L - 30} ${cx + 8},${L - 6} Q${cx + 11},${L + 4} ${cx + 3},${L + 9} Q${cx - 9},${L + 9} ${cx - 8},${L - 6} Q${cx - 9},${L - 30} ${cx - 7.5},${L - 78} Z" fill="${pal.trim}" stroke="#151020" stroke-width="1.2"/>
+          <path d="M${cx - 8},${L - 78} h16 l-1,6 h-14 Z" fill="${pal.accent}"/>
+          <path d="M${cx - 5},${L - 60} h10 M${cx - 5},${L - 46} h10 M${cx - 5},${L - 32} h10" stroke="${pal.accent}" stroke-width="1.5"/>
+          <rect x="${cx - 2}" y="${L + 8}" width="4" height="8" rx="1.5" fill="#151020"/>`;
         return {
-          shoes: `
-            <path d="M${137 - hip * 0.4 - 2},${B.legLen - 96} h${B.legW + 6} v88 q0,10 -${(B.legW + 6) / 2},10 h-${B.legW + 6} q-3,-14 0,-98 Z" fill="${pal.trim}" stroke="#151020" stroke-width="1.3"/>
-            <path d="M${163 + hip * 0.4 - B.legW - 4},${B.legLen - 96} h${B.legW + 6} q3,84 0,98 h-${B.legW + 6} q-${(B.legW + 6) / 2},0 -${(B.legW + 6) / 2},-10 v-88 Z" fill="${pal.trim}" stroke="#151020" stroke-width="1.3"/>
-            <path d="M${137 - hip * 0.4},${B.legLen - 84} h${B.legW} M${137 - hip * 0.4},${B.legLen - 66} h${B.legW} M${137 - hip * 0.4},${B.legLen - 48} h${B.legW}" stroke="${pal.accent}" stroke-width="1.6"/>
-            <path d="M${163 + hip * 0.4 - B.legW},${B.legLen - 84} h${B.legW} M${163 + hip * 0.4 - B.legW},${B.legLen - 66} h${B.legW} M${163 + hip * 0.4 - B.legW},${B.legLen - 48} h${B.legW}" stroke="${pal.accent}" stroke-width="1.6"/>`,
+          shoes: boot(cxL) + boot(cxR),
           behind: `
-            <path d="M${150 - w - 4},260 C ${150 - 64},300 ${150 - 84},330 ${150 - 88},${t3} ${zig(t3, 88).replace("M", "L").replace(/^L[^ ]+ /, "")} L${150 + 88},${t3} C ${150 + 84},330 ${150 + 64},300 ${150 + w + 4},260 Z" fill="${pal.main}" stroke="#151020" stroke-width="1.3"/>
-            <path d="${zig(t3, 88)}" fill="none" stroke="#151020" stroke-width="1.2"/>
-            <path d="M${150 - w - 2},260 C ${150 - 58},296 ${150 - 74},320 ${150 - 78},${t2} ${zig(t2, 78).replace(/^M[^ ]+ /, "L")} L${150 + 78},${t2} C ${150 + 74},320 ${150 + 58},296 ${150 + w + 2},260 Z" fill="${pal.accent}" opacity="0.85" stroke="#151020" stroke-width="1.1"/>
-            <path d="M${150 - w},258 C ${150 - 50},290 ${150 - 62},308 ${150 - 66},${t1} ${zig(t1, 66).replace(/^M[^ ]+ /, "L")} L${150 + 66},${t1} C ${150 + 62},308 ${150 + 50},290 ${150 + w},258 Z" fill="${pal.light}" stroke="#151020" stroke-width="1.2"/>
-            <path d="M${150 - sh},215 Q150,207 ${150 + sh},215 L${150 + w},262 L${150 - w},262 Z" fill="${pal.main}" stroke="#151020" stroke-width="1.3"/>
-            <path d="M${150 - 10},220 L${150 + 10},232 M${150 + 10},220 L${150 - 10},232 M${150 - 10},232 L${150 + 10},244 M${150 + 10},232 L${150 - 10},244 M${150 - 10},244 L${150 + 10},256 M${150 + 10},244 L${150 - 10},256" stroke="${pal.accent}" stroke-width="1.8"/>
-            <path d="M142,196 h16 v6 h-16 Z" fill="${pal.accent}"/>
-            <g transform="translate(${150 - w - 4},270)">
-              <circle r="6.5" fill="${pal.accent}"/><circle r="3.4" fill="#7c1f38"/><circle cx="7" cy="4" r="4.6" fill="${pal.accent}"/><circle cx="7" cy="4" r="2.2" fill="#7c1f38"/>
+            ${tier(410, 82, pal.main, 7, 1)}
+            ${tier(365, 68, pal.accent, 6, 0.9)}
+            ${tier(322, 52, pal.light, 5, 1)}
+            <path d="M${150 - sh + 3},190 Q150,184 ${150 + sh - 3},190 L${150 + w + 1},238 L${150 - w - 1},238 Z" fill="${pal.main}" stroke="#151020" stroke-width="1.2"/>
+            <path d="M${150 - 18},196 Q${150 - 9},189 150,196 Q${150 + 9},189 ${150 + 18},196" fill="none" stroke="${pal.accent}" stroke-width="1.8"/>
+            <path d="M${150 - 9},204 L${150 + 9},214 M${150 + 9},204 L${150 - 9},214 M${150 - 9},214 L${150 + 9},224 M${150 + 9},214 L${150 - 9},224 M${150 - 9},224 L${150 + 9},233 M${150 + 9},224 L${150 - 9},233" stroke="${pal.accent}" stroke-width="1.7"/>
+            ${bustArcs}
+            <g transform="translate(${150 - w - 3},246)">
+              <circle r="6" fill="${pal.accent}"/><circle r="3" fill="#7c1f38"/><circle cx="7" cy="4" r="4.2" fill="${pal.accent}"/><circle cx="7" cy="4" r="2" fill="#7c1f38"/>
+              <path d="M2,8 q4,4 8,3" fill="none" stroke="#3a5a30" stroke-width="2"/>
             </g>`,
           over: `
-            <path d="M${150 - sh},220 Q${150 - sh - 16},262 ${150 - sh - 8},318" fill="none" stroke="${pal.main}" stroke-width="${B.armW + 2}" stroke-linecap="round" opacity="0.55"/>
-            <path d="M${150 + sh},220 Q${150 + sh + 16},262 ${150 + sh + 8},318" fill="none" stroke="${pal.main}" stroke-width="${B.armW + 2}" stroke-linecap="round" opacity="0.55"/>
-            <circle cx="${150 - sh - 8}" cy="314" r="${B.armW * 0.6 + 2}" fill="none" stroke="${pal.accent}" stroke-width="2.4"/>
-            <circle cx="${150 + sh + 8}" cy="314" r="${B.armW * 0.6 + 2}" fill="none" stroke="${pal.accent}" stroke-width="2.4"/>`,
+            <ellipse cx="${150 - sh - 1}" cy="206" rx="${B.armW * 0.62 + 1.5}" ry="3.6" fill="${pal.accent}"/>
+            <ellipse cx="${150 + sh + 1}" cy="206" rx="${B.armW * 0.62 + 1.5}" ry="3.6" fill="${pal.accent}"/>
+            <path d="M${exd(-1)},243 Q${150 - (sh + 13)},270 ${hxd(-1)},292" fill="none" stroke="${pal.main}" stroke-width="${B.armW * 0.82 + 2}" stroke-linecap="round" opacity="0.92"/>
+            <path d="M${exd(1)},243 Q${150 + (sh + 13)},270 ${hxd(1)},292" fill="none" stroke="${pal.main}" stroke-width="${B.armW * 0.82 + 2}" stroke-linecap="round" opacity="0.92"/>
+            <circle cx="${hxd(-1)}" cy="294" r="${B.armW * 0.5 + 2.5}" fill="none" stroke="${pal.accent}" stroke-width="1.6"/>
+            <circle cx="${hxd(1)}" cy="294" r="${B.armW * 0.5 + 2.5}" fill="none" stroke="${pal.accent}" stroke-width="1.6"/>
+            <path d="M143,160 Q150,164 157,160" fill="none" stroke="${pal.accent}" stroke-width="3"/>
+            <circle cx="150" cy="166" r="2.2" fill="${pal.accent}"/>`,
         };
       }
 
       function accessorySVG(idx) {
         if (idx === 0) { /* 蝴蝶结 */
-          return `<g transform="translate(191,56) rotate(18)">
-            <path d="M0,0 Q-18,-12 -8,-22 Q3,-15 0,0 Q18,-12 8,-22 Q-3,-15 0,0 Z" fill="#f4a0b8" stroke="#d4788f" stroke-width="1.4"/>
-            <circle r="4" fill="#d4788f"/>
-            <path d="M-2,3 L-8,18 M2,3 L9,19" stroke="#f4a0b8" stroke-width="3" stroke-linecap="round"/>
+          return `<g transform="translate(185,50) rotate(18)">
+            <path d="M0,0 Q-16,-11 -7,-20 Q2,-13 0,0 Q16,-11 7,-20 Q-2,-13 0,0 Z" fill="#f4a0b8" stroke="#d4788f" stroke-width="1.3"/>
+            <circle r="3.6" fill="#d4788f"/>
+            <path d="M-2,3 L-7,16 M2,3 L8,17" stroke="#f4a0b8" stroke-width="2.8" stroke-linecap="round"/>
           </g>`;
         }
         if (idx === 1) { /* 蕾丝发带 */
-          return `<path d="M99,74 Q150,48 201,74" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity="0.92"/>
-            <path d="M99,74 Q150,48 201,74" fill="none" stroke="#e8d4ee" stroke-width="2" stroke-dasharray="1 6" stroke-linecap="round"/>
-            <circle cx="108" cy="70" r="3" fill="#fff"/><circle cx="150" cy="52" r="3.4" fill="#fff"/><circle cx="192" cy="70" r="3" fill="#fff"/>`;
+          return `<path d="M103,68 Q150,44 197,68" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity="0.92"/>
+            <path d="M103,68 Q150,44 197,68" fill="none" stroke="#e8d4ee" stroke-width="1.8" stroke-dasharray="1 5.5" stroke-linecap="round"/>
+            <circle cx="110" cy="64" r="2.8" fill="#fff"/><circle cx="150" cy="47" r="3.2" fill="#fff"/><circle cx="190" cy="64" r="2.8" fill="#fff"/>`;
         }
         if (idx === 2) { /* 星星发夹 */
-          return `<text x="104" y="80" font-size="17" fill="#e8c34f" stroke="#c79a2c" stroke-width="0.6">✦</text>
-            <text x="117" y="96" font-size="11" fill="#f0d478">✦</text>
-            <text x="182" y="86" font-size="13" fill="#e8c34f">✦</text>`;
+          return `<text x="106" y="74" font-size="16" fill="#e8c34f" stroke="#c79a2c" stroke-width="0.6">✦</text>
+            <text x="118" y="90" font-size="10" fill="#f0d478">✦</text>
+            <text x="184" y="80" font-size="12" fill="#e8c34f">✦</text>`;
         }
         return "";
       }
@@ -646,22 +680,34 @@
         const E = EYE_COLORS[s.eyes];
         const O = OUTFITS[s.outfit];
         const hair = hairSet(s.hair, uid, H);
-        const fit = outfitSet(s.outfit, s, B, O.pal);
+        const fit = outfitSet(s.outfit, uid, B, O.pal);
 
-        const hipOff = B.hip * 0.42;
-        const leg = (cx) => `<path d="M${cx},292 L${cx},${B.legLen}" stroke="${S.base}" stroke-width="${B.legW}" stroke-linecap="round"/>
-          <ellipse cx="${cx}" cy="${B.legLen + 6}" rx="${B.legW * 0.62}" ry="5" fill="${S.base}"/>`;
+        const sh = B.sh, w = B.waist, hip = B.hip;
+        const cxL = 150 - hip * 0.42, cxR = 150 + hip * 0.42;
+        const t = B.legW / 2, k = B.legW * 0.36, a = B.legW * 0.24;
+        const L = B.legLen;
+        const skirtTop = s.outfit === 1 ? "#ffffff" : O.pal.light;
+        const skirtBot = s.outfit === 1 ? O.pal.trim : O.pal.main;
+
+        /* 腿：大腿→膝→踝渐收的实心形状（非拉伸） */
+        const leg = (cx, dir) => `
+          <path d="M${cx - t},266 Q${cx - t - 1},330 ${cx - k},385 Q${cx - a - 1},440 ${cx - a},${L} L${cx + a},${L} Q${cx + a + 1},440 ${cx + k},385 Q${cx + t + 1},330 ${cx + t},266 Z" fill="${S.base}"/>
+          <ellipse cx="${cx + dir * 3}" cy="${L + 5}" rx="9" ry="5.5" fill="${S.base}"/>`;
+
+        /* 手臂：上臂/前臂两段渐细 */
         const arm = (dir) => {
-          const sx = 150 + dir * B.sh;
-          const ex = 150 + dir * (B.sh + 16);
-          const hx = 150 + dir * (B.sh + 8);
-          return `<path d="M${sx},220 Q${ex},262 ${hx},318" fill="none" stroke="${S.base}" stroke-width="${B.armW}" stroke-linecap="round"/>
-            <circle cx="${hx}" cy="322" r="${B.armW * 0.72}" fill="${S.base}"/>`;
+          const sx = 150 + dir * (sh - 3);
+          const ex = 150 + dir * (sh + 13);
+          const hx = 150 + dir * (sh + 7);
+          return `
+          <path d="M${sx},192 Q${150 + dir * (sh + 8)},215 ${ex},243" fill="none" stroke="${S.base}" stroke-width="${B.armW}" stroke-linecap="round"/>
+          <path d="M${ex},243 Q${150 + dir * (sh + 13)},270 ${hx},294" fill="none" stroke="${S.base}" stroke-width="${B.armW * 0.82}" stroke-linecap="round"/>
+          <ellipse cx="${hx}" cy="299" rx="${B.armW * 0.5}" ry="${B.armW * 0.62}" fill="${S.base}"/>`;
         };
 
         return `<svg viewBox="0 0 300 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="角色形象">
           <defs>
-            <radialGradient id="iris-${uid}" cx="50%" cy="42%" r="60%">
+            <radialGradient id="iris-${uid}" cx="50%" cy="40%" r="62%">
               <stop offset="0%" stop-color="${E.iris}"/>
               <stop offset="100%" stop-color="${E.rim}"/>
             </radialGradient>
@@ -670,41 +716,49 @@
               <stop offset="35%" stop-color="${H.base}"/>
               <stop offset="100%" stop-color="${H.dark}"/>
             </linearGradient>
+            <linearGradient id="skirt-${uid}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${skirtTop}"/>
+              <stop offset="100%" stop-color="${skirtBot}"/>
+            </linearGradient>
           </defs>
 
-          <ellipse cx="150" cy="${B.legLen + 16}" rx="86" ry="12" fill="#6a4e8a" opacity="0.18"/>
+          <ellipse cx="150" cy="${L + 16}" rx="82" ry="11" fill="#6a4e8a" opacity="0.18"/>
 
           <!-- 图层1：身后头发 -->
           ${hair.back}
 
-          <!-- 图层2：腿（肤色随选项） -->
-          ${leg(137 - hipOff + B.legW / 2)}
-          ${leg(163 + hipOff - B.legW / 2)}
+          <!-- 图层2：颈 + 躯干（肤色，一体成型不留缝） -->
+          <path d="M144,138 L143.5,172 Q150,178 156.5,172 L156,138 Z" fill="${S.base}"/>
+          <path d="M144,148 Q150,154 156,148 L156,155 Q150,160 144,155 Z" fill="${S.shade}" opacity="0.45"/>
+          <path d="M141,166 Q${150 - sh + 3},173 ${150 - sh},188 Q${150 - sh + 3},214 ${150 - w},236 Q${150 - hip},252 ${150 - hip + 2},272 L${150 + hip - 2},272 Q${150 + hip},252 ${150 + w},236 Q${150 + sh - 3},214 ${150 + sh},188 Q${150 + sh - 3},173 159,166 Z" fill="${S.base}"/>
 
-          <!-- 图层3：鞋 -->
+          <!-- 图层3：腿（渐细实心，肤色随选项） -->
+          ${leg(cxL, -1)}
+          ${leg(cxR, 1)}
+
+          <!-- 图层4：鞋 / 靴 -->
           ${fit.shoes}
 
-          <!-- 图层4：裙身 + 上衣 -->
+          <!-- 图层5：裙身 + 上衣 -->
           ${fit.behind}
 
-          <!-- 图层5：颈 + 脸（肤色） -->
-          <path d="M143,172 h14 v34 h-14 Z" fill="${S.base}"/>
-          <path d="M143,178 q7,7 14,0 v6 q-7,5 -14,0 Z" fill="${S.shade}" opacity="0.35"/>
-          <path d="${facePath(s.face)}" fill="${S.base}" stroke="${S.shade}" stroke-width="1.6"/>
+          <!-- 图层6：脸（肤色）+ 阴影 -->
+          <path d="${facePath(s.face)}" fill="${S.base}" stroke="${S.shade}" stroke-width="1.4"/>
+          <path d="M112,64 Q150,78 188,64 L188,72 Q150,88 112,72 Z" fill="${S.shade}" opacity="0.18"/>
 
-          <!-- 图层6：五官（瞳色独立图层，位置固定在眼眶） -->
+          <!-- 图层7：五官（瞳色渐变独立图层） -->
           ${eyes(uid, E, s.face)}
-          ${browsAndMouth(H, s.face)}
+          ${browsAndMouth(H, S, s.face)}
 
-          <!-- 图层7：手臂（肤色）与袖口覆盖 -->
+          <!-- 图层8：手臂（肤色）与袖/手套覆盖 -->
           ${arm(-1)}
           ${arm(1)}
           ${fit.over}
 
-          <!-- 图层8：刘海 -->
+          <!-- 图层9：刘海 -->
           ${hair.front}
 
-          <!-- 图层9：配饰 -->
+          <!-- 图层10：配饰 -->
           ${accessorySVG(s.acc)}
         </svg>`;
       }
