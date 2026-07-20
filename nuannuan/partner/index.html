@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>学习伙伴编成 · AI Literacy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/nuannuan/create/create.css" />
+  <style>
+    .partner-wrap { max-width: 720px; margin: 0 auto; padding: 1.2rem 1rem 2.5rem; position: relative; z-index: 1; }
+    .card {
+      margin-top: 1.2rem;
+      padding: 1.4rem 1.2rem;
+      text-align: center;
+      background: var(--cream);
+      border: 1.5px solid var(--gold-line);
+      border-radius: 20px;
+      box-shadow: 0 12px 28px rgba(140, 110, 180, 0.16);
+    }
+    .avatar-box { width: min(200px, 50vw); margin: 1rem auto; }
+    .avatar-box .avatar-svg { width: 100%; height: auto; }
+    .meta { color: var(--muted); font-size: 0.92rem; margin: 0.4rem 0 0; }
+    .name-display {
+      font-family: var(--font-title);
+      font-size: 1.35rem;
+      color: #8a6a2e;
+      letter-spacing: 0.12em;
+      margin: 0;
+    }
+    .row-actions {
+      display: flex; flex-wrap: wrap; gap: 0.65rem; justify-content: center;
+      margin-top: 1.3rem;
+    }
+    .row-actions a {
+      display: inline-grid; place-items: center; text-decoration: none;
+    }
+    .note {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #a58ad6;
+    }
+  </style>
+</head>
+<body>
+  <div class="scene-bg" aria-hidden="true"></div>
+  <div class="sparkles" aria-hidden="true"></div>
+
+  <div class="partner-wrap">
+    <div class="top-bar">
+      <a class="back" href="/nuannuan/create" aria-label="返回初始形象创建">← 返回编辑形象</a>
+      <span class="hint-top">步骤 2 · 学习伙伴编成</span>
+    </div>
+
+    <header class="head">
+      <div class="crown" aria-hidden="true">♛</div>
+      <h1 class="title" style="letter-spacing:0.2em;text-indent:0.2em;">学习伙伴编成</h1>
+      <p class="sub" style="letter-spacing:0.12em;">选择同行的学习伙伴（后续扩展）</p>
+    </header>
+
+    <div class="card">
+      <p class="meta" id="status">正在读取你的探索形象…</p>
+      <div class="avatar-box" id="avatar" aria-label="你的角色"></div>
+      <p class="name-display" id="char-name">—</p>
+      <p class="meta">伙伴选择页为后续系统预留。你可先进入章节地图，或返回继续调整形象。</p>
+      <p class="meta" style="margin-top:0.6rem;">外观、伙伴与测验题目内容、能力评价无关。</p>
+
+      <div class="row-actions">
+        <a class="btn btn-random" href="/nuannuan/create">返回编辑形象</a>
+        <a class="btn btn-confirm" href="/nuannuan" id="go-next">进入知识星橱</a>
+        <a class="btn btn-random" href="/collect" style="background:linear-gradient(160deg,#8eb6d8,#6a8fc0);">进入章节地图</a>
+      </div>
+      <p class="note">后续将接入：任务清单 · 章节结算 · 成就徽章 · AI 知识图鉴</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { loadFinal, DEFAULT_AVATAR, normalizeAvatar } from "/js/nuannuan/avatar-config.js";
+    import { buildAvatarSVG } from "/js/nuannuan/avatar-preview.js";
+
+    const avatar = normalizeAvatar(loadFinal() || DEFAULT_AVATAR);
+    if (!loadFinal()) {
+      location.replace("/nuannuan/create");
+    } else {
+      document.getElementById("status").textContent = "形象创建完成，可以开始探索旅程。";
+      document.getElementById("char-name").textContent = avatar.name || "未命名探索者";
+      document.getElementById("avatar").innerHTML = buildAvatarSVG(avatar, "partner");
+    }
+  </script>
+</body>
+</html>

@@ -397,15 +397,21 @@
   <script>
     (() => {
       /* 未创建角色 → 先去初始形象创建页 */
-      const PROFILE_KEY = "nn_profile_v1";
+      const PROFILE_KEYS = ["nn_avatar_v1", "nn_profile_v1"];
       let profile = null;
-      try { profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null"); } catch { profile = null; }
-      if (!profile) {
+      for (const key of PROFILE_KEYS) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) { profile = JSON.parse(raw); break; }
+        } catch { /* ignore */ }
+      }
+      if (!profile || !profile.name) {
         location.replace("/nuannuan/create");
         return;
       }
       const profileBtn = document.getElementById("profile-btn");
       profileBtn.textContent = `👗 ${profile.name}`;
+      profileBtn.addEventListener("click", () => { location.href = "/nuannuan/create"; });
 
       const SHEET = "/assets/nuannuan-shop.png";
       const CARD_W = 197;

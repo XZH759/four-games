@@ -3,931 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>初始形象创建 · 奇迹暖暖</title>
+  <title>初始形象创建 · AI Literacy</title>
+  <meta name="description" content="进入 AI Literacy 游戏化测试前，创建你的专属学习角色形象。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --gold: #c9a256;
-      --gold-soft: #d9bd85;
-      --violet: #7a5f9a;
-      --font-title: "Noto Serif SC", serif;
-      --font-body: "Noto Sans SC", sans-serif;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-
-    body {
-      font-family: var(--font-body);
-      color: #5c4a6e;
-      background:
-        radial-gradient(ellipse 70% 40% at 50% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
-        radial-gradient(ellipse 50% 40% at 12% 80%, rgba(244, 184, 200, 0.35), transparent 60%),
-        radial-gradient(ellipse 50% 40% at 88% 75%, rgba(185, 163, 227, 0.4), transparent 60%),
-        linear-gradient(170deg, #ece2f7 0%, #f4e8f4 45%, #e6d9f2 100%);
-      min-height: 100vh;
-    }
-
-    .wrap {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 1.2rem 1rem 2.2rem;
-    }
-
-    .top-links {
-      display: flex; justify-content: space-between;
-      font-size: 0.85rem;
-      margin-bottom: 0.4rem;
-    }
-    .top-links a { color: #9b7fb8; text-decoration: none; }
-    .top-links a:hover { color: var(--gold); }
-
-    .head { text-align: center; margin-bottom: 1.1rem; }
-    .crown { font-size: 1.2rem; color: var(--gold); }
-    .title {
-      margin: 0.15rem 0 0.4rem;
-      font-family: var(--font-title);
-      font-size: clamp(1.7rem, 5vw, 2.4rem);
-      font-weight: 700;
-      letter-spacing: 0.3em;
-      text-indent: 0.3em;
-      background: linear-gradient(120deg, #a2762c, #d8b166, #a2762c);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    .sub {
-      margin: 0;
-      color: #9b7fb8;
-      font-size: 0.88rem;
-      letter-spacing: 0.2em;
-    }
-    .sub::before { content: "→ "; }
-    .sub::after { content: " ←"; }
-
-    .cols {
-      display: grid;
-      grid-template-columns: 240px 1fr 240px;
-      gap: 1rem;
-      align-items: start;
-    }
-
-    .panel {
-      background: rgba(255, 255, 255, 0.72);
-      border: 1.5px solid var(--gold-soft);
-      border-radius: 18px;
-      padding: 0.85rem 0.8rem;
-      box-shadow: 0 10px 24px rgba(140, 110, 180, 0.18);
-      backdrop-filter: blur(6px);
-    }
-    .panel-title {
-      margin: 0 0 0.65rem;
-      text-align: center;
-      font-family: var(--font-title);
-      font-weight: 700;
-      font-size: 0.98rem;
-      color: #8a6a2e;
-      letter-spacing: 0.25em;
-      text-indent: 0.25em;
-    }
-    .panel-title::before, .panel-title::after { content: " ⸻ "; color: var(--gold-soft); font-size: 0.7em; }
-
-    .opt-row {
-      display: grid;
-      grid-template-columns: 3.4rem 1.4rem 1fr 1.4rem;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.5rem 0.2rem;
-      border-bottom: 1px dashed rgba(201, 162, 86, 0.35);
-    }
-    .opt-row:last-child { border-bottom: 0; }
-    .opt-label { font-size: 0.82rem; font-weight: 700; color: var(--violet); }
-    .arrow {
-      appearance: none; border: 1px solid var(--gold-soft);
-      background: #fff;
-      color: #b08a3e;
-      width: 1.4rem; height: 1.4rem;
-      border-radius: 50%;
-      font-size: 0.7rem; line-height: 1;
-      cursor: pointer;
-      display: grid; place-items: center;
-      transition: all 0.12s;
-    }
-    .arrow:hover { background: #f6e8c8; transform: scale(1.12); }
-    .opt-value {
-      display: flex; align-items: center; justify-content: center; gap: 0.35rem;
-      font-size: 0.8rem;
-      text-align: center;
-      min-height: 1.5rem;
-    }
-    .dot {
-      width: 0.95rem; height: 0.95rem;
-      border-radius: 50%;
-      border: 1.5px solid rgba(140, 110, 60, 0.4);
-      box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.12);
-      flex: 0 0 auto;
-    }
-
-    /* ——— 中央立绘（图层娃娃） ——— */
-    .center { text-align: center; }
-    .preview {
-      position: relative;
-      width: min(310px, 80vw);
-      margin: 0 auto;
-      aspect-ratio: 1 / 2;
-      overflow: hidden;
-      border-radius: 155px 155px 22px 22px;
-      border: 2px solid rgba(217, 189, 133, 0.9);
-      box-shadow:
-        0 0 0 6px rgba(255, 255, 255, 0.35),
-        0 24px 50px rgba(140, 110, 180, 0.35);
-      background: #e9def4;
-    }
-    .preview .bg {
-      position: absolute; inset: -4%;
-      width: 108%; height: 108%;
-      object-fit: cover;
-      object-position: center 20%;
-      filter: blur(3px) brightness(1.02) saturate(0.9);
-    }
-    .preview .doll {
-      position: absolute; inset: 0;
-      display: grid; place-items: end center;
-    }
-    .preview .doll svg {
-      width: 88%;
-      height: 96%;
-      display: block;
-    }
-    .preview::after {
-      content: "";
-      position: absolute; inset: 0;
-      pointer-events: none;
-      border-radius: inherit;
-      box-shadow: inset 0 -30px 60px var(--aura, rgba(244, 184, 200, 0.35));
-      transition: box-shadow 0.4s;
-    }
-
-    .name-block { margin-top: 1rem; }
-    .name-title {
-      display: inline-block;
-      margin: 0 0 0.5rem;
-      padding: 0.25rem 1.2rem;
-      border-radius: 999px;
-      background: linear-gradient(160deg, #b99ce0, #9d7dd0);
-      color: #fff;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-indent: 0.2em;
-    }
-    .name-row { display: flex; justify-content: center; gap: 0.45rem; }
-    .name-input {
-      width: min(240px, 60vw);
-      border: 1.5px solid var(--gold-soft);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 0.55rem 1rem;
-      font: inherit; font-size: 0.9rem;
-      color: #5c4a6e;
-      text-align: center;
-    }
-    .name-input:focus { outline: none; border-color: #b08a3e; }
-    .dice {
-      appearance: none; border: 1.5px solid var(--gold-soft);
-      background: #fff;
-      border-radius: 12px;
-      width: 2.5rem;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: transform 0.15s;
-    }
-    .dice:hover { transform: rotate(20deg) scale(1.08); }
-
-    /* ——— 右栏选择卡 ——— */
-    .choice-list { display: grid; gap: 0.55rem; }
-    .choice-list.h { grid-template-columns: repeat(3, 1fr); }
-    .choice {
-      position: relative;
-      appearance: none;
-      border: 2px solid rgba(217, 189, 133, 0.55);
-      background: rgba(255, 255, 255, 0.65);
-      border-radius: 14px;
-      padding: 0.4rem 0.3rem;
-      cursor: pointer;
-      display: grid;
-      gap: 0.25rem;
-      justify-items: center;
-      transition: all 0.15s;
-      font: inherit;
-      color: var(--violet);
-    }
-    .choice:hover { border-color: var(--gold); transform: translateY(-2px); }
-    .choice.is-on {
-      border-color: var(--gold);
-      background: linear-gradient(170deg, #fff8e8, #fdefd2);
-      box-shadow: 0 6px 18px rgba(201, 162, 86, 0.35);
-    }
-    .choice .check {
-      position: absolute;
-      right: -7px; bottom: -7px;
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      background: linear-gradient(160deg, #f0cf8d, var(--gold));
-      color: #fff;
-      font-size: 0.75rem;
-      display: none;
-      place-items: center;
-      box-shadow: 0 2px 6px rgba(140, 100, 30, 0.4);
-      z-index: 2;
-    }
-    .choice.is-on .check { display: grid; }
-    .choice-label { font-size: 0.75rem; font-weight: 700; }
-
-    .mini-doll {
-      width: 100%;
-      aspect-ratio: 1 / 1.9;
-      display: grid; place-items: center;
-      overflow: hidden;
-    }
-    .mini-doll svg { width: 100%; height: 100%; }
-
-    .pager {
-      text-align: center;
-      font-size: 0.75rem;
-      color: #b08a3e;
-      margin: 0.3rem 0 0;
-    }
-
-    .actions {
-      display: flex; justify-content: center; gap: 0.8rem;
-      margin-top: 1.4rem;
-      flex-wrap: wrap;
-    }
-    .btn {
-      appearance: none; border: 0;
-      border-radius: 999px;
-      padding: 0.75rem 2.2rem;
-      font: inherit; font-size: 1rem; font-weight: 700;
-      cursor: pointer;
-      letter-spacing: 0.15em;
-      text-indent: 0.15em;
-      transition: transform 0.12s, filter 0.15s;
-    }
-    .btn:hover { transform: translateY(-2px); filter: brightness(1.06); }
-    .btn:active { transform: scale(0.97); }
-    .btn-random {
-      background: linear-gradient(160deg, #b99ce0, #8d6cc4);
-      color: #fff;
-      box-shadow: 0 10px 22px rgba(141, 108, 196, 0.4);
-    }
-    .btn-confirm {
-      background: linear-gradient(160deg, #f9a8c4, #e26a9a);
-      color: #fff;
-      box-shadow: 0 10px 22px rgba(226, 106, 154, 0.45);
-    }
-
-    .foot {
-      text-align: center;
-      margin-top: 1.1rem;
-      color: #a58ad6;
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%; bottom: 9vh;
-      transform: translateX(-50%) translateY(20px);
-      z-index: 90;
-      padding: 0.6rem 1.2rem;
-      border-radius: 999px;
-      background: rgba(70, 45, 100, 0.95);
-      border: 1px solid rgba(232, 200, 131, 0.5);
-      color: #f6e3b8;
-      font-size: 0.9rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s, transform 0.25s;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    @media (max-width: 900px) {
-      .cols { grid-template-columns: 1fr 1fr; }
-      .center { grid-column: 1 / -1; order: -1; }
-    }
-    @media (max-width: 560px) {
-      .cols { grid-template-columns: 1fr; }
-    }
-  </style>
+  <link rel="stylesheet" href="/css/game-theme.css" />
+  <link rel="stylesheet" href="/css/avatar-motion.css" />
+  <link rel="stylesheet" href="/nuannuan/create/create.css" />
 </head>
-<body>
+<body class="game-page create-page">
+  <div class="scene-bg" aria-hidden="true"></div>
+  <div class="scene-veil" aria-hidden="true"></div>
+  <div class="sparkles" aria-hidden="true"></div>
+
   <div class="wrap">
-    <div class="top-links">
-      <a href="/">← 返回大厅</a>
-      <a href="/nuannuan">进入商城 →</a>
+    <div class="top-bar">
+      <a class="back game-focus" href="/" aria-label="返回游戏大厅">
+        <span class="back-icon" aria-hidden="true"></span>
+        返回大厅
+      </a>
+      <span class="hint-top">创建后的形象可在后续个人信息中继续修改</span>
     </div>
 
     <header class="head">
-      <div class="crown">♛</div>
+      <div class="title-ribbon" aria-hidden="true"></div>
+      <div class="crown" aria-hidden="true">✦</div>
       <h1 class="title">初始形象创建</h1>
-      <p class="sub">选择你的专属学习伙伴</p>
+      <p class="sub">选择你的专属学习伙伴形象</p>
+      <div class="title-divider" aria-hidden="true"></div>
     </header>
 
+    <p class="placeholder-note" id="placeholder-note" hidden>
+      人物图层未就绪，已临时使用开发 fallback。正式 WebP 位于 <code>/assets/avatar/</code>。
+    </p>
+
     <div class="cols">
-      <!-- 左：外观定制 -->
-      <section class="panel">
-        <h2 class="panel-title">外观定制</h2>
-        <div id="opts"></div>
+      <section class="panel ornate game-panel panel-block is-open" id="panel-appear" aria-labelledby="appear-title">
+        <button type="button" class="panel-toggle" data-panel-toggle="panel-appear" aria-expanded="true" aria-controls="appear-opts">
+          <h2 class="panel-title" id="appear-title">外观定制</h2>
+          <span class="toggle-hint" aria-hidden="true">▾</span>
+        </button>
+        <div id="appear-opts" class="panel-body appear-scroll"></div>
       </section>
 
-      <!-- 中：图层娃娃 -->
-      <section class="center">
-        <div class="preview" id="preview">
-          <img class="bg" src="/assets/nuannuan-outfit-1.png" alt="" />
-          <div class="doll" id="doll"></div>
+      <section class="center" aria-labelledby="preview-title">
+        <h2 id="preview-title" class="sr-only">角色实时预览</h2>
+        <div class="stage-shell">
+          <div class="stage-crest" aria-hidden="true"></div>
+          <div class="stage" id="stage">
+            <div class="pedestal" aria-hidden="true"></div>
+            <div class="doll-host" id="doll" aria-live="polite"></div>
+            <div class="petals" aria-hidden="true"></div>
+          </div>
         </div>
         <div class="name-block">
           <p class="name-title">角色名称</p>
-          <div class="name-row">
-            <input class="name-input" id="name" maxlength="8" placeholder="点击输入名称" />
-            <button type="button" class="dice" id="dice" title="随机名字">🎲</button>
+          <div class="name-scroll" id="name-scroll">
+            <div class="name-row">
+              <input class="name-input game-focus" id="name" maxlength="8" placeholder="点击输入名称" aria-label="角色名称" aria-describedby="name-error" autocomplete="off" />
+              <button type="button" class="dice game-focus" id="dice" title="随机名字" aria-label="随机生成角色名称"></button>
+            </div>
+          </div>
+          <p class="name-error" id="name-error" role="alert" hidden></p>
+        </div>
+      </section>
+
+      <section class="right-col">
+        <div class="panel ornate game-panel panel-block is-open" id="panel-gender" style="margin-bottom: 0.75rem;" aria-labelledby="gender-title">
+          <button type="button" class="panel-toggle" data-panel-toggle="panel-gender" aria-expanded="true" aria-controls="gender-list">
+            <h2 class="panel-title" id="gender-title">性别选择</h2>
+            <span class="toggle-hint" aria-hidden="true">▾</span>
+          </button>
+          <div class="panel-body">
+            <div class="choice-list h gender-list" id="gender-list" role="listbox" aria-label="性别选择"></div>
+          </div>
+        </div>
+        <div class="panel ornate game-panel panel-block is-open" id="panel-body" style="margin-bottom: 0.75rem;" aria-labelledby="body-title">
+          <button type="button" class="panel-toggle" data-panel-toggle="panel-body" aria-expanded="true" aria-controls="body-list">
+            <h2 class="panel-title" id="body-title">体型选择</h2>
+            <span class="toggle-hint" aria-hidden="true">▾</span>
+          </button>
+          <div class="panel-body">
+            <div class="choice-list h" id="body-list" role="listbox" aria-label="体型选择"></div>
+          </div>
+        </div>
+        <div class="panel ornate game-panel panel-block is-open" id="panel-outfit" aria-labelledby="outfit-title">
+          <button type="button" class="panel-toggle" data-panel-toggle="panel-outfit" aria-expanded="true" aria-controls="outfit-list">
+            <h2 class="panel-title" id="outfit-title">初始套装</h2>
+            <span class="toggle-hint" aria-hidden="true">▾</span>
+          </button>
+          <div class="panel-body">
+            <div class="choice-list h" id="outfit-list" role="listbox" aria-label="初始套装"></div>
+            <p class="pager" id="pager">1 / 3</p>
           </div>
         </div>
       </section>
-
-      <!-- 右：体型 + 套装 -->
-      <section>
-        <div class="panel" style="margin-bottom: 0.9rem;">
-          <h2 class="panel-title">体型选择</h2>
-          <div class="choice-list h" id="body-list"></div>
-        </div>
-        <div class="panel">
-          <h2 class="panel-title">初始套装</h2>
-          <div class="choice-list h" id="outfit-list"></div>
-          <p class="pager" id="pager">1 / 3</p>
-        </div>
-      </section>
     </div>
 
-    <div class="actions">
-      <button type="button" class="btn btn-random" id="random">随机生成 🎲</button>
-      <button type="button" class="btn btn-confirm" id="confirm">确认进入 ✦</button>
+    <div class="actions dock-safe">
+      <button type="button" class="btn btn-random game-button-secondary" id="random" aria-label="随机生成角色外观与名称">随机生成</button>
+      <button type="button" class="btn btn-confirm game-button-primary" id="confirm" aria-label="确认进入学习伙伴编成">确认进入 ✦</button>
     </div>
-    <p class="foot">后续可在「个人信息」中修改形象</p>
+    <p class="foot">后续可在「个人信息」中修改形象 · 外观与测验能力无关</p>
   </div>
 
-  <div class="toast" id="toast"></div>
-
-  <script>
-    (() => {
-      const PROFILE_KEY = "nn_profile_v1";
-
-      /* ═══════════ 图层数据 ═══════════ */
-      const HAIR_STYLES = ["波浪长发", "公主卷", "双马尾", "齐肩短发", "侧编发", "高马尾"];
-
-      const HAIR_COLORS = [
-        { n: "亚麻金",   base: "#d9c39a", dark: "#b0946a", light: "#f0e4c6" },
-        { n: "月光银",   base: "#dfe3f0", dark: "#aab1cc", light: "#f6f8fd" },
-        { n: "蜜茶棕",   base: "#a9805b", dark: "#7c5a3c", light: "#c9a97f" },
-        { n: "樱花粉",   base: "#f4b8c8", dark: "#d3849e", light: "#fbdce6" },
-        { n: "薰衣草紫", base: "#b9a3e3", dark: "#8b72c2", light: "#d8cbf3" },
-        { n: "夜空黑",   base: "#4a4458", dark: "#2e2a3a", light: "#6f6886" },
-      ];
-
-      const SKINS = [
-        { n: "瓷白", base: "#fdeee4", shade: "#f0d4c2" },
-        { n: "暖白", base: "#f9e2ce", shade: "#e9c6ab" },
-        { n: "自然", base: "#eec9a4", shade: "#d8ad83" },
-        { n: "小麦", base: "#d9aa7e", shade: "#bd8c60" },
-      ];
-
-      const EYE_COLORS = [
-        { n: "紫罗兰", iris: "#9678e0", rim: "#5c4699" },
-        { n: "湖水蓝", iris: "#66a4e6", rim: "#3a6cab" },
-        { n: "琥珀金", iris: "#dea845", rim: "#9c7127" },
-        { n: "樱桃红", iris: "#de7386", rim: "#a04352" },
-        { n: "翡翠绿", iris: "#57c493", rim: "#31855f" },
-      ];
-
-      const FACES = ["标准", "圆润", "尖俏"];
-      const ACCS = ["蝴蝶结", "蕾丝发带", "星星发夹", "无配饰"];
-
-      /* 体型：只改身体骨架参数（肩/腰/臀/四肢/腿长），背景与头部不动 */
-      const BODY_TYPES = [
-        { n: "纤细型", p: { sh: 26, waist: 17, hip: 25, armW: 9,    legW: 13, legLen: 500, bust: 0 } },
-        { n: "标准型", p: { sh: 30, waist: 21, hip: 30, armW: 10.5, legW: 16, legLen: 494, bust: 2 } },
-        { n: "活泼型", p: { sh: 34, waist: 26, hip: 35, armW: 12,   legW: 19, legLen: 482, bust: 4 } },
-      ];
-
-      const OUTFITS = [
-        { n: "星辉花嫁", pal: { main: "#f6c0d6", light: "#fdeaf2", accent: "#a98ade", trim: "#ffffff", deep: "#e296b8" }, aura: "rgba(244, 184, 200, 0.45)" },
-        { n: "月纱之约", pal: { main: "#e9eefb", light: "#ffffff", accent: "#7f9fdf", trim: "#cfdcf6", deep: "#b9c9ec" }, aura: "rgba(150, 180, 235, 0.5)" },
-        { n: "暗夜蔷薇", pal: { main: "#3c2c40", light: "#5c4358", accent: "#a83050", trim: "#241b2c", deep: "#2c2032" }, aura: "rgba(140, 60, 90, 0.5)" },
-      ];
-
-      const NAMES = ["暖暖", "星璃", "雪见", "岚音", "桃夭", "月见草", "绮罗", "苏芮", "小鹿", "菱纱", "洛神赋", "云裳"];
-
-      const sel = { hair: 0, hairColor: 0, skin: 1, eyes: 0, face: 0, acc: 0, body: 1, outfit: 0 };
-
-      /* ═══════════ SVG 娃娃渲染器（暖暖风格头身比） ═══════════ */
-      /* 画布 300 × 620；脸 y≈43-155，眼睛 y≈110，肩 y≈188，腰 y≈236，臀 y≈268 */
-
-      function facePath(i) {
-        if (i === 1) { /* 圆润：脸颊更饱满 */
-          return "M105,88 Q105,126 122,142 Q136,155 150,156 Q164,155 178,142 Q195,126 195,88 Q193,46 150,41 Q107,46 105,88 Z";
-        }
-        if (i === 2) { /* 尖俏：下巴收尖 */
-          return "M108,84 Q106,120 126,138 Q140,148 150,157 Q160,148 174,138 Q194,120 192,84 Q192,46 150,41 Q108,46 108,84 Z";
-        }
-        return "M108,86 Q107,122 123,139 Q136,152 150,153 Q164,152 177,139 Q193,122 192,86 Q192,48 150,43 Q108,48 108,86 Z";
-      }
-
-      /* 大眼睛：眼白/虹膜渐变/上眼睑阴影/瞳孔/双高光/睫毛/卧蚕 */
-      function eyes(uid, E, faceIdx) {
-        const ry = faceIdx === 1 ? 12.8 : 12;
-        const one = (cx, f) => `
-          <path d="M${cx + f * 9},96 Q${cx},92 ${cx - f * 8},95.5" fill="none" stroke="#caa4b2" stroke-width="1.1" opacity="0.8"/>
-          <ellipse cx="${cx}" cy="110" rx="10" ry="${ry}" fill="#fff" stroke="#decfda" stroke-width="0.6"/>
-          <ellipse cx="${cx}" cy="111" rx="8" ry="10.5" fill="url(#iris-${uid})"/>
-          <ellipse cx="${cx}" cy="105" rx="8" ry="5" fill="${E.rim}" opacity="0.45"/>
-          <ellipse cx="${cx}" cy="112" rx="3.8" ry="5" fill="#221623"/>
-          <ellipse cx="${cx}" cy="117" rx="4.4" ry="2" fill="${E.iris}" opacity="0.55"/>
-          <circle cx="${cx - 3}" cy="104.5" r="3" fill="#fff" opacity="0.95"/>
-          <circle cx="${cx + 3.4}" cy="115" r="1.8" fill="#fff" opacity="0.85"/>
-          <path d="M${cx + f * 12},104 Q${cx},94.5 ${cx - f * 10},102" fill="none" stroke="#2c1f28" stroke-width="3.6" stroke-linecap="round"/>
-          <path d="M${cx + f * 11.6},104.4 Q${cx + f * 15},101 ${cx + f * 16.4},96.8" fill="none" stroke="#2c1f28" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M${cx + f * 11.2},107 Q${cx + f * 15.4},106.4 ${cx + f * 17.6},104" fill="none" stroke="#2c1f28" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M${cx + f * 8},121.5 Q${cx},124.5 ${cx - f * 7},122.5" fill="none" stroke="#b895a8" stroke-width="1.3" opacity="0.8"/>`;
-        return one(130, -1) + one(170, 1);
-      }
-
-      function browsAndMouth(H, S, faceIdx) {
-        const blush = faceIdx === 1 ? 0.5 : faceIdx === 2 ? 0.22 : 0.32;
-        return `
-          <path d="M119,88.5 Q130,83.5 139,87" fill="none" stroke="${H.dark}" stroke-width="2" stroke-linecap="round"/>
-          <path d="M161,87 Q170,83.5 181,88.5" fill="none" stroke="${H.dark}" stroke-width="2" stroke-linecap="round"/>
-          <path d="M150.5,123 q1.6,2 0,3.8" fill="none" stroke="${S.shade}" stroke-width="1.3" stroke-linecap="round"/>
-          <path d="M144.5,135 Q150,139.8 155.5,135" fill="none" stroke="#c26875" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M147,141 Q150,142.6 153,141" fill="none" stroke="#e8b8c0" stroke-width="1" opacity="0.7"/>
-          <ellipse cx="122" cy="123" rx="7" ry="3.6" fill="#f7a8b8" opacity="${blush}"/>
-          <ellipse cx="178" cy="123" rx="7" ry="3.6" fill="#f7a8b8" opacity="${blush}"/>`;
-      }
-
-      /* 发型：back（身后）+ front（刘海，最上层），含发丝线与高光 */
-      function hairSet(styleIdx, uid, H) {
-        const g = `url(#hair-${uid})`;
-        const cap = `<path d="M104,98 Q95,34 150,28 Q205,34 196,98 Q192,64 150,54 Q108,64 104,98 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>`;
-        const bangs = `
-          <path d="M104,94 Q104,48 150,42 Q196,48 196,94 Q189,84 181,92 Q175,66 163,87 Q154,64 146,87 Q135,66 125,91 Q113,83 104,94 Z"
-                fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-          <path d="M128,58 Q123,74 121,86 M150,54 Q149,68 148,80 M172,58 Q177,74 179,86" fill="none" stroke="${H.dark}" stroke-width="1.1" opacity="0.35"/>
-          <path d="M120,60 Q150,50 180,60" fill="none" stroke="${H.light}" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>`;
-
-        let back = "";
-        if (styleIdx === 0) { /* 波浪长发 */
-          back = `
-            <path d="M104,78 Q78,140 88,205 Q74,268 90,330 Q78,392 96,442 Q108,452 114,438 Q100,386 112,330 Q100,270 114,210 Q104,144 118,84 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <path d="M196,78 Q222,140 212,205 Q226,268 210,330 Q222,392 204,442 Q192,452 186,438 Q200,386 188,330 Q200,270 186,210 Q196,144 182,84 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <path d="M98,150 Q90,230 100,310 M202,150 Q210,230 200,310" fill="none" stroke="${H.dark}" stroke-width="1.2" opacity="0.3"/>`;
-        } else if (styleIdx === 1) { /* 公主卷 */
-          const curl = (cx) => `
-            <circle cx="${cx}" cy="316" r="13" fill="${g}" stroke="${H.dark}" stroke-width="1.2"/>
-            <circle cx="${cx + 3}" cy="336" r="10" fill="${g}" stroke="${H.dark}" stroke-width="1.1"/>
-            <circle cx="${cx}" cy="352" r="7" fill="${g}" stroke="${H.dark}" stroke-width="1"/>
-            <circle cx="${cx - 3}" cy="332" r="3.4" fill="${H.light}" opacity="0.9"/>`;
-          back = `
-            <path d="M104,82 Q86,150 94,225 Q88,272 98,306 L120,296 Q110,255 116,205 Q108,148 118,86 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <path d="M196,82 Q214,150 206,225 Q212,272 202,306 L180,296 Q190,255 184,205 Q192,148 182,86 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            ${curl(100)} ${curl(200)}`;
-        } else if (styleIdx === 2) { /* 双马尾 */
-          back = `
-            <path d="M106,66 Q64,130 76,205 Q62,272 84,330 Q96,340 102,326 Q88,274 100,214 Q92,142 116,74 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <path d="M194,66 Q236,130 224,205 Q238,272 216,330 Q204,340 198,326 Q212,274 200,214 Q208,142 184,74 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <path d="M88,140 Q80,220 92,290 M212,140 Q220,220 208,290" fill="none" stroke="${H.dark}" stroke-width="1.1" opacity="0.3"/>
-            <circle cx="108" cy="63" r="6.5" fill="#e88ab0" stroke="#c94f82" stroke-width="1.2"/>
-            <circle cx="192" cy="63" r="6.5" fill="#e88ab0" stroke="#c94f82" stroke-width="1.2"/>`;
-        } else if (styleIdx === 3) { /* 齐肩短发 */
-          back = `
-            <path d="M118,160 Q150,178 182,160 L182,180 Q150,196 118,180 Z" fill="${g}"/>
-            <path d="M104,80 Q92,134 98,172 Q102,190 122,184 Q112,154 114,100 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <path d="M196,80 Q208,134 202,172 Q198,190 178,184 Q188,154 186,100 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>`;
-        } else if (styleIdx === 4) { /* 侧编发 */
-          const bead = (cy, r) => `<ellipse cx="${108 - (cy - 165) * 0.08}" cy="${cy}" rx="${r}" ry="${r * 0.82}" fill="${g}" stroke="${H.dark}" stroke-width="1.1"/>`;
-          back = `
-            <path d="M196,80 Q206,130 200,166 Q194,182 180,176 Q188,148 184,98 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <path d="M104,80 Q96,126 102,164 L120,156 Q112,128 114,96 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            ${bead(172, 11)} ${bead(192, 10.5)} ${bead(211, 10)} ${bead(229, 9)} ${bead(246, 8)} ${bead(262, 7)}
-            <path d="M99,272 L95,286 M102,272 L106,285" stroke="${H.dark}" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="100" cy="269" r="4.5" fill="#e26a9a"/>`;
-        } else { /* 高马尾 */
-          back = `
-            <ellipse cx="150" cy="26" rx="22" ry="12" fill="${g}" stroke="${H.dark}" stroke-width="1.2"/>
-            <path d="M162,30 Q208,74 200,145 Q214,205 194,266 Q184,278 178,264 Q192,208 180,152 Q188,92 152,40 Z" fill="${g}" stroke="${H.dark}" stroke-width="1.3"/>
-            <path d="M192,90 Q200,160 190,230" fill="none" stroke="${H.dark}" stroke-width="1.1" opacity="0.3"/>
-            <path d="M158,26 Q166,18 174,26 Q166,34 158,26 Z" fill="#e26a9a" stroke="#c94f82" stroke-width="1"/>`;
-        }
-        return { back: back + cap, front: bangs };
-      }
-
-      /* 波浪裙边：从 (xL,y) 起向右画 n 个圆弧 */
-      function scallop(xL, xR, y, n, d) {
-        const wd = (xR - xL) / n;
-        let p = "";
-        for (let i = 0; i < n; i++) {
-          p += ` Q${xL + wd * (i + 0.5)},${y + d} ${xL + wd * (i + 1)},${y}`;
-        }
-        return p;
-      }
-
-      /* 服装：behind（画在手臂前）+ over（袖/手套，画在手臂后）+ shoes */
-      function outfitSet(idx, uid, B, pal) {
-        const w = B.waist, sh = B.sh, hip = B.hip, L = B.legLen;
-        const cxL = 150 - hip * 0.42, cxR = 150 + hip * 0.42;
-        const exd = (d) => 150 + d * (sh + 13);   /* 肘 x */
-        const hxd = (d) => 150 + d * (sh + 7);    /* 手 x */
-        const bustArcs = `
-          <path d="M${150 - 14 - B.bust},205 q7,6 14,0 M${150 + B.bust},205 q7,6 14,0" fill="none" stroke="${pal.deep}" stroke-width="1.2" opacity="0.45"/>`;
-
-        if (idx === 0) { /* 星辉花嫁：渐变蓬蓬裙 + 高跟鞋 */
-          const pump = (cx) => `
-            <path d="M${cx - 7},${L - 5} Q${cx},${L - 10} ${cx + 7},${L - 5} Q${cx + 10},${L + 5} ${cx},${L + 9} Q${cx - 10},${L + 5} ${cx - 7},${L - 5} Z" fill="${pal.main}" stroke="${pal.deep}" stroke-width="1.2"/>
-            <path d="M${cx - 7},${L - 3} Q${cx},${L} ${cx + 7},${L - 3}" fill="none" stroke="${pal.deep}" stroke-width="1.3"/>
-            <circle cx="${cx}" cy="${L + 2.5}" r="2" fill="${pal.accent}"/>
-            <rect x="${cx - 1.6}" y="${L + 8}" width="3.4" height="7" rx="1.4" fill="${pal.deep}"/>`;
-          return {
-            shoes: pump(cxL) + pump(cxR),
-            behind: `
-              <path d="M${150 - w - 2},240 C${150 - 56},282 ${150 - 76},330 ${150 - 80},404 ${scallop(150 - 80, 150 + 80, 404, 7, 11)} C${150 + 76},330 ${150 + 56},282 ${150 + w + 2},240 Z" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1"/>
-              <circle cx="${150 - 44}" cy="392" r="1.8" fill="#fff"/><circle cx="150" cy="398" r="1.8" fill="#fff"/><circle cx="${150 + 44}" cy="392" r="1.8" fill="#fff"/>
-              <path d="M${150 - w - 1},238 C${150 - 50},276 ${150 - 66},318 ${150 - 70},378 ${scallop(150 - 70, 150 + 70, 378, 6, 13)} C${150 + 66},318 ${150 + 50},276 ${150 + w + 1},238 Z" fill="url(#skirt-${uid})" stroke="${pal.deep}" stroke-width="1.2"/>
-              <path d="M${150 - 60},306 Q150,332 ${150 + 60},306" fill="none" stroke="${pal.trim}" stroke-width="2.4" opacity="0.95"/>
-              <circle cx="${150 - 60}" cy="306" r="3.2" fill="${pal.accent}"/><circle cx="${150 + 60}" cy="306" r="3.2" fill="${pal.accent}"/>
-              <circle cx="${150 - 26}" cy="350" r="1.6" fill="#fff" opacity="0.9"/><circle cx="${150 + 32}" cy="342" r="1.8" fill="#fff" opacity="0.9"/><circle cx="150" cy="362" r="1.5" fill="#fff" opacity="0.85"/>
-              <path d="M${150 - sh + 4},188 Q150,182 ${150 + sh - 4},188 L${150 + w + 1},238 L${150 - w - 1},238 Z" fill="${pal.main}" stroke="${pal.deep}" stroke-width="1.2"/>
-              ${bustArcs}
-              <path d="M${150 - 8},190 L${150 + 8},190 L${150 + 6},236 L${150 - 6},236 Z" fill="${pal.light}"/>
-              <circle cx="150" cy="200" r="2.2" fill="${pal.accent}"/><circle cx="150" cy="212" r="2.2" fill="${pal.accent}"/><circle cx="150" cy="224" r="2.2" fill="${pal.accent}"/>
-              <path d="M${150 - sh + 4},188 Q150,182 ${150 + sh - 4},188" fill="none" stroke="${pal.trim}" stroke-width="3" stroke-dasharray="0.5 5" stroke-linecap="round"/>
-              <path d="M${150 - w - 1},232 L${150 + w + 1},232 L${150 + w - 1},240 L${150 - w + 1},240 Z" fill="${pal.accent}"/>
-              <g transform="translate(${150 + w + 3},246) rotate(12)">
-                <path d="M0,0 Q-13,-9 -6,-17 Q2,-11 0,0 Q13,-9 6,-17 Q-2,-11 0,0 Z" fill="${pal.accent}" stroke="#8f6cc0" stroke-width="1"/>
-                <circle r="3" fill="#8f6cc0"/>
-                <path d="M-2,2 L-6,18 M2,2 L7,19" stroke="${pal.accent}" stroke-width="2.4" stroke-linecap="round"/>
-              </g>`,
-            over: `
-              <ellipse cx="${150 - sh}" cy="194" rx="12" ry="10" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.1"/>
-              <ellipse cx="${150 + sh}" cy="194" rx="12" ry="10" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.1"/>
-              <path d="M${150 - sh - 9},198 q9,6 18,0 M${150 + sh - 9},198 q9,6 18,0" fill="none" stroke="${pal.trim}" stroke-width="1.6" opacity="0.9"/>
-              <circle cx="${hxd(-1)}" cy="291" r="${B.armW * 0.55 + 2}" fill="none" stroke="${pal.trim}" stroke-width="1.8" opacity="0.9"/>
-              <circle cx="${hxd(1)}" cy="291" r="${B.armW * 0.55 + 2}" fill="none" stroke="${pal.trim}" stroke-width="1.8" opacity="0.9"/>`,
-          };
-        }
-
-        if (idx === 1) { /* 月纱之约：及地渐变礼服 + 长手套 + 纱层 */
-          return {
-            shoes: "",
-            behind: `
-              <path d="M${150 - w},240 Q${150 - 108},380 ${150 - 72},545 Q150,560 ${150 + 72},545 Q${150 + 108},380 ${150 + w},240 Z" fill="${pal.accent}" opacity="0.16"/>
-              <path d="M${150 - w - 1},238 C${150 - 54},320 ${150 - 70},440 ${150 - 76},546 Q150,564 ${150 + 76},546 C${150 + 70},440 ${150 + 54},320 ${150 + w + 1},238 Z" fill="url(#skirt-${uid})" stroke="${pal.deep}" stroke-width="1.1"/>
-              <path d="M150,252 Q${150 - 38},400 ${150 - 32},536 Q150,552 ${150 + 32},536 Q${150 + 38},400 150,252 Z" fill="${pal.light}" opacity="0.85" stroke="${pal.trim}" stroke-width="1"/>
-              <path d="M${150 - 70},520 Q${150 - 35},532 150,520 Q${150 + 35},532 ${150 + 70},520" fill="none" stroke="${pal.accent}" stroke-width="1.6" opacity="0.6"/>
-              <path d="M${150 - 62},490 Q${150 - 31},500 150,490 Q${150 + 31},500 ${150 + 62},490" fill="none" stroke="${pal.accent}" stroke-width="1.3" opacity="0.45"/>
-              <circle cx="${150 - 42}" cy="380" r="2" fill="#fff" opacity="0.9"/><circle cx="${150 + 48}" cy="452" r="2.4" fill="#fff" opacity="0.9"/><circle cx="${150 + 24}" cy="330" r="1.6" fill="#fff" opacity="0.8"/><circle cx="${150 - 34}" cy="470" r="2" fill="#fff" opacity="0.85"/>
-              <text x="${150 + 40}" y="392" font-size="11" fill="#cfe0ff" opacity="0.9">✦</text>
-              <text x="${150 - 56}" y="440" font-size="9" fill="#cfe0ff" opacity="0.8">✦</text>
-              <path d="M${150 - sh - 3},196 Q150,187 ${150 + sh + 3},196 L${150 + w + 1},238 L${150 - w - 1},238 Z" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.1"/>
-              ${bustArcs}
-              <path d="M${150 - sh - 3},196 Q150,208 ${150 + sh + 3},196 L${150 + sh - 1},205 Q150,217 ${150 - sh + 1},205 Z" fill="${pal.trim}"/>
-              <path d="M${150 - w - 1},233 L${150 + w + 1},233 L${150 + w},238 L${150 - w},238 Z" fill="${pal.accent}" opacity="0.8"/>
-              <g transform="translate(150,222)">
-                <path d="M0,0 Q-14,-10 -6,-18 Q2,-12 0,0 Q14,-10 6,-18 Q-2,-12 0,0 Z" fill="${pal.accent}" stroke="#5f7fc0" stroke-width="1"/>
-                <circle r="3.2" fill="#5f7fc0"/>
-                <path d="M-2,3 L-7,22 M2,3 L8,24" stroke="${pal.accent}" stroke-width="2.4" stroke-linecap="round"/>
-              </g>`,
-            over: `
-              <ellipse cx="${150 - sh - 2}" cy="198" rx="10" ry="8" fill="#fff" opacity="0.6" stroke="${pal.trim}" stroke-width="1"/>
-              <ellipse cx="${150 + sh + 2}" cy="198" rx="10" ry="8" fill="#fff" opacity="0.6" stroke="${pal.trim}" stroke-width="1"/>
-              <path d="M${exd(-1)},243 Q${150 - (sh + 13)},270 ${hxd(-1)},294" fill="none" stroke="${pal.light}" stroke-width="${B.armW * 0.82 + 1.5}" stroke-linecap="round"/>
-              <path d="M${exd(1)},243 Q${150 + (sh + 13)},270 ${hxd(1)},294" fill="none" stroke="${pal.light}" stroke-width="${B.armW * 0.82 + 1.5}" stroke-linecap="round"/>
-              <ellipse cx="${hxd(-1)}" cy="298" rx="${B.armW * 0.5 + 1}" ry="${B.armW * 0.62 + 1}" fill="${pal.light}"/>
-              <ellipse cx="${hxd(1)}" cy="298" rx="${B.armW * 0.5 + 1}" ry="${B.armW * 0.62 + 1}" fill="${pal.light}"/>
-              <path d="M${exd(-1) - 5},244 q5,-3 10,0 M${exd(1) - 5},244 q5,-3 10,0" fill="none" stroke="${pal.accent}" stroke-width="1.4" opacity="0.7"/>`,
-          };
-        }
-
-        /* 暗夜蔷薇：三层波浪哥特裙 + 系带长靴 + 露肩袖 */
-        const tier = (yBot, halfBot, fill, n, op) => `
-          <path d="M${150 - w - 1},238 C${150 - halfBot + 8},264 ${150 - halfBot},${yBot - 30} ${150 - halfBot},${yBot} ${scallop(150 - halfBot, 150 + halfBot, yBot, n, 10)} C${150 + halfBot},${yBot - 30} ${150 + halfBot - 8},264 ${150 + w + 1},238 Z" fill="${fill}" stroke="#151020" stroke-width="1.1" opacity="${op}"/>`;
-        const boot = (cx) => `
-          <path d="M${cx - 7.5},${L - 78} L${cx + 7.5},${L - 78} Q${cx + 9},${L - 30} ${cx + 8},${L - 6} Q${cx + 11},${L + 4} ${cx + 3},${L + 9} Q${cx - 9},${L + 9} ${cx - 8},${L - 6} Q${cx - 9},${L - 30} ${cx - 7.5},${L - 78} Z" fill="${pal.trim}" stroke="#151020" stroke-width="1.2"/>
-          <path d="M${cx - 8},${L - 78} h16 l-1,6 h-14 Z" fill="${pal.accent}"/>
-          <path d="M${cx - 5},${L - 60} h10 M${cx - 5},${L - 46} h10 M${cx - 5},${L - 32} h10" stroke="${pal.accent}" stroke-width="1.5"/>
-          <rect x="${cx - 2}" y="${L + 8}" width="4" height="8" rx="1.5" fill="#151020"/>`;
-        return {
-          shoes: boot(cxL) + boot(cxR),
-          behind: `
-            ${tier(410, 82, pal.main, 7, 1)}
-            ${tier(365, 68, pal.accent, 6, 0.9)}
-            ${tier(322, 52, pal.light, 5, 1)}
-            <path d="M${150 - sh + 3},190 Q150,184 ${150 + sh - 3},190 L${150 + w + 1},238 L${150 - w - 1},238 Z" fill="${pal.main}" stroke="#151020" stroke-width="1.2"/>
-            <path d="M${150 - 18},196 Q${150 - 9},189 150,196 Q${150 + 9},189 ${150 + 18},196" fill="none" stroke="${pal.accent}" stroke-width="1.8"/>
-            <path d="M${150 - 9},204 L${150 + 9},214 M${150 + 9},204 L${150 - 9},214 M${150 - 9},214 L${150 + 9},224 M${150 + 9},214 L${150 - 9},224 M${150 - 9},224 L${150 + 9},233 M${150 + 9},224 L${150 - 9},233" stroke="${pal.accent}" stroke-width="1.7"/>
-            ${bustArcs}
-            <g transform="translate(${150 - w - 3},246)">
-              <circle r="6" fill="${pal.accent}"/><circle r="3" fill="#7c1f38"/><circle cx="7" cy="4" r="4.2" fill="${pal.accent}"/><circle cx="7" cy="4" r="2" fill="#7c1f38"/>
-              <path d="M2,8 q4,4 8,3" fill="none" stroke="#3a5a30" stroke-width="2"/>
-            </g>`,
-          over: `
-            <ellipse cx="${150 - sh - 1}" cy="206" rx="${B.armW * 0.62 + 1.5}" ry="3.6" fill="${pal.accent}"/>
-            <ellipse cx="${150 + sh + 1}" cy="206" rx="${B.armW * 0.62 + 1.5}" ry="3.6" fill="${pal.accent}"/>
-            <path d="M${exd(-1)},243 Q${150 - (sh + 13)},270 ${hxd(-1)},292" fill="none" stroke="${pal.main}" stroke-width="${B.armW * 0.82 + 2}" stroke-linecap="round" opacity="0.92"/>
-            <path d="M${exd(1)},243 Q${150 + (sh + 13)},270 ${hxd(1)},292" fill="none" stroke="${pal.main}" stroke-width="${B.armW * 0.82 + 2}" stroke-linecap="round" opacity="0.92"/>
-            <circle cx="${hxd(-1)}" cy="294" r="${B.armW * 0.5 + 2.5}" fill="none" stroke="${pal.accent}" stroke-width="1.6"/>
-            <circle cx="${hxd(1)}" cy="294" r="${B.armW * 0.5 + 2.5}" fill="none" stroke="${pal.accent}" stroke-width="1.6"/>
-            <path d="M143,160 Q150,164 157,160" fill="none" stroke="${pal.accent}" stroke-width="3"/>
-            <circle cx="150" cy="166" r="2.2" fill="${pal.accent}"/>`,
-        };
-      }
-
-      function accessorySVG(idx) {
-        if (idx === 0) { /* 蝴蝶结 */
-          return `<g transform="translate(185,50) rotate(18)">
-            <path d="M0,0 Q-16,-11 -7,-20 Q2,-13 0,0 Q16,-11 7,-20 Q-2,-13 0,0 Z" fill="#f4a0b8" stroke="#d4788f" stroke-width="1.3"/>
-            <circle r="3.6" fill="#d4788f"/>
-            <path d="M-2,3 L-7,16 M2,3 L8,17" stroke="#f4a0b8" stroke-width="2.8" stroke-linecap="round"/>
-          </g>`;
-        }
-        if (idx === 1) { /* 蕾丝发带 */
-          return `<path d="M103,68 Q150,44 197,68" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity="0.92"/>
-            <path d="M103,68 Q150,44 197,68" fill="none" stroke="#e8d4ee" stroke-width="1.8" stroke-dasharray="1 5.5" stroke-linecap="round"/>
-            <circle cx="110" cy="64" r="2.8" fill="#fff"/><circle cx="150" cy="47" r="3.2" fill="#fff"/><circle cx="190" cy="64" r="2.8" fill="#fff"/>`;
-        }
-        if (idx === 2) { /* 星星发夹 */
-          return `<text x="106" y="74" font-size="16" fill="#e8c34f" stroke="#c79a2c" stroke-width="0.6">✦</text>
-            <text x="118" y="90" font-size="10" fill="#f0d478">✦</text>
-            <text x="184" y="80" font-size="12" fill="#e8c34f">✦</text>`;
-        }
-        return "";
-      }
-
-      function buildDoll(s, uid) {
-        const B = BODY_TYPES[s.body].p;
-        const H = HAIR_COLORS[s.hairColor];
-        const S = SKINS[s.skin];
-        const E = EYE_COLORS[s.eyes];
-        const O = OUTFITS[s.outfit];
-        const hair = hairSet(s.hair, uid, H);
-        const fit = outfitSet(s.outfit, uid, B, O.pal);
-
-        const sh = B.sh, w = B.waist, hip = B.hip;
-        const cxL = 150 - hip * 0.42, cxR = 150 + hip * 0.42;
-        const t = B.legW / 2, k = B.legW * 0.36, a = B.legW * 0.24;
-        const L = B.legLen;
-        const skirtTop = s.outfit === 1 ? "#ffffff" : O.pal.light;
-        const skirtBot = s.outfit === 1 ? O.pal.trim : O.pal.main;
-
-        /* 腿：大腿→膝→踝渐收的实心形状（非拉伸） */
-        const leg = (cx, dir) => `
-          <path d="M${cx - t},266 Q${cx - t - 1},330 ${cx - k},385 Q${cx - a - 1},440 ${cx - a},${L} L${cx + a},${L} Q${cx + a + 1},440 ${cx + k},385 Q${cx + t + 1},330 ${cx + t},266 Z" fill="${S.base}"/>
-          <ellipse cx="${cx + dir * 3}" cy="${L + 5}" rx="9" ry="5.5" fill="${S.base}"/>`;
-
-        /* 手臂：上臂/前臂两段渐细 */
-        const arm = (dir) => {
-          const sx = 150 + dir * (sh - 3);
-          const ex = 150 + dir * (sh + 13);
-          const hx = 150 + dir * (sh + 7);
-          return `
-          <path d="M${sx},192 Q${150 + dir * (sh + 8)},215 ${ex},243" fill="none" stroke="${S.base}" stroke-width="${B.armW}" stroke-linecap="round"/>
-          <path d="M${ex},243 Q${150 + dir * (sh + 13)},270 ${hx},294" fill="none" stroke="${S.base}" stroke-width="${B.armW * 0.82}" stroke-linecap="round"/>
-          <ellipse cx="${hx}" cy="299" rx="${B.armW * 0.5}" ry="${B.armW * 0.62}" fill="${S.base}"/>`;
-        };
-
-        return `<svg viewBox="0 0 300 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="角色形象">
-          <defs>
-            <radialGradient id="iris-${uid}" cx="50%" cy="40%" r="62%">
-              <stop offset="0%" stop-color="${E.iris}"/>
-              <stop offset="100%" stop-color="${E.rim}"/>
-            </radialGradient>
-            <linearGradient id="hair-${uid}" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="${H.light}"/>
-              <stop offset="35%" stop-color="${H.base}"/>
-              <stop offset="100%" stop-color="${H.dark}"/>
-            </linearGradient>
-            <linearGradient id="skirt-${uid}" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="${skirtTop}"/>
-              <stop offset="100%" stop-color="${skirtBot}"/>
-            </linearGradient>
-          </defs>
-
-          <ellipse cx="150" cy="${L + 16}" rx="82" ry="11" fill="#6a4e8a" opacity="0.18"/>
-
-          <!-- 图层1：身后头发 -->
-          ${hair.back}
-
-          <!-- 图层2：颈 + 躯干（肤色，一体成型不留缝） -->
-          <path d="M144,138 L143.5,172 Q150,178 156.5,172 L156,138 Z" fill="${S.base}"/>
-          <path d="M144,148 Q150,154 156,148 L156,155 Q150,160 144,155 Z" fill="${S.shade}" opacity="0.45"/>
-          <path d="M141,166 Q${150 - sh + 3},173 ${150 - sh},188 Q${150 - sh + 3},214 ${150 - w},236 Q${150 - hip},252 ${150 - hip + 2},272 L${150 + hip - 2},272 Q${150 + hip},252 ${150 + w},236 Q${150 + sh - 3},214 ${150 + sh},188 Q${150 + sh - 3},173 159,166 Z" fill="${S.base}"/>
-
-          <!-- 图层3：腿（渐细实心，肤色随选项） -->
-          ${leg(cxL, -1)}
-          ${leg(cxR, 1)}
-
-          <!-- 图层4：鞋 / 靴 -->
-          ${fit.shoes}
-
-          <!-- 图层5：裙身 + 上衣 -->
-          ${fit.behind}
-
-          <!-- 图层6：脸（肤色）+ 阴影 -->
-          <path d="${facePath(s.face)}" fill="${S.base}" stroke="${S.shade}" stroke-width="1.4"/>
-          <path d="M112,64 Q150,78 188,64 L188,72 Q150,88 112,72 Z" fill="${S.shade}" opacity="0.18"/>
-
-          <!-- 图层7：五官（瞳色渐变独立图层） -->
-          ${eyes(uid, E, s.face)}
-          ${browsAndMouth(H, S, s.face)}
-
-          <!-- 图层8：手臂（肤色）与袖/手套覆盖 -->
-          ${arm(-1)}
-          ${arm(1)}
-          ${fit.over}
-
-          <!-- 图层9：刘海 -->
-          ${hair.front}
-
-          <!-- 图层10：配饰 -->
-          ${accessorySVG(s.acc)}
-        </svg>`;
-      }
-
-      /* ═══════════ 渲染与联动 ═══════════ */
-      const dollBox = document.getElementById("doll");
-      const preview = document.getElementById("preview");
-
-      function paintAll() {
-        dollBox.innerHTML = buildDoll(sel, "main");
-        preview.style.setProperty("--aura", OUTFITS[sel.outfit].aura);
-        /* 右栏缩略图跟随当前发型发色等实时更新 */
-        BODY_TYPES.forEach((b, i) => {
-          const box = document.getElementById(`body-thumb-${i}`);
-          if (box) box.innerHTML = buildDoll({ ...sel, body: i }, `body${i}`);
-        });
-        OUTFITS.forEach((o, i) => {
-          const box = document.getElementById(`outfit-thumb-${i}`);
-          if (box) box.innerHTML = buildDoll({ ...sel, outfit: i }, `outfit${i}`);
-        });
-      }
-
-      /* ——— 左栏：外观定制 ——— */
-      const APPEARANCE = [
-        { key: "hair",      label: "发型", names: HAIR_STYLES },
-        { key: "hairColor", label: "发色", names: HAIR_COLORS.map((v) => v.n), colors: HAIR_COLORS.map((v) => v.base) },
-        { key: "skin",      label: "肤色", names: SKINS.map((v) => v.n), colors: SKINS.map((v) => v.base) },
-        { key: "eyes",      label: "眼睛", names: EYE_COLORS.map((v) => v.n), colors: EYE_COLORS.map((v) => v.iris) },
-        { key: "face",      label: "脸型", names: FACES },
-        { key: "acc",       label: "配饰", names: ACCS },
-      ];
-
-      const optsRoot = document.getElementById("opts");
-      APPEARANCE.forEach((opt) => {
-        const row = document.createElement("div");
-        row.className = "opt-row";
-        row.innerHTML = `
-          <span class="opt-label">${opt.label}</span>
-          <button type="button" class="arrow" data-dir="-1" aria-label="上一个">◀</button>
-          <span class="opt-value" id="val-${opt.key}"></span>
-          <button type="button" class="arrow" data-dir="1" aria-label="下一个">▶</button>`;
-        row.querySelectorAll(".arrow").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const n = opt.names.length;
-            sel[opt.key] = (sel[opt.key] + Number(btn.dataset.dir) + n) % n;
-            paintOpt(opt);
-            paintAll();
-          });
-        });
-        optsRoot.appendChild(row);
-        paintOpt(opt);
-      });
-
-      function paintOpt(opt) {
-        const box = document.getElementById(`val-${opt.key}`);
-        const name = opt.names[sel[opt.key]];
-        if (opt.colors) {
-          box.innerHTML = `<span class="dot" style="background:${opt.colors[sel[opt.key]]}"></span>${name}`;
-        } else {
-          box.textContent = name;
-        }
-      }
-
-      /* ——— 右栏 ——— */
-      const bodyList = document.getElementById("body-list");
-      BODY_TYPES.forEach((b, i) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "choice";
-        btn.innerHTML = `
-          <span class="mini-doll" id="body-thumb-${i}"></span>
-          <span class="choice-label">${b.n}</span>
-          <span class="check">✓</span>`;
-        btn.addEventListener("click", () => {
-          sel.body = i;
-          paintChoices(bodyList, i);
-          paintAll();
-        });
-        bodyList.appendChild(btn);
-      });
-
-      const outfitList = document.getElementById("outfit-list");
-      OUTFITS.forEach((o, i) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "choice";
-        btn.innerHTML = `
-          <span class="mini-doll" id="outfit-thumb-${i}"></span>
-          <span class="choice-label">${o.n}</span>
-          <span class="check">✓</span>`;
-        btn.addEventListener("click", () => {
-          sel.outfit = i;
-          paintChoices(outfitList, i);
-          document.getElementById("pager").textContent = `${i + 1} / ${OUTFITS.length}`;
-          paintAll();
-        });
-        outfitList.appendChild(btn);
-      });
-
-      function paintChoices(listEl, activeIdx) {
-        [...listEl.children].forEach((c, i) => c.classList.toggle("is-on", i === activeIdx));
-      }
-
-      /* ——— 名称 / 随机 / 确认 ——— */
-      const nameInput = document.getElementById("name");
-
-      document.getElementById("dice").addEventListener("click", () => {
-        nameInput.value = NAMES[Math.floor(Math.random() * NAMES.length)];
-      });
-
-      document.getElementById("random").addEventListener("click", () => {
-        sel.hair = Math.floor(Math.random() * HAIR_STYLES.length);
-        sel.hairColor = Math.floor(Math.random() * HAIR_COLORS.length);
-        sel.skin = Math.floor(Math.random() * SKINS.length);
-        sel.eyes = Math.floor(Math.random() * EYE_COLORS.length);
-        sel.face = Math.floor(Math.random() * FACES.length);
-        sel.acc = Math.floor(Math.random() * ACCS.length);
-        sel.body = Math.floor(Math.random() * BODY_TYPES.length);
-        sel.outfit = Math.floor(Math.random() * OUTFITS.length);
-        APPEARANCE.forEach(paintOpt);
-        paintChoices(bodyList, sel.body);
-        paintChoices(outfitList, sel.outfit);
-        document.getElementById("pager").textContent = `${sel.outfit + 1} / ${OUTFITS.length}`;
-        if (!nameInput.value.trim()) {
-          nameInput.value = NAMES[Math.floor(Math.random() * NAMES.length)];
-        }
-        paintAll();
-        toast("随机形象已生成");
-      });
-
-      document.getElementById("confirm").addEventListener("click", () => {
-        const name = nameInput.value.trim();
-        if (!name) {
-          toast("先给角色起个名字吧");
-          nameInput.focus();
-          return;
-        }
-        localStorage.setItem(PROFILE_KEY, JSON.stringify({ name, ...sel, savedAt: Date.now() }));
-        toast(`欢迎来到暖暖世界，${name}！`);
-        setTimeout(() => { location.href = "/nuannuan"; }, 900);
-      });
-
-      /* ——— toast ——— */
-      let toastTimer = null;
-      function toast(msg) {
-        const el = document.getElementById("toast");
-        el.textContent = msg;
-        el.classList.add("show");
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
-      }
-
-      /* ——— 初始化（编辑模式回填） ——— */
-      try {
-        const p = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
-        if (p) {
-          nameInput.value = p.name || "";
-          Object.keys(sel).forEach((k) => {
-            if (typeof p[k] === "number") sel[k] = p[k];
-          });
-          APPEARANCE.forEach(paintOpt);
-        }
-      } catch { /* 忽略损坏档案 */ }
-
-      paintChoices(bodyList, sel.body);
-      paintChoices(outfitList, sel.outfit);
-      document.getElementById("pager").textContent = `${sel.outfit + 1} / ${OUTFITS.length}`;
-      paintAll();
-    })();
-  </script>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/nuannuan/create/create.js"></script>
 </body>
 </html>
