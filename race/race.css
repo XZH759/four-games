@@ -538,16 +538,7 @@ button { touch-action: none; }
   text-align: left;
 }
 .track-card::before {
-  content: "";
-  position: absolute;
-  left: -12%;
-  right: -12%;
-  bottom: 17px;
-  height: 16px;
-  border: 3px solid rgba(255,255,255,.75);
-  border-radius: 50%;
-  transform: rotate(-7deg);
-  opacity: .62;
+  content: none;
 }
 .track-card:hover { border-color: rgba(255,255,255,.55); transform: translateY(-2px); }
 .track-card[aria-selected="true"] {
@@ -574,6 +565,21 @@ button { touch-action: none; }
   font-weight: 900;
 }
 .track-card[aria-selected="true"] .track-check { display: grid; }
+.track-route-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .78;
+}
+.track-route-preview polyline {
+  fill: none;
+  stroke: white;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px var(--track-sun));
+}
 .selected-track-info {
   display: flex;
   align-items: center;

@@ -1,6 +1,7 @@
 import { AI_QUESTIONS } from "/monopoly/questions.js";
 
 const START_ANGLE = Math.PI / 2;
+const START_PROGRESS = 0.008;
 const LAPS_TO_WIN = 3;
 const RACER_COUNT = 6;
 const LETTERS = ["A", "B", "C", "D"];
@@ -14,6 +15,13 @@ const TRACKS = [
     length: "4.1 km",
     level: "入门",
     world: { width: 2200, height: 1300, cx: 1100, cy: 650, rx: 820, ry: 470 },
+    roadWidth: 142,
+    startIndex: 2,
+    route: [
+      [-0.92, 0.18], [-0.72, -0.46], [-0.20, -0.70], [0.36, -0.62],
+      [0.88, -0.26], [0.78, 0.30], [0.38, 0.66], [-0.18, 0.72],
+      [-0.68, 0.56],
+    ],
     gates: [0.30, 0.76],
     theme: {
       skyTop: "#3e8ed0", skyBottom: "#d8f3ff", mountain: "#6285a4",
@@ -29,6 +37,14 @@ const TRACKS = [
     length: "4.6 km",
     level: "进阶",
     world: { width: 2500, height: 1400, cx: 1250, cy: 700, rx: 940, ry: 500 },
+    roadWidth: 138,
+    startIndex: 2,
+    route: [
+      [-0.94, 0.34], [-0.82, -0.26], [-0.46, -0.68], [-0.02, -0.62],
+      [0.12, -0.18], [0.48, -0.58], [0.90, -0.40], [0.82, 0.08],
+      [0.42, 0.24], [0.24, 0.70], [-0.26, 0.74], [-0.40, 0.26],
+      [-0.72, 0.06],
+    ],
     gates: [0.34, 0.79],
     theme: {
       skyTop: "#151348", skyBottom: "#8b3bb4", mountain: "#242758",
@@ -44,6 +60,14 @@ const TRACKS = [
     length: "5.1 km",
     level: "挑战",
     world: { width: 2750, height: 1500, cx: 1375, cy: 750, rx: 1040, ry: 550 },
+    roadWidth: 134,
+    startIndex: 3,
+    route: [
+      [-0.94, 0.42], [-0.84, -0.18], [-0.56, -0.68], [-0.18, -0.48],
+      [0.08, -0.78], [0.52, -0.62], [0.88, -0.24], [0.58, 0.04],
+      [0.92, 0.38], [0.54, 0.72], [0.12, 0.46], [-0.16, 0.76],
+      [-0.52, 0.56], [-0.42, 0.16], [-0.78, 0.02],
+    ],
     gates: [0.28, 0.72],
     theme: {
       skyTop: "#18376d", skyBottom: "#8de0d0", mountain: "#a8c5d5",
@@ -163,22 +187,64 @@ const scenery = Array.from({ length: 95 }, (_, index) => {
 
 let selectedTrack = TRACKS[0];
 let selectedDriver = DRIVERS[0];
+let trackGeometry = buildTrackGeometry(selectedTrack);
 let game = createGame();
 let activeQuestion = null;
 let countdownToken = 0;
 let lastFrame = performance.now();
 let messageTimer = 0;
 
+function buildTrackGeometry(track) {
+  const orderedRoute = track.route.map(
+    (_, index) => track.route[(index + track.startIndex) % track.route.length],
+  );
+  const control = orderedRoute.map(([x, y]) => ({
+    x: track.world.cx + x * track.world.rx,
+    y: track.world.cy + y * track.world.ry,
+  }));
+  const samples = [];
+  const stepsPerCurve = 44;
+
+  for (let index = 0; index < control.length; index += 1) {
+    const p0 = control[(index - 1 + control.length) % control.length];
+    const p1 = control[index];
+    const p2 = control[(index + 1) % control.length];
+    const p3 = control[(index + 2) % control.length];
+    for (let step = 0; step < stepsPerCurve; step += 1) {
+      const t = step / stepsPerCurve;
+      const t2 = t * t;
+      const t3 = t2 * t;
+      samples.push({
+        x: .5 * ((2 * p1.x) + (-p0.x + p2.x) * t
+          + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2
+          + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+        y: .5 * ((2 * p1.y) + (-p0.y + p2.y) * t
+          + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2
+          + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3),
+      });
+    }
+  }
+
+  let totalLength = 0;
+  samples.forEach((sample, index) => {
+    const next = samples[(index + 1) % samples.length];
+    sample.cumulative = totalLength;
+    sample.segmentLength = Math.hypot(next.x - sample.x, next.y - sample.y);
+    totalLength += sample.segmentLength;
+  });
+  return { samples, totalLength };
+}
+
 function createPlayer() {
-  const t = START_ANGLE;
+  const start = pointAtProgress(START_PROGRESS, -22);
   return {
-    x: WORLD.cx + WORLD.rx * Math.cos(t),
-    y: WORLD.cy + WORLD.ry * Math.sin(t) - 22,
-    angle: 0,
+    x: start.x,
+    y: start.y,
+    angle: start.angle,
     speed: 0,
     lap: 1,
-    progress: 0,
-    previousProgress: 0,
+    progress: START_PROGRESS,
+    previousProgress: START_PROGRESS,
     checkpoints: new Set(),
     driftCharge: 0,
     drifting: false,
@@ -274,13 +340,20 @@ function paintTrackSelection() {
     button.style.setProperty("--track-sky", track.theme.skyTop);
     button.style.setProperty("--track-ground", track.theme.grassA);
     button.style.setProperty("--track-sun", track.theme.sun);
+    const previewPoints = [...track.route, track.route[0]]
+      .map(([x, y]) => `${50 + x * 42},${34 + y * 28}`)
+      .join(" ");
     button.innerHTML = `
       <span class="track-check">✓</span>
+      <svg class="track-route-preview" viewBox="0 0 100 68" aria-hidden="true">
+        <polyline points="${previewPoints}"></polyline>
+      </svg>
       <strong>${track.icon} ${track.name}</strong>
       <small>${track.subtitle} · ${track.length}</small>`;
     button.addEventListener("click", () => {
       selectedTrack = track;
       Object.assign(WORLD, selectedTrack.world);
+      trackGeometry = buildTrackGeometry(selectedTrack);
       game = createGame();
       updateOpponents(0);
       paintTrackSelection();
@@ -314,10 +387,7 @@ function clamp(value, min, max) {
 }
 
 function trackLapLength() {
-  const a = WORLD.rx;
-  const b = WORLD.ry;
-  const h = ((a - b) ** 2) / ((a + b) ** 2);
-  return Math.PI * (a + b) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
+  return trackGeometry.totalLength;
 }
 
 function normalizeAngle(value) {
@@ -330,31 +400,72 @@ function signedAngle(value) {
   return angle;
 }
 
-function progressAt(x, y) {
-  const t = normalizeAngle(Math.atan2((y - WORLD.cy) / WORLD.ry, (x - WORLD.cx) / WORLD.rx));
-  return normalizeAngle(START_ANGLE - t) / TAU;
+function progressAt(x, y, hint = null) {
+  return nearestTrackPosition(x, y, hint).progress;
 }
 
 function pointAtProgress(progress, lane = 0) {
-  const t = START_ANGLE - progress * TAU;
-  const cos = Math.cos(t);
-  const sin = Math.sin(t);
-  const nxRaw = cos / WORLD.rx;
-  const nyRaw = sin / WORLD.ry;
-  const length = Math.hypot(nxRaw, nyRaw) || 1;
-  const nx = nxRaw / length;
-  const ny = nyRaw / length;
-  const x = WORLD.cx + WORLD.rx * cos + nx * lane;
-  const y = WORLD.cy + WORLD.ry * sin + ny * lane;
-  const angle = Math.atan2(-WORLD.ry * cos, WORLD.rx * sin);
-  return { x, y, angle, nx, ny };
+  const normalized = ((progress % 1) + 1) % 1;
+  const target = normalized * trackGeometry.totalLength;
+  const samples = trackGeometry.samples;
+  let low = 0;
+  let high = samples.length - 1;
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    if (samples[mid].cumulative <= target) low = mid + 1;
+    else high = mid - 1;
+  }
+  const index = Math.max(0, high);
+  const current = samples[index];
+  const next = samples[(index + 1) % samples.length];
+  const mix = current.segmentLength
+    ? (target - current.cumulative) / current.segmentLength
+    : 0;
+  const centerX = current.x + (next.x - current.x) * mix;
+  const centerY = current.y + (next.y - current.y) * mix;
+  const angle = Math.atan2(next.y - current.y, next.x - current.x);
+  const nx = -Math.sin(angle);
+  const ny = Math.cos(angle);
+  return {
+    x: centerX + nx * lane,
+    y: centerY + ny * lane,
+    angle,
+    nx,
+    ny,
+  };
 }
 
 function isOnRoad(x, y) {
-  const dx = (x - WORLD.cx) / WORLD.rx;
-  const dy = (y - WORLD.cy) / WORLD.ry;
-  const radial = Math.sqrt(dx * dx + dy * dy);
-  return Math.abs(radial - 1) < 0.225;
+  return nearestTrackPosition(x, y).distance <= selectedTrack.roadWidth;
+}
+
+function nearestTrackPosition(x, y, hint = null) {
+  const samples = trackGeometry.samples;
+  let nearestScore = Infinity;
+  let nearestDistanceSq = Infinity;
+  let nearestProgress = 0;
+  for (let index = 0; index < samples.length; index += 1) {
+    const current = samples[index];
+    const next = samples[(index + 1) % samples.length];
+    const dx = next.x - current.x;
+    const dy = next.y - current.y;
+    const lengthSq = dx * dx + dy * dy || 1;
+    const mix = clamp(((x - current.x) * dx + (y - current.y) * dy) / lengthSq, 0, 1);
+    const projectedX = current.x + dx * mix;
+    const projectedY = current.y + dy * mix;
+    const distanceSq = (x - projectedX) ** 2 + (y - projectedY) ** 2;
+    const candidateProgress = (current.cumulative + current.segmentLength * mix) / trackGeometry.totalLength;
+    const continuity = hint == null
+      ? 0
+      : Math.abs(((candidateProgress - hint + 1.5) % 1) - .5) * trackGeometry.totalLength * .32;
+    const score = distanceSq + continuity * continuity;
+    if (score < nearestScore) {
+      nearestScore = score;
+      nearestDistanceSq = distanceSq;
+      nearestProgress = candidateProgress;
+    }
+  }
+  return { progress: nearestProgress % 1, distance: Math.sqrt(nearestDistanceSq) };
 }
 
 function resetInput() {
@@ -496,8 +607,9 @@ function updatePlayer(dt) {
 
 function updatePlayerProgress() {
   const player = game.player;
-  const next = progressAt(player.x, player.y);
   const previous = player.progress;
+  let next = progressAt(player.x, player.y, previous);
+  if (previous < 0.08 && next > 0.92) next = 0;
   player.previousProgress = previous;
   player.progress = next;
   if (player.speed > 30) {
@@ -1247,30 +1359,41 @@ function drawMiniMap(width, height) {
   ctx.font = "900 9px Fredoka, sans-serif";
   ctx.textAlign = "left";
   ctx.fillText(`赛道地图 · LAP ${Math.min(game.player.lap, LAPS_TO_WIN)}/${LAPS_TO_WIN}`, x, y + 4);
+  const mapPoint = (point) => ({
+    x: x + mapWidth / 2 + (point.x - WORLD.cx) / WORLD.rx * 59,
+    y: y + 57 + (point.y - WORLD.cy) / WORLD.ry * 27,
+  });
   ctx.strokeStyle = "rgba(255,255,255,.65)";
-  ctx.lineWidth = 9;
+  ctx.lineWidth = 7;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
   ctx.beginPath();
-  ctx.ellipse(x + mapWidth / 2, y + 57, 59, 27, 0, 0, TAU);
+  trackGeometry.samples.forEach((sample, index) => {
+    if (index % 5 !== 0) return;
+    const mapped = mapPoint(sample);
+    if (index === 0) ctx.moveTo(mapped.x, mapped.y);
+    else ctx.lineTo(mapped.x, mapped.y);
+  });
+  const routeStart = mapPoint(trackGeometry.samples[0]);
+  ctx.lineTo(routeStart.x, routeStart.y);
   ctx.stroke();
   const drawDot = (progress, color, radius) => {
     const point = pointAtProgress(progress);
-    const dotX = x + mapWidth / 2 + (point.x - WORLD.cx) / WORLD.rx * 59;
-    const dotY = y + 57 + (point.y - WORLD.cy) / WORLD.ry * 27;
+    const mapped = mapPoint(point);
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(dotX, dotY, radius, 0, TAU);
+    ctx.arc(mapped.x, mapped.y, radius, 0, TAU);
     ctx.fill();
   };
   game.opponents.forEach((opponent) => drawDot(normalizeAngle(opponent.totalProgress * TAU) / TAU, opponent.color, 3));
   selectedTrack.gates.forEach((gate) => drawDot(gate, selectedTrack.theme.accent, 2.5));
   drawDot(game.player.progress, "#ffd338", 5);
   const finish = pointAtProgress(0);
-  const finishX = x + mapWidth / 2 + (finish.x - WORLD.cx) / WORLD.rx * 59;
-  const finishY = y + 57 + (finish.y - WORLD.cy) / WORLD.ry * 27;
+  const mappedFinish = mapPoint(finish);
   ctx.fillStyle = "#fff";
-  ctx.fillRect(finishX - 1, finishY - 8, 2, 9);
+  ctx.fillRect(mappedFinish.x - 1, mappedFinish.y - 8, 2, 9);
   ctx.fillStyle = "#111";
-  ctx.fillRect(finishX + 1, finishY - 8, 7, 5);
+  ctx.fillRect(mappedFinish.x + 1, mappedFinish.y - 8, 7, 5);
   ctx.restore();
 }
 
