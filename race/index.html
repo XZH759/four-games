@@ -3,26 +3,117 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>race · 答题数榜</title>
+  <meta name="description" content="将街机卡丁车竞速与 AI literacy 知识挑战结合的原创赛车游戏。" />
+  <title>AI 极速赛道</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/race/race.css" />
 </head>
 <body>
-  <div class="bg" aria-hidden="true"></div>
-  <header class="topbar">
-    <a class="brand" href="/">
-      <img src="/assets/bot-buddy.png" width="36" height="36" alt="" />
-      <span>AI世界修复计划</span>
-    </a>
-    <p class="top-note">/race</p>
-  </header>
-  <main class="game-stub">
-    <p class="stub-path">/race</p>
-    <h1>race · 答题数榜</h1>
-    <p>游戏逻辑稍后接入。当前仅完成路由跳转。</p>
-    <a class="primary" href="/">返回大厅</a>
+  <main class="race-shell">
+    <canvas id="race-canvas" width="1600" height="1000" aria-label="AI 极速赛道游戏画面"></canvas>
+
+    <header class="race-header">
+      <a class="home-link" href="/">← 游戏大厅</a>
+      <div class="race-logo">
+        <span class="logo-bolt">⚡</span>
+        <span><strong>AI 极速赛道</strong><small>KNOWLEDGE KART</small></span>
+      </div>
+      <button type="button" class="icon-button" id="pause-button" aria-label="暂停游戏">Ⅱ</button>
+    </header>
+
+    <section class="hud" aria-label="比赛信息">
+      <div class="position-panel"><strong id="position">1</strong><span>/ 6</span><small>当前排名</small></div>
+      <div class="lap-panel"><span>圈数</span><strong id="lap">1 / 3</strong></div>
+      <div class="timer-panel"><span>时间</span><strong id="timer">00:00.0</strong></div>
+      <div class="speed-panel">
+        <strong id="speed">0</strong><span>km/h</span>
+        <div class="speed-bar"><i id="speed-fill"></i></div>
+      </div>
+      <div class="effect-panel" id="effect-panel">
+        <span class="effect-icon" id="effect-icon">◇</span>
+        <span><small>当前效果</small><strong id="effect-name">等待知识门</strong></span>
+      </div>
+    </section>
+
+    <div class="race-message" id="race-message" role="status" aria-live="polite"></div>
+    <div class="countdown" id="countdown" aria-live="assertive"></div>
+
+    <section class="touch-controls" aria-label="触屏驾驶控制">
+      <div class="touch-steer">
+        <button type="button" data-control="left" aria-label="向左转向">◀</button>
+        <button type="button" data-control="right" aria-label="向右转向">▶</button>
+      </div>
+      <div class="touch-drive">
+        <button type="button" class="touch-drift" data-control="drift">漂移</button>
+        <button type="button" data-control="brake">刹车</button>
+        <button type="button" class="touch-gas" data-control="gas">加速</button>
+      </div>
+    </section>
+
+    <section class="start-screen overlay is-visible" id="start-screen" aria-labelledby="start-title">
+      <div class="start-card">
+        <p class="eyebrow">AI LITERACY GRAND PRIX</p>
+        <h1 id="start-title">AI 极速赛道</h1>
+        <p class="start-copy">穿越知识门回答 AI 素养题。答对获得加速或正面道具，答错则会减速或触发负面效果。</p>
+        <div class="feature-grid">
+          <div><span>🏁</span><strong>3 圈竞速</strong><small>挑战 5 位电脑车手</small></div>
+          <div><span>🧠</span><strong>知识道具</strong><small>每圈经过 3 座知识门</small></div>
+          <div><span>💨</span><strong>漂移加速</strong><small>弯道蓄力，松开喷射</small></div>
+        </div>
+        <div class="control-guide">
+          <span><kbd>W</kbd>/<kbd>↑</kbd> 加速</span>
+          <span><kbd>A</kbd><kbd>D</kbd> 转向</span>
+          <span><kbd>Space</kbd> 漂移</span>
+          <span><kbd>P</kbd> 暂停</span>
+        </div>
+        <button type="button" class="race-primary" id="start-button">开始比赛</button>
+        <a class="text-link" href="/">返回游戏大厅</a>
+      </div>
+    </section>
+
+    <section class="quiz-overlay overlay" id="quiz-overlay" aria-labelledby="question-title">
+      <div class="quiz-card">
+        <div class="quiz-head">
+          <span class="quiz-mark">?</span>
+          <div><p id="question-domain">AI 素养知识门</p><h2 id="question-title">选择正确答案</h2></div>
+          <span class="quiz-stakes">答对加速 · 答错减速</span>
+        </div>
+        <p class="question-stem" id="question-stem"></p>
+        <div class="answer-list" id="answer-list"></div>
+        <div class="answer-feedback" id="answer-feedback" hidden></div>
+        <button type="button" class="race-primary quiz-continue" id="quiz-continue" hidden>带着效果继续比赛</button>
+      </div>
+    </section>
+
+    <section class="pause-screen overlay" id="pause-screen" aria-labelledby="pause-title">
+      <div class="pause-card">
+        <p class="eyebrow">PIT STOP</p>
+        <h2 id="pause-title">比赛暂停</h2>
+        <button type="button" class="race-primary" id="resume-button">继续比赛</button>
+        <button type="button" class="race-secondary" id="restart-button">重新开始</button>
+        <a class="text-link" href="/">退出到大厅</a>
+      </div>
+    </section>
+
+    <section class="finish-screen overlay" id="finish-screen" aria-labelledby="finish-title">
+      <div class="finish-card">
+        <div class="finish-trophy" id="finish-icon">🏆</div>
+        <p class="eyebrow">RACE COMPLETE</p>
+        <h2 id="finish-title">比赛完成！</h2>
+        <p id="finish-summary"></p>
+        <div class="result-stats">
+          <div><small>最终排名</small><strong id="finish-position">1 / 6</strong></div>
+          <div><small>比赛用时</small><strong id="finish-time">00:00.0</strong></div>
+          <div><small>答题正确</small><strong id="finish-answers">0 / 0</strong></div>
+        </div>
+        <button type="button" class="race-primary" id="play-again">再赛一局</button>
+        <a class="text-link" href="/">返回游戏大厅</a>
+      </div>
+    </section>
   </main>
+
+  <script type="module" src="/race/race.js"></script>
 </body>
 </html>
