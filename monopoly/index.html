@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="将经典地产棋盘玩法与 AI literacy 答题结合的教育游戏。" />
+  <title>AI 地产大亨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/monopoly/monopoly.css" />
+</head>
+<body>
+  <header class="game-header">
+    <a class="home-link" href="/">← 返回游戏大厅</a>
+    <div class="game-title">
+      <span class="title-mark" aria-hidden="true">🎩</span>
+      <span><strong>AI 地产大亨</strong><small>经典地产棋盘 · 知识决定财富</small></span>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="header-button" id="mode-button">对战模式</button>
+      <button type="button" class="header-button" id="rules-button">游戏规则</button>
+    </div>
+  </header>
+
+  <main class="game-layout">
+    <aside class="status-panel" aria-label="玩家状态">
+      <section class="player-card is-active" id="player-card">
+        <div class="player-head">
+          <span class="token token-player" aria-hidden="true">🤖</span>
+          <span><strong id="player-name">你</strong><small id="player-status">等待掷骰</small></span>
+        </div>
+        <div class="money" id="player-money">$1,500</div>
+        <div class="asset-line"><span>地产</span><strong id="player-properties">0</strong></div>
+      </section>
+
+      <section class="player-card" id="bot-card">
+        <div class="player-head">
+          <span class="token token-bot" aria-hidden="true">🧠</span>
+          <span><strong id="opponent-name">AI 对手</strong><small id="bot-status">等待回合</small></span>
+        </div>
+        <div class="money" id="bot-money">$1,500</div>
+        <div class="asset-line"><span>地产</span><strong id="bot-properties">0</strong></div>
+      </section>
+
+      <section class="turn-card">
+        <p>第 <strong id="round-number">1</strong> 回合</p>
+        <p id="turn-label">轮到你行动</p>
+        <div class="dice-pair" aria-live="polite">
+          <span class="die" id="die-one">–</span>
+          <span class="die" id="die-two">–</span>
+        </div>
+        <button type="button" class="primary-action" id="roll-button">掷骰子</button>
+        <button type="button" class="secondary-action" id="buy-button" hidden>购买地产</button>
+        <button type="button" class="secondary-action" id="end-button" hidden>结束回合</button>
+      </section>
+
+      <section class="legend-card">
+        <h2>棋盘图例</h2>
+        <p><span class="legend-dot property"></span> 可购买地产</p>
+        <p><span class="legend-dot question">?</span> AI literacy 题目</p>
+        <p><span class="legend-dot station"></span> 数据枢纽</p>
+        <p><span class="legend-dot tax"></span> 费用格</p>
+      </section>
+    </aside>
+
+    <section class="board-section" aria-label="AI 地产大亨棋盘">
+      <div class="board" id="board">
+        <div class="board-center">
+          <p class="center-eyebrow">AI LITERACY</p>
+          <h1>地产大亨</h1>
+          <p>走到 <strong>?</strong> 格回答 AI 素养题</p>
+          <div class="reward-rule">
+            <span>答对 <strong>+$300</strong></span>
+            <span>答错 <strong>−$150</strong></span>
+          </div>
+          <div class="center-message" id="center-message" role="status" aria-live="polite">
+            点击“掷骰子”开始游戏
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="log-panel">
+      <div class="goal-card">
+        <span aria-hidden="true">🏆</span>
+        <div><strong>胜利目标</strong><small>让对手破产，或率先达到 $4,000</small></div>
+      </div>
+      <section class="property-summary">
+        <h2 id="asset-title">我的资产</h2>
+        <div class="owned-list" id="owned-list"><p>尚未购买地产</p></div>
+      </section>
+      <section class="game-log">
+        <h2>事件记录</h2>
+        <ol id="game-log"></ol>
+      </section>
+      <button type="button" class="restart-button" id="restart-button">重新开始</button>
+    </aside>
+  </main>
+
+  <div class="modal" id="question-modal" hidden>
+    <section class="modal-card question-card" role="dialog" aria-modal="true" aria-labelledby="question-title">
+      <div class="question-top">
+        <span class="question-symbol" aria-hidden="true">?</span>
+        <div>
+          <p id="question-domain">AI 素养挑战</p>
+          <h2 id="question-title">知识卡</h2>
+        </div>
+        <span class="question-stakes">答对 +$300 · 答错 −$150</span>
+      </div>
+      <p class="question-stem" id="question-stem"></p>
+      <div class="answer-list" id="answer-list"></div>
+      <div class="answer-feedback" id="answer-feedback" hidden></div>
+      <button type="button" class="primary-action modal-continue" id="question-continue" hidden>继续游戏</button>
+    </section>
+  </div>
+
+  <div class="modal" id="rules-modal" hidden>
+    <section class="modal-card rules-card" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+      <button class="modal-close" id="rules-close" aria-label="关闭规则">×</button>
+      <h2 id="rules-title">游戏规则</h2>
+      <ul>
+        <li>双方玩家（或玩家与 AI）轮流掷两颗骰子并沿棋盘前进。</li>
+        <li>无主地产可以购买；停在对手地产时需要支付租金。</li>
+        <li>经过“起点”获得 $200，税费格会扣除对应金额。</li>
+        <li>进入监测区后暂停一回合；“前往监测区”会立即移动。</li>
+        <li>停在“?”格需要回答 AI literacy 题目：答对获得 $300，答错扣除 $150。</li>
+        <li>任一方资产低于 $0 即破产；率先达到 $4,000 也会获胜。</li>
+      </ul>
+      <button type="button" class="primary-action" id="rules-confirm">知道了</button>
+    </section>
+  </div>
+
+  <div class="modal" id="lobby-modal" hidden>
+    <section class="modal-card lobby-card" role="dialog" aria-modal="true" aria-labelledby="lobby-title">
+      <h2 id="lobby-title">选择对战模式</h2>
+      <p class="lobby-intro">保留 AI 对手，也可以让第二位玩家输入用户名加入本机对战。</p>
+      <div class="mode-tabs" role="tablist" aria-label="对战模式">
+        <button type="button" class="mode-tab is-active" data-mode="ai" role="tab" aria-selected="true">🤖 AI 对战</button>
+        <button type="button" class="mode-tab" data-mode="pvp" role="tab" aria-selected="false">👥 玩家对战</button>
+      </div>
+      <div class="join-fields">
+        <label>
+          <span>玩家 1 用户名</span>
+          <input id="player-one-input" maxlength="12" autocomplete="off" placeholder="输入用户名" value="玩家一" />
+        </label>
+        <label id="player-two-field" hidden>
+          <span>玩家 2 用户名</span>
+          <input id="player-two-input" maxlength="12" autocomplete="off" placeholder="输入用户名即可加入" value="玩家二" />
+        </label>
+      </div>
+      <p class="join-error" id="join-error" role="alert" hidden></p>
+      <button type="button" class="primary-action" id="join-game">加入游戏</button>
+      <p class="local-note">本模式为同一设备轮流操作，不会将用户名上传到服务器。</p>
+    </section>
+  </div>
+
+  <div class="modal" id="gameover-modal" hidden>
+    <section class="modal-card gameover-card" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
+      <div class="gameover-icon" id="gameover-icon">🏆</div>
+      <h2 id="gameover-title">游戏结束</h2>
+      <p id="gameover-text"></p>
+      <button type="button" class="primary-action" id="play-again">再玩一局</button>
+      <a class="secondary-link" href="/">返回大厅</a>
+    </section>
+  </div>
+
+  <script type="module" src="/monopoly/monopoly.js"></script>
+</body>
+</html>
