@@ -18,7 +18,7 @@
       <a class="home-link" href="/">← 游戏大厅</a>
       <div class="race-logo">
         <span class="logo-bolt">⚡</span>
-        <span><strong>AI 极速赛道</strong><small>KNOWLEDGE KART</small></span>
+        <span><strong>AI 极速赛道</strong><small id="hud-track-name">云海环城 · KNOWLEDGE KART</small></span>
       </div>
       <button type="button" class="icon-button" id="pause-button" aria-label="暂停游戏">Ⅱ</button>
     </header>
@@ -28,14 +28,31 @@
       <div class="lap-panel"><span>圈数</span><strong id="lap">1 / 3</strong></div>
       <div class="timer-panel"><span>时间</span><strong id="timer">00:00.0</strong></div>
       <div class="speed-panel">
-        <strong id="speed">0</strong><span>km/h</span>
+        <div class="speed-dial">
+          <i class="speed-needle" id="speed-needle"></i>
+          <div><strong id="speed">0</strong><span>km/h</span></div>
+        </div>
+        <div class="boost-label"><span>BOOST</span><strong id="boost-state">READY</strong></div>
         <div class="speed-bar"><i id="speed-fill"></i></div>
       </div>
-      <div class="effect-panel" id="effect-panel">
-        <span class="effect-icon" id="effect-icon">◇</span>
-        <span><small>当前效果</small><strong id="effect-name">等待知识门</strong></span>
+      <div class="effect-panel item-rack" id="effect-panel">
+        <div class="item-slot is-main">
+          <span class="effect-icon" id="effect-icon">◇</span>
+          <span><small>当前道具</small><strong id="effect-name">等待知识门</strong></span>
+        </div>
+        <div class="item-slot" id="shield-slot" title="事实护盾"><span>🛡️</span></div>
+        <div class="item-slot quiz-slot" title="下一座知识门"><span>?</span></div>
       </div>
     </section>
+
+    <section class="live-ranking" aria-label="实时排名">
+      <header><span>实时排名</span><small id="rank-lap-label">第 1 圈</small></header>
+      <ol id="live-ranking-list"></ol>
+    </section>
+
+    <div class="race-flow-mini" aria-label="游戏流程">
+      <span>角色选择</span><i></i><span class="is-current">比赛</span><i></i><span>成绩排名</span>
+    </div>
 
     <div class="race-message" id="race-message" role="status" aria-live="polite"></div>
     <div class="countdown" id="countdown" aria-live="assertive"></div>
@@ -56,11 +73,33 @@
       <div class="start-card">
         <p class="eyebrow">AI LITERACY GRAND PRIX</p>
         <h1 id="start-title">AI 极速赛道</h1>
-        <p class="start-copy">穿越知识门回答 AI 素养题。答对获得加速或正面道具，答错则会减速或触发负面效果。</p>
-        <div class="feature-grid">
-          <div><span>🏁</span><strong>3 圈竞速</strong><small>挑战 5 位电脑车手</small></div>
-          <div><span>🧠</span><strong>知识道具</strong><small>每圈经过 3 座知识门</small></div>
-          <div><span>💨</span><strong>漂移加速</strong><small>弯道蓄力，松开喷射</small></div>
+        <div class="flow-steps" aria-label="当前流程">
+          <span class="is-current"><b>1</b>角色选择</span><i></i>
+          <span><b>2</b>竞速比赛</span><i></i>
+          <span><b>3</b>成绩排名</span>
+        </div>
+        <p class="select-title">选择你的车手与专属赛车</p>
+        <div class="character-grid" id="character-grid" role="listbox" aria-label="车手选择"></div>
+        <section class="selected-driver" aria-live="polite">
+          <div class="driver-portrait" id="driver-portrait">⚡</div>
+          <div class="driver-copy">
+            <small>当前车手</small>
+            <strong id="driver-name">闪电学员</strong>
+            <span id="driver-skill">起步时获得短暂加速</span>
+          </div>
+          <div class="driver-stats">
+            <label><span>速度</span><i><b id="stat-speed"></b></i></label>
+            <label><span>加速</span><i><b id="stat-accel"></b></i></label>
+            <label><span>操控</span><i><b id="stat-handling"></b></i></label>
+          </div>
+        </section>
+        <p class="select-title track-select-title">选择大奖赛地图</p>
+        <div class="track-grid" id="track-grid" role="listbox" aria-label="地图选择"></div>
+        <div class="selected-track-info" aria-live="polite">
+          <span><b id="selected-track-icon">☁️</b><strong id="selected-track-name">云海环城</strong></span>
+          <span>路线长度 <strong id="selected-track-length">4.1 km</strong></span>
+          <span>知识门 <strong id="selected-track-gates">2 座/圈</strong></span>
+          <span>难度 <strong id="selected-track-level">入门</strong></span>
         </div>
         <div class="control-guide">
           <span><kbd>W</kbd>/<kbd>↑</kbd> 加速</span>
@@ -102,7 +141,16 @@
         <div class="finish-trophy" id="finish-icon">🏆</div>
         <p class="eyebrow">RACE COMPLETE</p>
         <h2 id="finish-title">比赛完成！</h2>
+        <div class="flow-steps finish-flow" aria-label="完成流程">
+          <span><b>1</b>角色选择</span><i></i>
+          <span><b>2</b>竞速比赛</span><i></i>
+          <span class="is-current"><b>3</b>成绩排名</span>
+        </div>
         <p id="finish-summary"></p>
+        <section class="final-ranking">
+          <header><strong>大奖赛最终排名</strong><span>AI SPEEDWAY CUP</span></header>
+          <ol id="final-ranking-list"></ol>
+        </section>
         <div class="result-stats">
           <div><small>最终排名</small><strong id="finish-position">1 / 6</strong></div>
           <div><small>比赛用时</small><strong id="finish-time">00:00.0</strong></div>

@@ -1,12 +1,96 @@
 import { AI_QUESTIONS } from "/monopoly/questions.js";
 
-const WORLD = { width: 1600, height: 1000, cx: 800, cy: 500, rx: 610, ry: 345 };
 const START_ANGLE = Math.PI / 2;
 const LAPS_TO_WIN = 3;
 const RACER_COUNT = 6;
-const GATES = [0.18, 0.48, 0.78];
 const LETTERS = ["A", "B", "C", "D"];
 const TAU = Math.PI * 2;
+const TRACKS = [
+  {
+    id: "cloud-city",
+    name: "云海环城",
+    icon: "☁️",
+    subtitle: "宽阔高速 · 长直道",
+    length: "4.1 km",
+    level: "入门",
+    world: { width: 2200, height: 1300, cx: 1100, cy: 650, rx: 820, ry: 470 },
+    gates: [0.30, 0.76],
+    theme: {
+      skyTop: "#3e8ed0", skyBottom: "#d8f3ff", mountain: "#6285a4",
+      hill: "#7fa879", grassA: "#5eb95f", grassB: "#66c568",
+      roadA: "#263745", roadB: "#2d404e", accent: "#35d9f1", sun: "#fff0a1",
+    },
+  },
+  {
+    id: "neon-harbor",
+    name: "霓虹港湾",
+    icon: "🌃",
+    subtitle: "连续弯道 · 霓虹夜景",
+    length: "4.6 km",
+    level: "进阶",
+    world: { width: 2500, height: 1400, cx: 1250, cy: 700, rx: 940, ry: 500 },
+    gates: [0.34, 0.79],
+    theme: {
+      skyTop: "#151348", skyBottom: "#8b3bb4", mountain: "#242758",
+      hill: "#164e68", grassA: "#153e53", grassB: "#194a60",
+      roadA: "#20243d", roadB: "#292c49", accent: "#f15dff", sun: "#77efff",
+    },
+  },
+  {
+    id: "aurora-snow",
+    name: "极光雪原",
+    icon: "❄️",
+    subtitle: "超长赛程 · 高速挑战",
+    length: "5.1 km",
+    level: "挑战",
+    world: { width: 2750, height: 1500, cx: 1375, cy: 750, rx: 1040, ry: 550 },
+    gates: [0.28, 0.72],
+    theme: {
+      skyTop: "#18376d", skyBottom: "#8de0d0", mountain: "#a8c5d5",
+      hill: "#d7edf2", grassA: "#b8dce3", grassB: "#c7e6ea",
+      roadA: "#344654", roadB: "#3b4f5e", accent: "#73ffca", sun: "#d5fff8",
+    },
+  },
+];
+const WORLD = { ...TRACKS[0].world };
+const DRIVERS = [
+  {
+    id: "spark",
+    name: "闪电学员",
+    title: "极速新星",
+    emoji: "🧑‍🚀",
+    color: "#2f8ef4",
+    skill: "起步时获得短暂加速",
+    stats: { speed: 88, acceleration: 82, handling: 66 },
+  },
+  {
+    id: "bubble",
+    name: "泡泡工程师",
+    title: "防护专家",
+    emoji: "👩‍🔬",
+    color: "#ee6ba7",
+    skill: "开局携带一次事实护盾",
+    stats: { speed: 72, acceleration: 86, handling: 82 },
+  },
+  {
+    id: "claw",
+    name: "云爪侦探",
+    title: "弯道猎手",
+    emoji: "🦊",
+    color: "#f29a32",
+    skill: "漂移蓄力速度提升",
+    stats: { speed: 80, acceleration: 72, handling: 94 },
+  },
+  {
+    id: "aurora",
+    name: "极光领航员",
+    title: "稳定大师",
+    emoji: "🐧",
+    color: "#43b978",
+    skill: "开局获得专注引擎",
+    stats: { speed: 76, acceleration: 78, handling: 88 },
+  },
+];
 
 const canvas = document.getElementById("race-canvas");
 const ctx = canvas.getContext("2d");
@@ -29,10 +113,30 @@ const els = {
   lap: document.getElementById("lap"),
   timer: document.getElementById("timer"),
   speed: document.getElementById("speed"),
+  speedNeedle: document.getElementById("speed-needle"),
   speedFill: document.getElementById("speed-fill"),
+  boostState: document.getElementById("boost-state"),
   effectPanel: document.getElementById("effect-panel"),
   effectIcon: document.getElementById("effect-icon"),
   effectName: document.getElementById("effect-name"),
+  shieldSlot: document.getElementById("shield-slot"),
+  liveRanking: document.getElementById("live-ranking-list"),
+  rankLapLabel: document.getElementById("rank-lap-label"),
+  characterGrid: document.getElementById("character-grid"),
+  driverPortrait: document.getElementById("driver-portrait"),
+  driverName: document.getElementById("driver-name"),
+  driverSkill: document.getElementById("driver-skill"),
+  statSpeed: document.getElementById("stat-speed"),
+  statAccel: document.getElementById("stat-accel"),
+  statHandling: document.getElementById("stat-handling"),
+  finalRanking: document.getElementById("final-ranking-list"),
+  trackGrid: document.getElementById("track-grid"),
+  selectedTrackIcon: document.getElementById("selected-track-icon"),
+  selectedTrackName: document.getElementById("selected-track-name"),
+  selectedTrackLength: document.getElementById("selected-track-length"),
+  selectedTrackGates: document.getElementById("selected-track-gates"),
+  selectedTrackLevel: document.getElementById("selected-track-level"),
+  hudTrackName: document.getElementById("hud-track-name"),
   message: document.getElementById("race-message"),
   countdown: document.getElementById("countdown"),
   quiz: document.getElementById("quiz-overlay"),
@@ -57,6 +161,8 @@ const scenery = Array.from({ length: 95 }, (_, index) => {
   };
 });
 
+let selectedTrack = TRACKS[0];
+let selectedDriver = DRIVERS[0];
 let game = createGame();
 let activeQuestion = null;
 let countdownToken = 0;
@@ -83,7 +189,8 @@ function createPlayer() {
     spinTimer: 0,
     shield: false,
     onRoad: true,
-    color: "#ffd338",
+    color: selectedDriver.color,
+    driverId: selectedDriver.id,
   };
 }
 
@@ -102,6 +209,7 @@ function createOpponents() {
     y: 0,
     angle: 0,
     finished: false,
+    finishTime: null,
   }));
 }
 
@@ -120,6 +228,78 @@ function createGame() {
   };
 }
 
+function paintDriverSelection() {
+  els.characterGrid.innerHTML = "";
+  DRIVERS.forEach((driver) => {
+    const selected = driver.id === selectedDriver.id;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "character-card";
+    button.setAttribute("role", "option");
+    button.setAttribute("aria-selected", String(selected));
+    button.style.setProperty("--driver-color", driver.color);
+    button.innerHTML = `
+      <span class="character-avatar">${driver.emoji}</span>
+      <strong>${driver.name}</strong>
+      <small>${driver.title}</small>
+      <span class="character-kart" aria-hidden="true"></span>`;
+    button.addEventListener("click", () => {
+      selectedDriver = driver;
+      paintDriverSelection();
+      paintSelectedDriver();
+    });
+    els.characterGrid.appendChild(button);
+  });
+}
+
+function paintSelectedDriver() {
+  els.driverPortrait.textContent = selectedDriver.emoji;
+  els.driverPortrait.style.setProperty("--selected-driver-color", selectedDriver.color);
+  els.driverName.textContent = selectedDriver.name;
+  els.driverSkill.textContent = selectedDriver.skill;
+  els.statSpeed.style.width = `${selectedDriver.stats.speed}%`;
+  els.statAccel.style.width = `${selectedDriver.stats.acceleration}%`;
+  els.statHandling.style.width = `${selectedDriver.stats.handling}%`;
+}
+
+function paintTrackSelection() {
+  els.trackGrid.innerHTML = "";
+  TRACKS.forEach((track) => {
+    const selected = track.id === selectedTrack.id;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "track-card";
+    button.setAttribute("role", "option");
+    button.setAttribute("aria-selected", String(selected));
+    button.style.setProperty("--track-sky", track.theme.skyTop);
+    button.style.setProperty("--track-ground", track.theme.grassA);
+    button.style.setProperty("--track-sun", track.theme.sun);
+    button.innerHTML = `
+      <span class="track-check">✓</span>
+      <strong>${track.icon} ${track.name}</strong>
+      <small>${track.subtitle} · ${track.length}</small>`;
+    button.addEventListener("click", () => {
+      selectedTrack = track;
+      Object.assign(WORLD, selectedTrack.world);
+      game = createGame();
+      updateOpponents(0);
+      paintTrackSelection();
+      paintSelectedTrack();
+    });
+    els.trackGrid.appendChild(button);
+  });
+}
+
+function paintSelectedTrack() {
+  els.selectedTrackIcon.textContent = selectedTrack.icon;
+  els.selectedTrackName.textContent = selectedTrack.name;
+  els.selectedTrackLength.textContent = selectedTrack.length;
+  els.selectedTrackGates.textContent = `${selectedTrack.gates.length} 座/圈`;
+  els.selectedTrackLevel.textContent = selectedTrack.level;
+  els.hudTrackName.textContent = `${selectedTrack.name} · KNOWLEDGE KART`;
+  els.start.textContent = `在「${selectedTrack.name}」开始比赛`;
+}
+
 function shuffle(items) {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i -= 1) {
@@ -131,6 +311,13 @@ function shuffle(items) {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function trackLapLength() {
+  const a = WORLD.rx;
+  const b = WORLD.ry;
+  const h = ((a - b) ** 2) / ((a + b) ** 2);
+  return Math.PI * (a + b) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
 }
 
 function normalizeAngle(value) {
@@ -207,7 +394,20 @@ async function runCountdown() {
   if (token !== countdownToken) return;
   els.countdown.classList.remove("is-active");
   game.mode = "racing";
-  announce("冲过知识门，答题赢取加速！");
+  applyDriverStartSkill();
+  announce(`${selectedTrack.icon} ${selectedTrack.name} · 前方知识门 ${selectedTrack.gates.length} 座/圈`);
+}
+
+function applyDriverStartSkill() {
+  const player = game.player;
+  if (selectedDriver.id === "spark") {
+    player.boostTimer = 2.2;
+    player.speed = 315;
+  } else if (selectedDriver.id === "bubble") {
+    player.shield = true;
+  } else if (selectedDriver.id === "aurora") {
+    player.focusTimer = 5;
+  }
 }
 
 function startRace() {
@@ -242,7 +442,8 @@ function updatePlayer(dt) {
   const wasDrifting = player.drifting;
   player.onRoad = isOnRoad(player.x, player.y);
 
-  const acceleration = player.focusTimer > 0 ? 285 : 235;
+  const driverAcceleration = .84 + selectedDriver.stats.acceleration / 500;
+  const acceleration = (player.focusTimer > 0 ? 285 : 235) * driverAcceleration;
   if (input.gas) player.speed += acceleration * dt;
   if (input.brake) player.speed -= (player.speed > 0 ? 330 : 145) * dt;
   if (!input.gas && !input.brake) {
@@ -253,7 +454,8 @@ function updatePlayer(dt) {
   const drifting = input.drift && Math.abs(steer) > 0 && player.speed > 145 && player.onRoad;
   player.drifting = drifting;
   if (drifting) {
-    player.driftCharge = Math.min(1.8, player.driftCharge + dt);
+    const driftGain = selectedDriver.id === "claw" ? 1.28 : 1;
+    player.driftCharge = Math.min(1.8, player.driftCharge + dt * driftGain);
     player.speed -= 20 * dt;
     if (Math.random() < dt * 18) emitParticle(player, "#d9f6ff", 1.2);
   } else if (wasDrifting && player.driftCharge > 0.38) {
@@ -267,12 +469,14 @@ function updatePlayer(dt) {
   }
 
   let maxSpeed = player.boostTimer > 0 ? 520 : player.focusTimer > 0 ? 405 : 355;
+  maxSpeed *= .89 + selectedDriver.stats.speed / 830;
   if (!player.onRoad) maxSpeed = 150;
   if (player.slowTimer > 0) maxSpeed = Math.min(maxSpeed, 175);
   player.speed = clamp(player.speed, -85, maxSpeed);
 
   const speedFactor = clamp(Math.abs(player.speed) / 260, 0.25, 1.25);
-  const turnRate = (drifting ? 2.25 : 1.7) * speedFactor;
+  const handling = .84 + selectedDriver.stats.handling / 520;
+  const turnRate = (drifting ? 2.25 : 1.7) * speedFactor * handling;
   player.angle += steer * turnRate * dt * (player.speed >= 0 ? 1 : -1);
   if (player.spinTimer > 0) player.angle += 8.5 * dt;
 
@@ -318,8 +522,8 @@ function updatePlayerProgress() {
 function checkKnowledgeGates(previous, next) {
   if (next < previous || next - previous > 0.2) return;
   const lapIndex = game.player.lap - 1;
-  for (let index = 0; index < GATES.length; index += 1) {
-    const gate = GATES[index];
+  for (let index = 0; index < selectedTrack.gates.length; index += 1) {
+    const gate = selectedTrack.gates[index];
     const key = `${lapIndex}-${index}`;
     if (!game.usedGates.has(key) && previous < gate && next >= gate) {
       game.usedGates.add(key);
@@ -335,10 +539,11 @@ function updateOpponents(dt) {
     const wave = Math.sin(game.elapsed * 0.8 + opponent.wobble) * 13;
     const target = opponent.baseSpeed + wave;
     opponent.speed += (target - opponent.speed) * dt * 1.2;
-    opponent.totalProgress += opponent.speed * dt / 3270;
+    opponent.totalProgress += opponent.speed * dt / trackLapLength();
     if (opponent.totalProgress >= LAPS_TO_WIN) {
       opponent.finished = true;
       opponent.totalProgress = LAPS_TO_WIN;
+      opponent.finishTime = game.elapsed;
     }
     const localProgress = normalizeAngle(opponent.totalProgress * TAU) / TAU;
     const point = pointAtProgress(localProgress, opponent.lane + Math.sin(game.elapsed + index) * 4);
@@ -393,6 +598,59 @@ function getPlayerTotalProgress() {
 function getPosition() {
   const total = getPlayerTotalProgress();
   return 1 + game.opponents.filter((opponent) => opponent.totalProgress > total).length;
+}
+
+function currentStandings() {
+  return [
+    {
+      id: "player",
+      name: selectedDriver.name,
+      avatar: selectedDriver.emoji,
+      color: selectedDriver.color,
+      total: getPlayerTotalProgress(),
+      isPlayer: true,
+    },
+    ...game.opponents.map((opponent, index) => ({
+      id: `ai-${index}`,
+      name: opponent.name,
+      avatar: ["🦊", "🐰", "🐻", "🐱", "🦅"][index],
+      color: opponent.color,
+      total: opponent.totalProgress,
+      isPlayer: false,
+      finishTime: opponent.finishTime,
+    })),
+  ].sort((a, b) => b.total - a.total);
+}
+
+function renderLiveRanking() {
+  const standings = currentStandings();
+  els.liveRanking.innerHTML = standings.map((racer, index) => `
+    <li class="${racer.isPlayer ? "is-player" : ""}">
+      <span class="rank-number">${index + 1}</span>
+      <span class="rank-avatar">${racer.avatar}</span>
+      <span>${racer.name}</span>
+    </li>`).join("");
+  els.rankLapLabel.textContent = `第 ${Math.min(game.player.lap, LAPS_TO_WIN)} 圈`;
+}
+
+function renderFinalRanking() {
+  const racers = currentStandings();
+  racers.forEach((racer) => {
+    if (racer.isPlayer) racer.finishTime = game.elapsed;
+  });
+  racers.sort((a, b) => {
+    if (a.finishTime != null && b.finishTime != null) return a.finishTime - b.finishTime;
+    if (a.finishTime != null) return -1;
+    if (b.finishTime != null) return 1;
+    return b.total - a.total;
+  });
+  els.finalRanking.innerHTML = racers.map((racer, index) => `
+    <li class="${racer.isPlayer ? "is-player" : ""}">
+      <span class="final-rank-number">${index + 1}</span>
+      <span>${racer.avatar}</span>
+      <span>${racer.name}${racer.isPlayer ? "（你）" : ""}</span>
+      <span class="final-rank-time">${racer.finishTime != null ? formatTime(racer.finishTime) : "比赛中"}</span>
+    </li>`).join("");
 }
 
 function nextQuestion() {
@@ -514,16 +772,19 @@ function finishRace() {
   if (game.mode === "finished") return;
   game.mode = "finished";
   resetInput();
-  game.finalPosition = getPosition();
+  game.finalPosition = 1 + game.opponents
+    .filter((opponent) => opponent.finishTime != null && opponent.finishTime < game.elapsed)
+    .length;
   const won = game.finalPosition === 1;
   els.finishIcon.textContent = won ? "🏆" : game.finalPosition <= 3 ? "🏅" : "🏁";
   els.finishTitle.textContent = won ? "冠军冲线！" : "比赛完成！";
   els.finishSummary.textContent = won
-    ? "你用速度与 AI 素养赢得了本场大奖赛。"
-    : "完成比赛！继续练习漂移与 AI 素养题，向冠军发起挑战。";
+    ? `你征服了「${selectedTrack.name}」，用速度与 AI 素养赢得本场大奖赛。`
+    : `你完成了「${selectedTrack.name}」！继续练习漂移与 AI 素养题，向冠军发起挑战。`;
   els.finishPosition.textContent = `${game.finalPosition} / ${RACER_COUNT}`;
   els.finishTime.textContent = formatTime(game.elapsed);
   els.finishAnswers.textContent = `${game.correct} / ${game.answered}`;
+  renderFinalRanking();
   showOverlay(els.finishScreen, true);
 }
 
@@ -547,11 +808,20 @@ function updateHud() {
   const displayedSpeed = Math.max(0, Math.round(game.player.speed * .82));
   els.speed.textContent = String(displayedSpeed);
   els.speedFill.style.width = `${clamp(displayedSpeed / 420 * 100, 0, 100)}%`;
+  const speedAngle = -128 + clamp(displayedSpeed / 420, 0, 1) * 256;
+  els.speedNeedle.style.setProperty("--speed-angle", `${speedAngle}deg`);
+  els.boostState.textContent = game.player.boostTimer > 0
+    ? "ACTIVE"
+    : game.player.driftCharge > .45
+      ? `${Math.round(game.player.driftCharge / 1.8 * 100)}%`
+      : "READY";
   const effect = activeEffect();
   els.effectIcon.textContent = effect.icon;
   els.effectName.textContent = effect.name;
   els.effectPanel.classList.toggle("is-positive", effect.type === "positive");
   els.effectPanel.classList.toggle("is-negative", effect.type === "negative");
+  els.shieldSlot.classList.toggle("is-active", game.player.shield);
+  renderLiveRanking();
 }
 
 function resizeCanvas() {
@@ -623,7 +893,7 @@ function drawPseudo3D(width, height) {
     const far = slices[index + 1];
     const near = slices[index];
     const stripe = Math.floor((playerProgress + index * stepProgress) * 180);
-    ctx.fillStyle = stripe % 2 ? "#5eb95f" : "#66c568";
+    ctx.fillStyle = stripe % 2 ? selectedTrack.theme.grassA : selectedTrack.theme.grassB;
     ctx.fillRect(0, far.y, width, Math.max(1, near.y - far.y + 1));
 
     drawRoadQuad(far, near, stripe);
@@ -640,24 +910,25 @@ function drawPseudo3D(width, height) {
 }
 
 function drawSky(width, height, horizon) {
+  const theme = selectedTrack.theme;
   const sky = ctx.createLinearGradient(0, 0, 0, horizon + 80);
-  sky.addColorStop(0, "#3e8ed0");
-  sky.addColorStop(.62, "#70c7ea");
-  sky.addColorStop(1, "#d8f3ff");
+  sky.addColorStop(0, theme.skyTop);
+  sky.addColorStop(.62, lighten(theme.skyTop, 22));
+  sky.addColorStop(1, theme.skyBottom);
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, width, horizon + 80);
 
   const sunX = width * .78;
   const sunY = horizon * .34;
   const glow = ctx.createRadialGradient(sunX, sunY, 8, sunX, sunY, 80);
-  glow.addColorStop(0, "rgba(255,250,193,.95)");
-  glow.addColorStop(1, "rgba(255,250,193,0)");
+  glow.addColorStop(0, theme.sun);
+  glow.addColorStop(1, "rgba(255,255,255,0)");
   ctx.fillStyle = glow;
   ctx.beginPath();
   ctx.arc(sunX, sunY, 80, 0, TAU);
   ctx.fill();
 
-  ctx.fillStyle = "#6285a4";
+  ctx.fillStyle = theme.mountain;
   ctx.beginPath();
   ctx.moveTo(0, horizon + 35);
   for (let x = 0; x <= width; x += 55) {
@@ -668,7 +939,7 @@ function drawSky(width, height, horizon) {
   ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = "#7fa879";
+  ctx.fillStyle = theme.hill;
   ctx.beginPath();
   ctx.moveTo(0, horizon + 48);
   for (let x = 0; x <= width; x += 42) {
@@ -691,7 +962,7 @@ function drawSky(width, height, horizon) {
 }
 
 function drawRoadQuad(far, near, stripe) {
-  ctx.fillStyle = stripe % 2 ? "#313b47" : "#35414d";
+  ctx.fillStyle = stripe % 2 ? selectedTrack.theme.roadA : selectedTrack.theme.roadB;
   quad(
     far.x - far.half, far.y,
     far.x + far.half, far.y,
@@ -702,7 +973,7 @@ function drawRoadQuad(far, near, stripe) {
 
   const farCurb = Math.max(2, far.half * .09);
   const nearCurb = Math.max(3, near.half * .09);
-  ctx.fillStyle = stripe % 2 ? "#ef4545" : "#fff";
+  ctx.fillStyle = stripe % 2 ? selectedTrack.theme.accent : "#fff";
   quad(
     far.x - far.half - farCurb, far.y,
     far.x - far.half, far.y,
@@ -785,7 +1056,7 @@ function sliceForDistance(slices, distance) {
 
 function drawUpcomingGates3D(slices, playerProgress) {
   const lapIndex = game.player.lap - 1;
-  GATES.forEach((gate, index) => {
+  selectedTrack.gates.forEach((gate, index) => {
     const key = `${lapIndex}-${index}`;
     if (game.usedGates.has(key)) return;
     const distance = progressDistance(gate, playerProgress);
@@ -797,9 +1068,9 @@ function drawUpcomingGates3D(slices, playerProgress) {
     const height = Math.max(25, roadWidth * .48);
     ctx.save();
     ctx.translate(slice.x, slice.y);
-    ctx.shadowColor = "#35d9f1";
+    ctx.shadowColor = selectedTrack.theme.accent;
     ctx.shadowBlur = 12 * scale;
-    ctx.strokeStyle = "#35d9f1";
+    ctx.strokeStyle = selectedTrack.theme.accent;
     ctx.lineWidth = Math.max(2, 8 * scale);
     ctx.beginPath();
     ctx.moveTo(-roadWidth / 2, 0);
@@ -901,10 +1172,10 @@ function drawPlayerKart3D(x, y) {
   roundRect(ctx, 47, -13, 25, 52, 7);
   ctx.fill();
   const body = ctx.createLinearGradient(0, -45, 0, 40);
-  body.addColorStop(0, "#fff3a5");
-  body.addColorStop(.28, "#ffd338");
-  body.addColorStop(.72, "#f29a21");
-  body.addColorStop(1, "#ba4b22");
+  body.addColorStop(0, lighten(selectedDriver.color, 36));
+  body.addColorStop(.28, lighten(selectedDriver.color, 18));
+  body.addColorStop(.72, selectedDriver.color);
+  body.addColorStop(1, darken(selectedDriver.color, 28));
   ctx.fillStyle = body;
   roundRect(ctx, -58, -42, 116, 78, 24);
   ctx.fill();
@@ -923,9 +1194,9 @@ function drawPlayerKart3D(x, y) {
   ctx.arc(0, -42, 22, Math.PI, TAU);
   ctx.fill();
   ctx.fillStyle = "#fff";
-  ctx.font = "900 13px Fredoka, sans-serif";
+  ctx.font = "22px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("YOU", 0, -32);
+  ctx.fillText(selectedDriver.emoji, 0, -31);
   ctx.fillStyle = "#ef4545";
   ctx.fillRect(-43, 14, 86, 14);
   ctx.fillStyle = "#fff";
@@ -972,22 +1243,34 @@ function drawMiniMap(width, height) {
   ctx.fillStyle = "rgba(6,20,33,.72)";
   roundRect(ctx, x - 10, y - 10, mapWidth + 20, mapHeight + 20, 15);
   ctx.fill();
+  ctx.fillStyle = "#ffd338";
+  ctx.font = "900 9px Fredoka, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText(`赛道地图 · LAP ${Math.min(game.player.lap, LAPS_TO_WIN)}/${LAPS_TO_WIN}`, x, y + 4);
   ctx.strokeStyle = "rgba(255,255,255,.65)";
   ctx.lineWidth = 9;
   ctx.beginPath();
-  ctx.ellipse(x + mapWidth / 2, y + mapHeight / 2, 59, 32, 0, 0, TAU);
+  ctx.ellipse(x + mapWidth / 2, y + 57, 59, 27, 0, 0, TAU);
   ctx.stroke();
   const drawDot = (progress, color, radius) => {
     const point = pointAtProgress(progress);
     const dotX = x + mapWidth / 2 + (point.x - WORLD.cx) / WORLD.rx * 59;
-    const dotY = y + mapHeight / 2 + (point.y - WORLD.cy) / WORLD.ry * 32;
+    const dotY = y + 57 + (point.y - WORLD.cy) / WORLD.ry * 27;
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(dotX, dotY, radius, 0, TAU);
     ctx.fill();
   };
   game.opponents.forEach((opponent) => drawDot(normalizeAngle(opponent.totalProgress * TAU) / TAU, opponent.color, 3));
+  selectedTrack.gates.forEach((gate) => drawDot(gate, selectedTrack.theme.accent, 2.5));
   drawDot(game.player.progress, "#ffd338", 5);
+  const finish = pointAtProgress(0);
+  const finishX = x + mapWidth / 2 + (finish.x - WORLD.cx) / WORLD.rx * 59;
+  const finishY = y + 57 + (finish.y - WORLD.cy) / WORLD.ry * 27;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(finishX - 1, finishY - 8, 2, 9);
+  ctx.fillStyle = "#111";
+  ctx.fillRect(finishX + 1, finishY - 8, 7, 5);
   ctx.restore();
 }
 
@@ -1036,7 +1319,7 @@ function drawWorld() {
   ctx.restore();
 
   drawInfield();
-  GATES.forEach((gate, index) => drawGate(gate, index));
+  selectedTrack.gates.forEach((gate, index) => drawGate(gate, index));
   drawFinishLine();
 
   particles.forEach(drawParticle);
@@ -1307,6 +1590,10 @@ els.playAgain.addEventListener("click", startRace);
 els.quizContinue.addEventListener("click", continueFromQuiz);
 window.addEventListener("resize", resizeCanvas);
 
+paintDriverSelection();
+paintSelectedDriver();
+paintTrackSelection();
+paintSelectedTrack();
 resizeCanvas();
 updateOpponents(0);
 updateHud();
