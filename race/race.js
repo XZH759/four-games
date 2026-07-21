@@ -137,6 +137,12 @@ function normalizeAngle(value) {
   return ((value % TAU) + TAU) % TAU;
 }
 
+function signedAngle(value) {
+  let angle = normalizeAngle(value);
+  if (angle > Math.PI) angle -= TAU;
+  return angle;
+}
+
 function progressAt(x, y) {
   const t = normalizeAngle(Math.atan2((y - WORLD.cy) / WORLD.ry, (x - WORLD.cx) / WORLD.rx));
   return normalizeAngle(START_ANGLE - t) / TAU;
@@ -580,15 +586,425 @@ function render() {
   const cssWidth = canvas.clientWidth;
   const cssHeight = canvas.clientHeight;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const sky = ctx.createLinearGradient(0, 0, 0, cssHeight);
-  sky.addColorStop(0, "#5ac0df");
-  sky.addColorStop(1, "#77c96f");
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, cssWidth, cssHeight);
+  drawPseudo3D(cssWidth, cssHeight);
+}
 
-  const view = viewTransform();
-  ctx.setTransform(dpr * view.scale, 0, 0, dpr * view.scale, dpr * view.x, dpr * view.y);
-  drawWorld();
+function drawPseudo3D(width, height) {
+  const horizon = height * .29;
+  drawSky(width, height, horizon);
+
+  const playerProgress = game.player.progress;
+  const basePoint = pointAtProgress(playerProgress);
+  const lateral = (game.player.x - basePoint.x) * basePoint.nx
+    + (game.player.y - basePoint.y) * basePoint.ny;
+  const segmentCount = 92;
+  const stepProgress = .00275;
+  const nearHalfWidth = Math.min(width * .48, height * .69);
+  const slices = [];
+
+  for (let index = 0; index <= segmentCount; index += 1) {
+    const depth = index / segmentCount;
+    const closeness = 1 - depth;
+    const progress = normalizeAngle((playerProgress + index * stepProgress) * TAU) / TAU;
+    const point = pointAtProgress(progress);
+    const headingDelta = signedAngle(point.angle - basePoint.angle);
+    const curveShift = headingDelta * width * .35 * Math.pow(depth, 1.35);
+    const lateralShift = -(lateral / 112) * nearHalfWidth * Math.pow(closeness, 1.45);
+    slices.push({
+      progress,
+      x: width / 2 + curveShift + lateralShift,
+      y: horizon + Math.pow(closeness, 1.62) * (height - horizon + 44),
+      half: 7 + Math.pow(closeness, 1.12) * nearHalfWidth,
+      depth,
+    });
+  }
+
+  for (let index = segmentCount - 1; index >= 0; index -= 1) {
+    const far = slices[index + 1];
+    const near = slices[index];
+    const stripe = Math.floor((playerProgress + index * stepProgress) * 180);
+    ctx.fillStyle = stripe % 2 ? "#5eb95f" : "#66c568";
+    ctx.fillRect(0, far.y, width, Math.max(1, near.y - far.y + 1));
+
+    drawRoadQuad(far, near, stripe);
+    if (index % 7 === 0 && index > 3) {
+      drawRoadsideObject(near, index, width);
+    }
+  }
+
+  drawUpcomingGates3D(slices, playerProgress);
+  drawOpponents3D(slices, playerProgress);
+  drawSpeedEffects(width, height);
+  drawPlayerKart3D(width / 2 + ((input.right ? 1 : 0) - (input.left ? 1 : 0)) * 10, height - 84);
+  drawMiniMap(width, height);
+}
+
+function drawSky(width, height, horizon) {
+  const sky = ctx.createLinearGradient(0, 0, 0, horizon + 80);
+  sky.addColorStop(0, "#3e8ed0");
+  sky.addColorStop(.62, "#70c7ea");
+  sky.addColorStop(1, "#d8f3ff");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, width, horizon + 80);
+
+  const sunX = width * .78;
+  const sunY = horizon * .34;
+  const glow = ctx.createRadialGradient(sunX, sunY, 8, sunX, sunY, 80);
+  glow.addColorStop(0, "rgba(255,250,193,.95)");
+  glow.addColorStop(1, "rgba(255,250,193,0)");
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, 80, 0, TAU);
+  ctx.fill();
+
+  ctx.fillStyle = "#6285a4";
+  ctx.beginPath();
+  ctx.moveTo(0, horizon + 35);
+  for (let x = 0; x <= width; x += 55) {
+    const y = horizon - 18 - Math.sin(x * .018) * 27 - Math.sin(x * .043) * 12;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(width, horizon + 65);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "#7fa879";
+  ctx.beginPath();
+  ctx.moveTo(0, horizon + 48);
+  for (let x = 0; x <= width; x += 42) {
+    const y = horizon + 12 - Math.sin(x * .027 + 1.5) * 17;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(width, horizon + 75);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(255,255,255,.78)";
+  for (let index = 0; index < 5; index += 1) {
+    const x = ((index * 271 + game.elapsed * (5 + index)) % (width + 180)) - 90;
+    const y = 42 + (index % 3) * 36;
+    ctx.beginPath();
+    ctx.ellipse(x, y, 42, 13, 0, 0, TAU);
+    ctx.ellipse(x + 28, y - 5, 28, 14, 0, 0, TAU);
+    ctx.fill();
+  }
+}
+
+function drawRoadQuad(far, near, stripe) {
+  ctx.fillStyle = stripe % 2 ? "#313b47" : "#35414d";
+  quad(
+    far.x - far.half, far.y,
+    far.x + far.half, far.y,
+    near.x + near.half, near.y,
+    near.x - near.half, near.y,
+  );
+  ctx.fill();
+
+  const farCurb = Math.max(2, far.half * .09);
+  const nearCurb = Math.max(3, near.half * .09);
+  ctx.fillStyle = stripe % 2 ? "#ef4545" : "#fff";
+  quad(
+    far.x - far.half - farCurb, far.y,
+    far.x - far.half, far.y,
+    near.x - near.half, near.y,
+    near.x - near.half - nearCurb, near.y,
+  );
+  ctx.fill();
+  quad(
+    far.x + far.half, far.y,
+    far.x + far.half + farCurb, far.y,
+    near.x + near.half + nearCurb, near.y,
+    near.x + near.half, near.y,
+  );
+  ctx.fill();
+
+  if (stripe % 8 < 4) {
+    const farLine = Math.max(1, far.half * .018);
+    const nearLine = Math.max(2, near.half * .018);
+    ctx.fillStyle = "rgba(255,255,255,.5)";
+    quad(
+      far.x - farLine, far.y,
+      far.x + farLine, far.y,
+      near.x + nearLine, near.y,
+      near.x - nearLine, near.y,
+    );
+    ctx.fill();
+  }
+}
+
+function quad(x1, y1, x2, y2, x3, y3, x4, y4) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.lineTo(x3, y3);
+  ctx.lineTo(x4, y4);
+  ctx.closePath();
+}
+
+function drawRoadsideObject(slice, index, width) {
+  const scale = Math.max(.15, (1 - slice.depth) * 1.25);
+  const side = index % 2 ? -1 : 1;
+  const x = slice.x + side * (slice.half + 32 * scale);
+  const y = slice.y;
+  ctx.save();
+  ctx.translate(x, y);
+  if (index % 14 === 0) {
+    ctx.fillStyle = "#f5d74c";
+    ctx.fillRect(-3 * scale, -46 * scale, 6 * scale, 46 * scale);
+    ctx.fillStyle = "#17334b";
+    roundRect(ctx, -30 * scale, -66 * scale, 60 * scale, 27 * scale, 5 * scale);
+    ctx.fill();
+    ctx.fillStyle = "white";
+    ctx.font = `900 ${12 * scale}px Fredoka, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillText("AI", 0, -48 * scale);
+  } else {
+    ctx.fillStyle = "rgba(0,0,0,.18)";
+    ctx.beginPath();
+    ctx.ellipse(5 * scale, 3 * scale, 23 * scale, 8 * scale, 0, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = "#765236";
+    ctx.fillRect(-3 * scale, -28 * scale, 6 * scale, 30 * scale);
+    ctx.fillStyle = index % 3 ? "#27864a" : "#3aa357";
+    ctx.beginPath();
+    ctx.arc(0, -36 * scale, 22 * scale, 0, TAU);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function progressDistance(ahead, current) {
+  return normalizeAngle((ahead - current) * TAU) / TAU;
+}
+
+function sliceForDistance(slices, distance) {
+  const index = Math.round(distance / .00275);
+  if (index < 1 || index >= slices.length) return null;
+  return slices[index];
+}
+
+function drawUpcomingGates3D(slices, playerProgress) {
+  const lapIndex = game.player.lap - 1;
+  GATES.forEach((gate, index) => {
+    const key = `${lapIndex}-${index}`;
+    if (game.usedGates.has(key)) return;
+    const distance = progressDistance(gate, playerProgress);
+    if (distance > .24) return;
+    const slice = sliceForDistance(slices, distance);
+    if (!slice) return;
+    const scale = Math.max(.16, 1 - slice.depth);
+    const roadWidth = slice.half * 1.6;
+    const height = Math.max(25, roadWidth * .48);
+    ctx.save();
+    ctx.translate(slice.x, slice.y);
+    ctx.shadowColor = "#35d9f1";
+    ctx.shadowBlur = 12 * scale;
+    ctx.strokeStyle = "#35d9f1";
+    ctx.lineWidth = Math.max(2, 8 * scale);
+    ctx.beginPath();
+    ctx.moveTo(-roadWidth / 2, 0);
+    ctx.lineTo(-roadWidth / 2, -height);
+    ctx.quadraticCurveTo(0, -height * 1.35, roadWidth / 2, -height);
+    ctx.lineTo(roadWidth / 2, 0);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "#8c63e9";
+    ctx.beginPath();
+    ctx.arc(0, -height * 1.12, Math.max(6, 19 * scale), 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = "white";
+    ctx.font = `900 ${Math.max(9, 20 * scale)}px Fredoka, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillText("?", 0, -height * 1.12 + Math.max(3, 7 * scale));
+    ctx.restore();
+  });
+}
+
+function drawOpponents3D(slices) {
+  const playerTotal = getPlayerTotalProgress();
+  const visible = game.opponents
+    .map((opponent, index) => ({ opponent, index, distance: opponent.totalProgress - playerTotal }))
+    .filter((entry) => entry.distance > .002 && entry.distance < .245)
+    .sort((a, b) => b.distance - a.distance);
+  visible.forEach(({ opponent, index, distance }) => {
+    const slice = sliceForDistance(slices, distance);
+    if (!slice) return;
+    const scale = .18 + Math.pow(1 - slice.depth, 1.2) * 1.18;
+    const laneOffset = opponent.lane / 112 * slice.half;
+    drawRivalKart3D(slice.x + laneOffset, slice.y, scale, opponent.color, index + 2);
+  });
+}
+
+function drawRivalKart3D(x, y, scale, color, number) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = "rgba(0,0,0,.25)";
+  ctx.beginPath();
+  ctx.ellipse(0, 4 * scale, 32 * scale, 9 * scale, 0, 0, TAU);
+  ctx.fill();
+  ctx.fillStyle = "#111923";
+  ctx.fillRect(-29 * scale, -15 * scale, 10 * scale, 24 * scale);
+  ctx.fillRect(19 * scale, -15 * scale, 10 * scale, 24 * scale);
+  const body = ctx.createLinearGradient(0, -25 * scale, 0, 13 * scale);
+  body.addColorStop(0, lighten(color, 28));
+  body.addColorStop(.55, color);
+  body.addColorStop(1, darken(color, 25));
+  ctx.fillStyle = body;
+  roundRect(ctx, -25 * scale, -22 * scale, 50 * scale, 34 * scale, 9 * scale);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.75)";
+  ctx.lineWidth = Math.max(1, 2 * scale);
+  ctx.stroke();
+  ctx.fillStyle = "#d8edf8";
+  ctx.beginPath();
+  ctx.arc(0, -21 * scale, 10 * scale, 0, TAU);
+  ctx.fill();
+  ctx.fillStyle = "#10283c";
+  ctx.font = `900 ${9 * scale}px Fredoka, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.fillText(String(number), 0, -18 * scale);
+  ctx.restore();
+}
+
+function drawPlayerKart3D(x, y) {
+  const steer = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+  const bounce = Math.sin(game.elapsed * 18) * Math.min(2.5, Math.abs(game.player.speed) / 150);
+  ctx.save();
+  ctx.translate(x, y + bounce);
+  ctx.rotate(steer * .045 + (game.player.spinTimer > 0 ? Math.sin(game.elapsed * 14) * .16 : 0));
+  if (game.player.boostTimer > 0) {
+    const flame = ctx.createLinearGradient(0, 18, 0, 68);
+    flame.addColorStop(0, "#fff");
+    flame.addColorStop(.35, "#35d9f1");
+    flame.addColorStop(1, "rgba(53,217,241,0)");
+    ctx.fillStyle = flame;
+    ctx.beginPath();
+    ctx.moveTo(-33, 18);
+    ctx.lineTo(-17, 18);
+    ctx.lineTo(-25, 65 + Math.random() * 14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(17, 18);
+    ctx.lineTo(33, 18);
+    ctx.lineTo(25, 65 + Math.random() * 14);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.fillStyle = "rgba(0,0,0,.34)";
+  ctx.beginPath();
+  ctx.ellipse(0, 24, 77, 18, 0, 0, TAU);
+  ctx.fill();
+  ctx.fillStyle = "#121923";
+  roundRect(ctx, -72, -13, 25, 52, 7);
+  ctx.fill();
+  roundRect(ctx, 47, -13, 25, 52, 7);
+  ctx.fill();
+  const body = ctx.createLinearGradient(0, -45, 0, 40);
+  body.addColorStop(0, "#fff3a5");
+  body.addColorStop(.28, "#ffd338");
+  body.addColorStop(.72, "#f29a21");
+  body.addColorStop(1, "#ba4b22");
+  ctx.fillStyle = body;
+  roundRect(ctx, -58, -42, 116, 78, 24);
+  ctx.fill();
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 5;
+  ctx.stroke();
+  ctx.fillStyle = "#16324b";
+  roundRect(ctx, -34, -30, 68, 35, 14);
+  ctx.fill();
+  ctx.fillStyle = "#d9f4ff";
+  ctx.beginPath();
+  ctx.arc(0, -38, 25, 0, TAU);
+  ctx.fill();
+  ctx.fillStyle = "#26394a";
+  ctx.beginPath();
+  ctx.arc(0, -42, 22, Math.PI, TAU);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.font = "900 13px Fredoka, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("YOU", 0, -32);
+  ctx.fillStyle = "#ef4545";
+  ctx.fillRect(-43, 14, 86, 14);
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(-35, 17, 14, 7);
+  ctx.fillRect(21, 17, 14, 7);
+  if (game.player.shield) {
+    ctx.strokeStyle = "rgba(91,235,255,.9)";
+    ctx.lineWidth = 5;
+    ctx.shadowColor = "#35d9f1";
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.ellipse(0, -5, 82, 69, 0, 0, TAU);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawSpeedEffects(width, height) {
+  const intensity = clamp((game.player.speed - 300) / 180, 0, 1);
+  if (intensity <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = intensity * .55;
+  ctx.strokeStyle = game.player.boostTimer > 0 ? "#7bf5ff" : "#fff";
+  ctx.lineWidth = 2;
+  for (let index = 0; index < 22; index += 1) {
+    const side = index % 2 ? -1 : 1;
+    const x = width / 2 + side * (width * .16 + (index % 11) * width * .032);
+    const y = (index * 83 + game.elapsed * 780) % height;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + side * 28 * intensity, y + 74 * intensity);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawMiniMap(width, height) {
+  if (width < 720) return;
+  const mapWidth = 152;
+  const mapHeight = 96;
+  const x = width - mapWidth - 20;
+  const y = height - mapHeight - 22;
+  ctx.save();
+  ctx.fillStyle = "rgba(6,20,33,.72)";
+  roundRect(ctx, x - 10, y - 10, mapWidth + 20, mapHeight + 20, 15);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.65)";
+  ctx.lineWidth = 9;
+  ctx.beginPath();
+  ctx.ellipse(x + mapWidth / 2, y + mapHeight / 2, 59, 32, 0, 0, TAU);
+  ctx.stroke();
+  const drawDot = (progress, color, radius) => {
+    const point = pointAtProgress(progress);
+    const dotX = x + mapWidth / 2 + (point.x - WORLD.cx) / WORLD.rx * 59;
+    const dotY = y + mapHeight / 2 + (point.y - WORLD.cy) / WORLD.ry * 32;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, radius, 0, TAU);
+    ctx.fill();
+  };
+  game.opponents.forEach((opponent) => drawDot(normalizeAngle(opponent.totalProgress * TAU) / TAU, opponent.color, 3));
+  drawDot(game.player.progress, "#ffd338", 5);
+  ctx.restore();
+}
+
+function lighten(hex, amount) {
+  return shadeColor(hex, amount);
+}
+
+function darken(hex, amount) {
+  return shadeColor(hex, -amount);
+}
+
+function shadeColor(hex, amount) {
+  const value = Number.parseInt(hex.slice(1), 16);
+  const r = clamp((value >> 16) + Math.round(255 * amount / 100), 0, 255);
+  const g = clamp(((value >> 8) & 0xff) + Math.round(255 * amount / 100), 0, 255);
+  const b = clamp((value & 0xff) + Math.round(255 * amount / 100), 0, 255);
+  return `rgb(${r},${g},${b})`;
 }
 
 function drawWorld() {
