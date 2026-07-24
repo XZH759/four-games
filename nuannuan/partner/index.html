@@ -3,90 +3,116 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>学习伙伴编成 · AI Literacy</title>
+  <title>学习伙伴选择 · AI Literacy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/nuannuan/create/create.css" />
-  <style>
-    .partner-wrap { max-width: 720px; margin: 0 auto; padding: 1.2rem 1rem 2.5rem; position: relative; z-index: 1; }
-    .card {
-      margin-top: 1.2rem;
-      padding: 1.4rem 1.2rem;
-      text-align: center;
-      background: var(--cream);
-      border: 1.5px solid var(--gold-line);
-      border-radius: 20px;
-      box-shadow: 0 12px 28px rgba(140, 110, 180, 0.16);
-    }
-    .avatar-box { width: min(200px, 50vw); margin: 1rem auto; }
-    .avatar-box .avatar-svg { width: 100%; height: auto; }
-    .meta { color: var(--muted); font-size: 0.92rem; margin: 0.4rem 0 0; }
-    .name-display {
-      font-family: var(--font-title);
-      font-size: 1.35rem;
-      color: #8a6a2e;
-      letter-spacing: 0.12em;
-      margin: 0;
-    }
-    .row-actions {
-      display: flex; flex-wrap: wrap; gap: 0.65rem; justify-content: center;
-      margin-top: 1.3rem;
-    }
-    .row-actions a {
-      display: inline-grid; place-items: center; text-decoration: none;
-    }
-    .note {
-      margin-top: 1rem;
-      font-size: 0.8rem;
-      color: #a58ad6;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/nuannuan/partner/partner.css" />
 </head>
-<body>
-  <div class="scene-bg" aria-hidden="true"></div>
-  <div class="sparkles" aria-hidden="true"></div>
-
-  <div class="partner-wrap">
-    <div class="top-bar">
-      <a class="back" href="/nuannuan/create" aria-label="返回初始形象创建">← 返回编辑形象</a>
-      <span class="hint-top">步骤 2 · 学习伙伴编成</span>
-    </div>
-
-    <header class="head">
-      <div class="crown" aria-hidden="true">♛</div>
-      <h1 class="title" style="letter-spacing:0.2em;text-indent:0.2em;">学习伙伴编成</h1>
-      <p class="sub" style="letter-spacing:0.12em;">选择同行的学习伙伴（后续扩展）</p>
-    </header>
-
-    <div class="card">
-      <p class="meta" id="status">正在读取你的探索形象…</p>
-      <div class="avatar-box" id="avatar" aria-label="你的角色"></div>
-      <p class="name-display" id="char-name">—</p>
-      <p class="meta">伙伴选择页为后续系统预留。你可先进入章节地图，或返回继续调整形象。</p>
-      <p class="meta" style="margin-top:0.6rem;">外观、伙伴与测验题目内容、能力评价无关。</p>
-
-      <div class="row-actions">
-        <a class="btn btn-random" href="/nuannuan/create">返回编辑形象</a>
-        <a class="btn btn-confirm" href="/nuannuan" id="go-next">进入知识星橱</a>
-        <a class="btn btn-random" href="/collect" style="background:linear-gradient(160deg,#8eb6d8,#6a8fc0);">进入章节地图</a>
-      </div>
-      <p class="note">后续将接入：任务清单 · 章节结算 · 成就徽章 · AI 知识图鉴</p>
-    </div>
+<body class="partner-page" data-companion="diana">
+  <div class="scene" aria-hidden="true">
+    <div class="scene__bg"></div>
+    <div class="scene__hex"></div>
+    <div class="scene__glow"></div>
   </div>
 
-  <script type="module">
-    import { loadFinal, DEFAULT_AVATAR, normalizeAvatar } from "/js/nuannuan/avatar-config.js";
-    import { buildAvatarSVG } from "/js/nuannuan/avatar-preview.js";
+  <header class="topbar">
+    <a class="icon-btn" href="/nuannuan/login" aria-label="返回登录建角">←</a>
+    <div class="topbar-title">
+      <h1>学习伙伴选择</h1>
+      <p>选择 1 位 AI 助手陪伴你完成本次测试</p>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" class="guide-btn" id="guide-open">? 伙伴指南</button>
+      <span class="ai-badge" aria-hidden="true">AI</span>
+    </div>
+  </header>
 
-    const avatar = normalizeAvatar(loadFinal() || DEFAULT_AVATAR);
-    if (!loadFinal()) {
-      location.replace("/nuannuan/create");
-    } else {
-      document.getElementById("status").textContent = "形象创建完成，可以开始探索旅程。";
-      document.getElementById("char-name").textContent = avatar.name || "未命名探索者";
-      document.getElementById("avatar").innerHTML = buildAvatarSVG(avatar, "partner");
-    }
-  </script>
+  <p class="notice" id="partner-note">
+    <span class="notice-ico" aria-hidden="true">!</span>
+    重要说明：伙伴只提供鼓励与提醒，不会直接告诉你答案。
+  </p>
+
+  <main class="layout">
+    <section class="candidates" aria-labelledby="candidate-title">
+      <h2 id="candidate-title" class="panel-title">候选伙伴</h2>
+      <div class="candidate-grid" id="candidate-list" role="listbox" aria-label="学习伙伴候选列表"></div>
+    </section>
+
+    <section class="detail" id="detail-panel" aria-labelledby="detail-name" aria-live="polite">
+      <div class="detail-stage-wrap">
+        <div class="portrait-frame" aria-hidden="true"></div>
+        <div class="detail-stage" id="detail-avatar"></div>
+        <div class="name-banner" id="name-banner">
+          <span id="detail-name-en">DIANA</span>
+        </div>
+      </div>
+
+      <div class="detail-side">
+        <div class="detail-head">
+          <span class="detail-kicker">当前伙伴</span>
+          <h2 class="detail-name" id="detail-name">DIANA</h2>
+          <p class="detail-role" id="detail-role">学术支援型</p>
+        </div>
+        <p class="detail-bio" id="detail-bio"></p>
+        <blockquote class="speech" id="detail-intro"></blockquote>
+        <div class="trait-area">
+          <h3 class="trait-title">核心特质</h3>
+          <div class="trait-list" id="trait-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <section class="team" aria-labelledby="team-title">
+      <h2 class="team-title" id="team-title">我的学习小队 <small>（本次仅可选 1 位）</small></h2>
+      <div class="team-slots" id="team-slots"></div>
+    </section>
+
+    <aside class="tips" aria-label="操作提示">
+      <span class="tips-ico" aria-hidden="true">📘</span>
+      <div>
+        <strong>TIPS</strong>
+        <p id="tips-text">点击左侧卡片预览伙伴，确认后再开始答题。</p>
+      </div>
+    </aside>
+
+    <div class="actions">
+      <button type="button" class="btn btn-detail" id="view-detail">
+        <span aria-hidden="true">📄</span>查看详情
+      </button>
+      <button type="button" class="btn btn-confirm" id="confirm-partner">
+        <span aria-hidden="true">✦</span>选择伙伴
+      </button>
+      <button type="button" class="btn btn-start" id="start-test" disabled>
+        <span aria-hidden="true">◎</span>开始答题
+      </button>
+    </div>
+  </footer>
+
+  <dialog class="guide-dialog" id="guide-dialog" aria-labelledby="guide-title">
+    <form method="dialog" class="guide-card">
+      <h2 id="guide-title">伙伴指南</h2>
+      <ul>
+        <li>每次测试只能选择 <strong>1</strong> 位学习伙伴。</li>
+        <li>伙伴只提供鼓励、流程提醒与进度反馈。</li>
+        <li>伙伴<strong>不会</strong>直接告诉你答案，也不影响评分。</li>
+        <li>先点选卡片预览，再点「选择伙伴」，最后「开始答题」。</li>
+      </ul>
+      <button type="submit" class="btn btn-confirm">知道了</button>
+    </form>
+  </dialog>
+
+  <dialog class="guide-dialog" id="detail-dialog" aria-labelledby="detail-dialog-title">
+    <form method="dialog" class="guide-card">
+      <h2 id="detail-dialog-title">伙伴详情</h2>
+      <p id="detail-dialog-body"></p>
+      <button type="submit" class="btn btn-confirm">关闭</button>
+    </form>
+  </dialog>
+
+  <div class="toast" id="page-message" role="status" aria-live="polite"></div>
+  <script type="module" src="/nuannuan/partner/partner.js"></script>
 </body>
 </html>

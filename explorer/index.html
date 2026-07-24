@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>建立你的探索者 · AI Literacy</title>
+  <meta name="description" content="在開始 AI Literacy 遊戲化測驗前，建立你的探索者形象。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/explorer/explorer.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand-link" href="/" aria-label="返回遊戲大廳">← 返回大廳</a>
+      <nav class="steps" aria-label="建立流程">
+        <span class="pill is-current">步驟 1 / 2 · 角色建立</span>
+        <span class="sep" aria-hidden="true">→</span>
+        <span class="pill">選擇夥伴</span>
+        <span class="sep" aria-hidden="true">→</span>
+        <span class="pill">開始探索</span>
+      </nav>
+    </header>
+
+    <div class="page-head">
+      <h1>建立你的探索者</h1>
+      <p>選擇一個讓你感到舒服的形象。之後還可以透過完成章節獲得新的服裝和配件。外觀不會影響測驗內容或評分。</p>
+    </div>
+
+    <div class="layout">
+      <!-- 左側：即時預覽 -->
+      <section class="panel preview-panel" aria-labelledby="preview-title">
+        <h2 id="preview-title" class="sr-only">角色即時預覽</h2>
+        <div class="stage" aria-live="polite">
+          <div class="stage-glow" aria-hidden="true"></div>
+          <div class="pedestal" aria-hidden="true"></div>
+          <div class="preview-host is-idle" id="preview-host"></div>
+        </div>
+        <div class="preview-actions">
+          <button type="button" class="btn-tool" id="btn-rot-left" aria-label="向左旋轉角色">
+            <span class="ico" aria-hidden="true">↶</span>向左旋轉
+          </button>
+          <button type="button" class="btn-tool" id="btn-rot-right" aria-label="向右旋轉角色">
+            <span class="ico" aria-hidden="true">↷</span>向右旋轉
+          </button>
+          <button type="button" class="btn-tool" id="btn-random" aria-label="隨機產生角色造型">
+            <span class="ico" aria-hidden="true">🎲</span>隨機產生
+          </button>
+          <button type="button" class="btn-tool" id="btn-reset" aria-label="恢復預設角色造型">
+            <span class="ico" aria-hidden="true">↺</span>恢復預設
+          </button>
+        </div>
+        <p class="view-hint" id="view-hint">目前視角：正面</p>
+      </section>
+
+      <!-- 右側：特徵選擇 -->
+      <section class="panel select-panel" aria-labelledby="select-title">
+        <h2 id="select-title" class="sr-only">角色特徵選擇</h2>
+        <div class="tabs" id="tabs" role="tablist" aria-label="特徵分類"></div>
+        <div id="options" class="options-grid" role="listbox" aria-label="特徵選項"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="dock" role="region" aria-label="頁面操作">
+    <div class="dock-inner">
+      <div class="dock-left">
+        <button type="button" class="btn btn-ghost" id="btn-skip" aria-label="使用預設角色並繼續">
+          使用預設角色
+        </button>
+      </div>
+      <div class="dock-right">
+        <a class="btn btn-ghost" href="/" style="display:inline-grid;place-items:center;text-decoration:none;">上一步</a>
+        <button type="button" class="btn btn-primary" id="btn-finish" aria-label="完成建立並前往下一步">
+          完成建立
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-backdrop" id="reset-dialog" hidden role="presentation">
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="reset-title" aria-describedby="reset-desc">
+      <h2 id="reset-title">要恢復初始角色嗎？</h2>
+      <p id="reset-desc">目前的造型選擇將會被預設造型取代，之後仍可重新調整。</p>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-ghost" id="reset-cancel">繼續編輯</button>
+        <button type="button" class="btn btn-secondary" id="reset-confirm">恢復預設</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="/explorer/character-create.js"></script>
+</body>
+</html>

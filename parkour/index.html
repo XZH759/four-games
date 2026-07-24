@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>云城冲刺 · AI 跑酷答题</title>
+  <meta name="description" content="神庙逃亡式三车道跑酷：答对连吃 20 金币，答错扣一条生命。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/parkour/parkour.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true"></div>
+
+  <section class="screen is-on" id="screen-menu">
+    <a class="back" href="/">← LOBBY</a>
+    <div class="menu-card">
+      <p class="eyebrow">PIXEL RUNNER · QUIZ GATES</p>
+      <h1>云城冲刺</h1>
+      <p class="lead">像素风三车道跑酷。答题驱动转向：<strong>答对</strong>连吃 20 金币特效；<strong>答错</strong>桥断坠落再爬起。</p>
+      <ul class="rules">
+        <li>点选 A/B/C：左 / 中 / 右道</li>
+        <li>答对 → 转向正道 + 金币爆发特效</li>
+        <li>答错 / 超时 → 桥断掉下去，生命 -1</li>
+      </ul>
+      <button type="button" class="btn-go" id="start-btn">START!</button>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-play">
+    <canvas id="game" width="960" height="640" aria-label="跑酷画面"></canvas>
+
+    <div class="hud">
+      <div class="hud-left">
+        <div class="stat"><span>SCORE</span><strong id="hud-score">0</strong></div>
+        <div class="stat"><span>DIST</span><strong id="hud-dist">0 M</strong></div>
+        <div class="lives" id="hud-lives" aria-label="生命"></div>
+      </div>
+      <div class="hud-right">
+        <div class="currency"><i class="coin"></i><strong id="hud-coins">0</strong></div>
+        <button type="button" class="pause-btn" id="pause-btn" aria-label="暂停">Ⅱ</button>
+      </div>
+    </div>
+
+    <div class="mission" id="mission">
+      <p>任务</p>
+      <ul>
+        <li id="m-coins">收集金币 0 / 20</li>
+        <li id="m-dist">奔跑距离 0 / 1000m</li>
+        <li id="m-quiz">答对知识门 0</li>
+      </ul>
+    </div>
+
+    <div class="hint" id="swipe-hint">出现题目后，点击下方选项作答</div>
+
+    <div class="quiz-banner" id="quiz-banner" hidden>
+      <span class="q-tag" id="quiz-domain"></span>
+      <p id="quiz-stem"></p>
+      <div class="lane-keys" id="lane-keys" role="group" aria-label="题目选项"></div>
+      <p class="quiz-timer" id="quiz-timer">请选择答案</p>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+  </section>
+
+  <section class="screen" id="screen-over">
+    <div class="menu-card">
+      <p class="eyebrow">RUN COMPLETE</p>
+      <h2 id="over-title">冲刺结束</h2>
+      <div class="over-stats">
+        <div><span>得分</span><strong id="over-score">0</strong></div>
+        <div><span>距离</span><strong id="over-dist">0 M</strong></div>
+        <div><span>金币</span><strong id="over-coins">0</strong></div>
+        <div><span>答对</span><strong id="over-quiz">0</strong></div>
+      </div>
+      <p class="over-msg" id="over-msg"></p>
+      <div class="over-actions">
+        <button type="button" class="btn-go" id="retry-btn">再跑一局</button>
+        <a class="btn-ghost" href="/">返回大厅</a>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="/parkour/parkour.js"></script>
+</body>
+</html>

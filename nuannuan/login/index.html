@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>角色登录 · AI Character System</title>
+  <meta name="description" content="选择性别与职业路线，确认形象后进入。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/avatar-motion.css" />
+  <link rel="stylesheet" href="/nuannuan/login/login.css" />
+</head>
+<body data-role="researcher" data-step="1">
+  <div class="sys-scene" aria-hidden="true">
+    <div class="sys-scene__lobby"></div>
+    <div class="sys-scene__veil"></div>
+    <div class="sys-scene__grid"></div>
+    <div class="sys-scene__particles"></div>
+  </div>
+
+  <header class="sys-top">
+    <a class="sys-back" href="/">← 游戏大厅</a>
+    <div class="sys-brand">
+      <span class="sys-bolt" aria-hidden="true">AI</span>
+      <div>
+        <strong>AI CHARACTER SYSTEM</strong>
+        <small>LOGIN · ROLE SELECT</small>
+      </div>
+    </div>
+    <span class="sys-ver">// SYSTEM ONLINE</span>
+  </header>
+
+  <main class="sys-shell">
+    <aside class="panel panel-select holo-panel" aria-labelledby="select-title">
+      <header class="panel-head">
+        <h2 id="select-title">形象设定</h2>
+        <p>选择性别与职业路线</p>
+      </header>
+
+      <p class="section-label">性别 / GENDER</p>
+      <div class="gender-grid" id="gender-list" role="radiogroup" aria-label="性别"></div>
+
+      <p class="section-label">职业路线 / ROLE</p>
+      <div class="role-grid" id="role-list" role="listbox" aria-label="职业路线"></div>
+
+      <button type="button" class="btn btn-secondary btn-block" id="random">
+        <span class="btn-ico" aria-hidden="true">⚄</span>随机生成
+      </button>
+    </aside>
+
+    <section class="stage-col" aria-labelledby="preview-title">
+      <h2 id="preview-title" class="sr-only">角色实时预览</h2>
+      <div class="stage-frame holo-panel">
+        <div class="stage-meta">
+          <span id="stage-role">研究员</span>
+          <span id="stage-gender">女性</span>
+          <span id="stage-id">RS-F-01</span>
+        </div>
+
+        <div class="stage-board">
+          <div class="stage-tools" aria-label="舞台工具">
+            <button type="button" class="tool-btn" id="undo" title="回撤">回撤</button>
+            <button type="button" class="tool-btn" id="reset" title="重置">重置</button>
+            <button type="button" class="tool-btn" id="share" title="分享">分享</button>
+          </div>
+
+          <button type="button" class="nav-arrow nav-arrow--prev" id="role-prev" aria-label="上一个职业">‹</button>
+
+          <div class="stage-canvas" id="stage">
+            <div class="stage-chamber" aria-hidden="true"></div>
+            <div class="stage-ring" aria-hidden="true"></div>
+            <div class="stage-glow" aria-hidden="true"></div>
+            <div class="doll-host layered-character" id="doll" aria-live="polite"></div>
+            <div class="foot-guide" aria-hidden="true"><i></i><span>FOOT CENTER</span></div>
+          </div>
+
+          <button type="button" class="nav-arrow nav-arrow--next" id="role-next" aria-label="下一个职业">›</button>
+        </div>
+
+        <p class="stage-hint" id="stage-hint">选择职业后可预览形象</p>
+
+        <div class="module-dock" id="module-dock" role="tablist" aria-label="档案焦点">
+          <button type="button" class="module-btn is-on" data-module="role" role="tab" aria-selected="true">
+            <span class="module-ico" aria-hidden="true">◇</span><small>职业</small>
+          </button>
+          <button type="button" class="module-btn" data-module="outfit" role="tab" aria-selected="false">
+            <span class="module-ico" aria-hidden="true">▦</span><small>服装</small>
+          </button>
+          <button type="button" class="module-btn" data-module="accessory" role="tab" aria-selected="false">
+            <span class="module-ico" aria-hidden="true">✦</span><small>配饰</small>
+          </button>
+          <button type="button" class="module-btn" data-module="mark" role="tab" aria-selected="false">
+            <span class="module-ico" aria-hidden="true">◎</span><small>印记</small>
+          </button>
+          <button type="button" class="module-btn" data-module="eyes" role="tab" aria-selected="false">
+            <span class="module-ico" aria-hidden="true">◉</span><small>眼部</small>
+          </button>
+          <button type="button" class="module-btn" data-module="theme" role="tab" aria-selected="false">
+            <span class="module-ico" aria-hidden="true">◐</span><small>主题</small>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel panel-detail holo-panel" aria-labelledby="detail-title">
+      <header class="panel-head">
+        <h2 id="detail-title">角色档案</h2>
+        <p id="detail-sub">当前职业信息</p>
+      </header>
+
+      <label class="name-field">
+        <span>角色名称</span>
+        <div class="name-control">
+          <input id="name" maxlength="8" placeholder="输入名称" autocomplete="off" aria-label="角色名称" />
+          <button type="button" class="dice btn-icon" id="dice" aria-label="随机名称">⚄</button>
+        </div>
+      </label>
+      <p class="name-error" id="name-error" role="alert" hidden></p>
+
+      <div class="profile-card" id="profile-card">
+        <dl class="profile-dl">
+          <div data-focus="role"><dt>名称</dt><dd id="profile-name">—</dd></div>
+          <div data-focus="role"><dt>职业</dt><dd id="profile-role">—</dd></div>
+          <div data-focus="role"><dt>编号</dt><dd id="profile-code">—</dd></div>
+          <div data-focus="outfit"><dt>所属</dt><dd id="profile-aff">—</dd></div>
+          <div data-focus="theme"><dt>身高</dt><dd id="profile-height">—</dd></div>
+        </dl>
+        <div class="profile-sync" aria-hidden="true"><span>98%</span><small>SYNC</small></div>
+      </div>
+
+      <div class="mark-card" id="mark-card" data-focus="mark">
+        <p class="section-label">专属印记</p>
+        <div class="mark-body">
+          <span class="mark-glyph" aria-hidden="true" id="mark-glyph">◆</span>
+          <div>
+            <strong id="mark-title">理性之芯</strong>
+            <small id="mark-desc">以观测与推理推进实验。</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="collect-card" id="collect-card">
+        <p class="section-label">职业收集</p>
+        <div class="collect-body">
+          <span class="collect-ico" aria-hidden="true">▣</span>
+          <span>已浏览 <strong id="collect-count">0</strong> / 3</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="sys-foot holo-panel">
+    <button type="button" class="btn btn-secondary" id="step-prev">上一步</button>
+    <button type="button" class="btn btn-primary" id="confirm">确认进入</button>
+    <button type="button" class="btn btn-secondary" id="step-next">下一步</button>
+    <ol class="step-track" id="step-track" aria-label="流程进度">
+      <li class="is-done" data-step="1"><span>1</span>选择职业</li>
+      <li class="is-on" data-step="2"><span>2</span>形象确认</li>
+      <li data-step="3"><span>3</span>信息确认</li>
+    </ol>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/nuannuan/login/login.js"></script>
+</body>
+</html>

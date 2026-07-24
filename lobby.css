@@ -1,0 +1,308 @@
+:root {
+  --ink: #1e2a24;
+  --muted: #5a6b62;
+  --paper: #fffaf2;
+  --panel: #fffdf8;
+  --line: rgba(30, 42, 36, 0.12);
+  --plaza: #2f7a38;
+  --adventure: #1f7a70;
+  --arena: #c45a28;
+  --town: #c44d72;
+  --sky1: #8fd6ff;
+  --sky2: #ffe7b8;
+  --grass: #5fbf55;
+  --display: "Fredoka", "ZCOOL KuaiLe", "Noto Sans SC", sans-serif;
+  --body: "Noto Sans SC", "ZCOOL KuaiLe", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: var(--body);
+  color: var(--ink);
+  background: #d8f0ff;
+  overflow-x: hidden;
+}
+
+.sky-wash {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(255, 230, 150, 0.55), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 90% 10%, rgba(120, 210, 255, 0.5), transparent 50%),
+    linear-gradient(180deg, #9ad8ff 0%, #c8ecff 28%, #e8f7d8 62%, #f7efd2 100%);
+}
+
+.guide-top {
+  position: relative; z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem 0.65rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.brand-block img {
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 0 rgba(30, 42, 36, 0.15);
+  background: #fff;
+}
+.eyebrow {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--adventure);
+}
+.brand-block h1 {
+  margin: 0.1rem 0 0;
+  font-family: var(--display);
+  font-size: clamp(1.55rem, 4vw, 2.35rem);
+  line-height: 1.1;
+  color: #1a5f8a;
+  text-shadow: 2px 2px 0 #fff, 0 6px 0 rgba(26, 95, 138, 0.12);
+}
+.guide-hint {
+  margin: 0 0 0.35rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* ===== 主布局：横屏左右 / 竖屏上下 ===== */
+.park-guide {
+  position: relative; z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0.5rem 1.1rem 1.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.9fr);
+  gap: 1rem;
+  align-items: stretch;
+  min-height: calc(100vh - 96px);
+}
+
+.map-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.map-frame {
+  flex: 1;
+  min-height: 360px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.55), transparent 40%),
+    linear-gradient(160deg, #b8e8ff 0%, #dff5c8 55%, #ffe9b5 100%);
+  border: 4px solid #1e2a24;
+  box-shadow: 8px 8px 0 rgba(30, 42, 36, 0.18);
+  border-radius: 18px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: 0.4rem;
+}
+.park-map {
+  width: 100%;
+  height: auto;
+  max-height: min(68vh, 640px);
+  display: block;
+}
+.map-caption {
+  margin: 0.55rem 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.zone-chip, .gate-text, .zone-label {
+  font-family: var(--display);
+  fill: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+.zone-label.hub {
+  fill: #5b4636;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.map-pin {
+  cursor: pointer;
+  outline: none;
+}
+.map-pin .pin-bg {
+  stroke: #fff;
+  stroke-width: 3;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.2));
+  transition: transform 0.15s ease;
+}
+.map-pin .pin-num {
+  fill: #fff;
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  pointer-events: none;
+}
+.map-pin .pin-bg.z-plaza { fill: var(--plaza); }
+.map-pin .pin-bg.z-adventure { fill: var(--adventure); }
+.map-pin .pin-bg.z-arena { fill: var(--arena); }
+.map-pin .pin-bg.z-town { fill: var(--town); }
+
+.map-pin:hover .pin-bg,
+.map-pin.is-hot .pin-bg,
+.map-pin:focus-visible .pin-bg {
+  stroke: #ffd45a;
+  stroke-width: 4;
+  filter: drop-shadow(0 0 6px rgba(255, 212, 90, 0.9));
+}
+
+.zone-land.is-hot {
+  filter: brightness(1.08) saturate(1.15);
+}
+
+/* ===== 右侧 / 下方编号列表 ===== */
+.legend-panel {
+  background: var(--panel);
+  border: 4px solid #1e2a24;
+  box-shadow: 8px 8px 0 rgba(30, 42, 36, 0.15);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.legend-head {
+  padding: 1rem 1.05rem 0.75rem;
+  border-bottom: 2px dashed var(--line);
+  background: linear-gradient(180deg, #fff8e8, #fffdf8);
+}
+.legend-head h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.25rem;
+  color: #1a5f8a;
+}
+.legend-head p {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.legend-scroll {
+  overflow: auto;
+  padding: 0.65rem 0.75rem 1rem;
+  display: grid;
+  gap: 0.85rem;
+  flex: 1;
+}
+
+.legend-zone h3 {
+  margin: 0 0 0.4rem;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.dot {
+  width: 0.7rem; height: 0.7rem;
+  border-radius: 2px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+  display: inline-block;
+}
+.dot.plaza { background: var(--plaza); }
+.dot.adventure { background: var(--adventure); }
+.dot.arena { background: var(--arena); }
+.dot.town { background: var(--town); }
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: inherit;
+  padding: 0.55rem 0.6rem;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.65);
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  margin-bottom: 0.35rem;
+}
+.legend-item:hover,
+.legend-item.is-hot,
+.legend-item:focus-visible {
+  border-color: #1a5f8a;
+  background: #fff;
+  transform: translateX(3px);
+  outline: none;
+}
+.legend-item .num {
+  flex: 0 0 auto;
+  width: 2rem; height: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+}
+.legend-item .num.plaza { background: var(--plaza); }
+.legend-item .num.adventure { background: var(--adventure); }
+.legend-item .num.arena { background: var(--arena); }
+.legend-item .num.town { background: var(--town); }
+.legend-item .meta {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.legend-item strong {
+  font-family: var(--display);
+  font-size: 0.98rem;
+  line-height: 1.2;
+}
+.legend-item small {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+/* 竖屏 / 窄屏：上图下列表 */
+@media (max-width: 900px), (orientation: portrait) and (max-width: 1100px) {
+  .guide-top {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 0.25rem;
+  }
+  .park-guide {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(280px, 1fr);
+    min-height: auto;
+    padding-bottom: 1.25rem;
+  }
+  .map-frame {
+    min-height: 280px;
+  }
+  .park-map {
+    max-height: min(46vh, 420px);
+  }
+  .legend-panel {
+    max-height: none;
+  }
+  .legend-scroll {
+    max-height: min(48vh, 520px);
+  }
+}
+
+@media (max-width: 520px) {
+  .brand-block h1 { font-size: 1.45rem; }
+  .guide-hint { font-size: 0.8rem; }
+  .map-frame { border-width: 3px; border-radius: 14px; }
+  .legend-panel { border-width: 3px; border-radius: 14px; }
+}

@@ -347,7 +347,7 @@
   <header class="topbar">
     <a class="back-link" href="/">← 返回大厅</a>
     <div class="wallet">
-      <a class="signin-btn" id="profile-btn" href="/nuannuan/create">👤 个人信息</a>
+      <a class="signin-btn" id="profile-btn" href="/nuannuan/login">👤 个人信息</a>
       <button type="button" class="signin-btn" id="signin-btn">每日签到 +600</button>
       <span class="diamonds" id="diamond-box">💎 <span id="diamond-num">0</span></span>
     </div>
@@ -406,12 +406,12 @@
         } catch { /* ignore */ }
       }
       if (!profile || !profile.name) {
-        location.replace("/nuannuan/create");
+        location.replace("/nuannuan/login");
         return;
       }
       const profileBtn = document.getElementById("profile-btn");
       profileBtn.textContent = `👗 ${profile.name}`;
-      profileBtn.addEventListener("click", () => { location.href = "/nuannuan/create"; });
+      profileBtn.addEventListener("click", () => { location.href = "/nuannuan/login"; });
 
       const SHEET = "/assets/nuannuan-shop.png";
       const CARD_W = 197;

@@ -2,113 +2,11 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>初始形象创建 · AI Literacy</title>
-  <meta name="description" content="进入 AI Literacy 游戏化测试前，创建你的专属学习角色形象。" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/css/game-theme.css" />
-  <link rel="stylesheet" href="/css/avatar-motion.css" />
-  <link rel="stylesheet" href="/nuannuan/create/create.css" />
+  <meta http-equiv="refresh" content="0; url=/nuannuan/login" />
+  <script>location.replace("/nuannuan/login");</script>
+  <title>跳转登录建角…</title>
 </head>
-<body class="game-page create-page">
-  <div class="scene-bg" aria-hidden="true"></div>
-  <div class="scene-veil" aria-hidden="true"></div>
-  <div class="sparkles" aria-hidden="true"></div>
-
-  <div class="wrap">
-    <div class="top-bar">
-      <a class="back game-focus" href="/" aria-label="返回游戏大厅">
-        <span class="back-icon" aria-hidden="true"></span>
-        返回大厅
-      </a>
-      <span class="hint-top">创建后的形象可在后续个人信息中继续修改</span>
-    </div>
-
-    <header class="head">
-      <div class="title-ribbon" aria-hidden="true"></div>
-      <div class="crown" aria-hidden="true">✦</div>
-      <h1 class="title">初始形象创建</h1>
-      <p class="sub">选择你的专属学习伙伴形象</p>
-      <div class="title-divider" aria-hidden="true"></div>
-    </header>
-
-    <p class="placeholder-note" id="placeholder-note" hidden>
-      人物图层未就绪，已临时使用开发 fallback。正式 WebP 位于 <code>/assets/avatar/</code>。
-    </p>
-
-    <div class="cols">
-      <section class="panel ornate game-panel panel-block is-open" id="panel-appear" aria-labelledby="appear-title">
-        <button type="button" class="panel-toggle" data-panel-toggle="panel-appear" aria-expanded="true" aria-controls="appear-opts">
-          <h2 class="panel-title" id="appear-title">外观定制</h2>
-          <span class="toggle-hint" aria-hidden="true">▾</span>
-        </button>
-        <div id="appear-opts" class="panel-body appear-scroll"></div>
-      </section>
-
-      <section class="center" aria-labelledby="preview-title">
-        <h2 id="preview-title" class="sr-only">角色实时预览</h2>
-        <div class="stage-shell">
-          <div class="stage-crest" aria-hidden="true"></div>
-          <div class="stage" id="stage">
-            <div class="pedestal" aria-hidden="true"></div>
-            <div class="doll-host" id="doll" aria-live="polite"></div>
-            <div class="petals" aria-hidden="true"></div>
-          </div>
-        </div>
-        <div class="name-block">
-          <p class="name-title">角色名称</p>
-          <div class="name-scroll" id="name-scroll">
-            <div class="name-row">
-              <input class="name-input game-focus" id="name" maxlength="8" placeholder="点击输入名称" aria-label="角色名称" aria-describedby="name-error" autocomplete="off" />
-              <button type="button" class="dice game-focus" id="dice" title="随机名字" aria-label="随机生成角色名称"></button>
-            </div>
-          </div>
-          <p class="name-error" id="name-error" role="alert" hidden></p>
-        </div>
-      </section>
-
-      <section class="right-col">
-        <div class="panel ornate game-panel panel-block is-open" id="panel-gender" style="margin-bottom: 0.75rem;" aria-labelledby="gender-title">
-          <button type="button" class="panel-toggle" data-panel-toggle="panel-gender" aria-expanded="true" aria-controls="gender-list">
-            <h2 class="panel-title" id="gender-title">性别选择</h2>
-            <span class="toggle-hint" aria-hidden="true">▾</span>
-          </button>
-          <div class="panel-body">
-            <div class="choice-list h gender-list" id="gender-list" role="listbox" aria-label="性别选择"></div>
-          </div>
-        </div>
-        <div class="panel ornate game-panel panel-block is-open" id="panel-body" style="margin-bottom: 0.75rem;" aria-labelledby="body-title">
-          <button type="button" class="panel-toggle" data-panel-toggle="panel-body" aria-expanded="true" aria-controls="body-list">
-            <h2 class="panel-title" id="body-title">体型选择</h2>
-            <span class="toggle-hint" aria-hidden="true">▾</span>
-          </button>
-          <div class="panel-body">
-            <div class="choice-list h" id="body-list" role="listbox" aria-label="体型选择"></div>
-          </div>
-        </div>
-        <div class="panel ornate game-panel panel-block is-open" id="panel-outfit" aria-labelledby="outfit-title">
-          <button type="button" class="panel-toggle" data-panel-toggle="panel-outfit" aria-expanded="true" aria-controls="outfit-list">
-            <h2 class="panel-title" id="outfit-title">初始套装</h2>
-            <span class="toggle-hint" aria-hidden="true">▾</span>
-          </button>
-          <div class="panel-body">
-            <div class="choice-list h" id="outfit-list" role="listbox" aria-label="初始套装"></div>
-            <p class="pager" id="pager">1 / 3</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <div class="actions dock-safe">
-      <button type="button" class="btn btn-random game-button-secondary" id="random" aria-label="随机生成角色外观与名称">随机生成</button>
-      <button type="button" class="btn btn-confirm game-button-primary" id="confirm" aria-label="确认进入学习伙伴编成">确认进入 ✦</button>
-    </div>
-    <p class="foot">后续可在「个人信息」中修改形象 · 外观与测验能力无关</p>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="/nuannuan/create/create.js"></script>
+<body>
+  <p><a href="/nuannuan/login">前往角色登录建角</a></p>
 </body>
 </html>

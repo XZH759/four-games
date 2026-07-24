@@ -9,6 +9,7 @@ import {
   EYE_STYLES,
   STARTER_OUTFITS,
   BODY_TYPES,
+  outfitPalette,
 } from "./avatar-config.js";
 
 const BODY_PARAMS = {
@@ -18,6 +19,20 @@ const BODY_PARAMS = {
   standard: { sh: 30, waist: 21, hip: 30, armW: 10.5, legW: 16, legLen: 494, bust: 2 },
   lively: { sh: 34, waist: 26, hip: 35, armW: 12, legW: 19, legLen: 482, bust: 4 },
 };
+
+function bodyFor(cfg) {
+  const base = BODY_PARAMS[cfg.bodyType] || BODY_PARAMS.balanced;
+  if (cfg.gender !== "male") return base;
+  return {
+    ...base,
+    sh: base.sh * 1.1,
+    waist: base.waist * 1.18,
+    hip: base.hip * 0.92,
+    armW: base.armW * 1.12,
+    legW: base.legW * 1.1,
+    bust: 0,
+  };
+}
 
 const HAIR_STYLE_IDX = {
   wave_long: 0, princess: 1, twin: 2, bob: 3, side_braid: 4,
@@ -57,13 +72,17 @@ function eyes(uid, E, faceIdx) {
   return one(130, -1) + one(170, 1);
 }
 
-function browsAndMouth(H, S, faceIdx) {
-  const blush = faceIdx === 1 ? 0.5 : faceIdx === 2 ? 0.22 : 0.32;
+function browsAndMouth(H, S, faceIdx, gender = "female") {
+  const blush = gender === "male"
+    ? (faceIdx === 1 ? 0.18 : 0.08)
+    : (faceIdx === 1 ? 0.5 : faceIdx === 2 ? 0.22 : 0.32);
+  const browW = gender === "male" ? 2.4 : 2;
+  const lip = gender === "male" ? "#9a6a72" : "#c26875";
   return `
-    <path d="M119,88.5 Q130,83.5 139,87" fill="none" stroke="${H.dark}" stroke-width="2" stroke-linecap="round"/>
-    <path d="M161,87 Q170,83.5 181,88.5" fill="none" stroke="${H.dark}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M119,88.5 Q130,83.5 139,87" fill="none" stroke="${H.dark}" stroke-width="${browW}" stroke-linecap="round"/>
+    <path d="M161,87 Q170,83.5 181,88.5" fill="none" stroke="${H.dark}" stroke-width="${browW}" stroke-linecap="round"/>
     <path d="M150.5,123 q1.6,2 0,3.8" fill="none" stroke="${S.shade}" stroke-width="1.3" stroke-linecap="round"/>
-    <path d="M144.5,135 Q150,139.8 155.5,135" fill="none" stroke="#c26875" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M144.5,135 Q150,${gender === "male" ? 138 : 139.8} 155.5,135" fill="none" stroke="${lip}" stroke-width="${gender === "male" ? 1.8 : 2.2}" stroke-linecap="round"/>
     <ellipse cx="122" cy="123" rx="7" ry="3.6" fill="#f7a8b8" opacity="${blush}"/>
     <ellipse cx="178" cy="123" rx="7" ry="3.6" fill="#f7a8b8" opacity="${blush}"/>`;
 }
@@ -117,12 +136,63 @@ function scallop(xL, xR, y, n, d) {
   return p;
 }
 
-function outfitSet(idx, uid, B, pal) {
+function outfitSet(idx, uid, B, pal, gender = "female") {
   const w = B.waist, sh = B.sh, hip = B.hip, L = B.legLen;
   const cxL = 150 - hip * 0.42, cxR = 150 + hip * 0.42;
   const exd = (d) => 150 + d * (sh + 13);
   const hxd = (d) => 150 + d * (sh + 7);
-  const bustArcs = `<path d="M${150 - 14 - B.bust},205 q7,6 14,0 M${150 + B.bust},205 q7,6 14,0" fill="none" stroke="${pal.deep}" stroke-width="1.2" opacity="0.45"/>`;
+  const bustArcs = gender === "male"
+    ? ""
+    : `<path d="M${150 - 14 - B.bust},205 q7,6 14,0 M${150 + B.bust},205 q7,6 14,0" fill="none" stroke="${pal.deep}" stroke-width="1.2" opacity="0.45"/>`;
+
+  if (gender === "male") {
+    const boot = (cx) => `
+      <path d="M${cx - 8},${L - 8} Q${cx},${L - 14} ${cx + 8},${L - 8} Q${cx + 11},${L + 4} ${cx},${L + 10} Q${cx - 11},${L + 4} ${cx - 8},${L - 8} Z" fill="${pal.deep}" stroke="#1a1520" stroke-width="1.1"/>`;
+    if (idx === 0) {
+      return {
+        shoes: boot(cxL) + boot(cxR),
+        behind: `
+          <path d="M${150 - w - 2},236 L${150 + w + 2},236 L${150 + hip - 4},272 L${150 - hip + 4},272 Z" fill="${pal.deep}"/>
+          <path d="M${150 - hip + 6},270 L${150 - 6},270 L${150 - 8},${L - 4} L${150 - legHalf(B)},${L - 4} Z" fill="${pal.main}"/>
+          <path d="M${150 + 6},270 L${150 + hip - 6},270 L${150 + legHalf(B)},${L - 4} L${150 + 8},${L - 4} Z" fill="${pal.main}"/>
+          <path d="M${150 - sh + 2},186 Q150,178 ${150 + sh - 2},186 L${150 + w + 2},236 L${150 - w - 2},236 Z" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1.2"/>
+          <path d="M${150 - sh - 8},190 Q${150 - sh - 22},250 ${150 - sh - 4},320 L${150 - sh + 18},318 Q${150 - sh + 4},250 ${150 - sh + 10},194 Z" fill="${pal.accent}" opacity="0.75"/>
+          <path d="M${150 + sh + 8},190 Q${150 + sh + 22},250 ${150 + sh + 4},320 L${150 + sh - 18},318 Q${150 + sh - 4},250 ${150 + sh - 10},194 Z" fill="${pal.accent}" opacity="0.75"/>
+          <path d="M143,200 L157,200 L155,228 L145,228 Z" fill="${pal.accent}"/>`,
+        over: `
+          <ellipse cx="${150 - sh}" cy="194" rx="11" ry="9" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1"/>
+          <ellipse cx="${150 + sh}" cy="194" rx="11" ry="9" fill="${pal.light}" stroke="${pal.deep}" stroke-width="1"/>`,
+      };
+    }
+    if (idx === 1) {
+      return {
+        shoes: boot(cxL) + boot(cxR),
+        behind: `
+          <path d="M${150 - w},238 L${150 + w},238 L${150 + hip - 2},270 L${150 - hip + 2},270 Z" fill="${pal.accent}"/>
+          <path d="M${150 - hip + 8},268 L${150 - 5},268 L${150 - 7},${L - 2} L${150 - legHalf(B) + 2},${L - 2} Z" fill="${pal.light}"/>
+          <path d="M${150 + 5},268 L${150 + hip - 8},268 L${150 + legHalf(B) - 2},${L - 2} L${150 + 7},${L - 2} Z" fill="${pal.light}"/>
+          <path d="M${150 - sh},188 Q150,180 ${150 + sh},188 L${150 + w},238 L${150 - w},238 Z" fill="${pal.main}" stroke="${pal.deep}" stroke-width="1.1"/>
+          <path d="M${150 - sh - 18},200 Q${150 - 50},280 ${150 - sh - 6},360 L${150 - sh + 22},356 Q${150 - 20},280 ${150 - 40},210 Z" fill="${pal.accent}" opacity="0.65"/>
+          <rect x="${150 - 22}" y="218" width="44" height="10" rx="3" fill="${pal.deep}"/>`,
+        over: `
+          <path d="M${exd(-1)},243 Q${150 - (sh + 13)},268 ${hxd(-1)},290" fill="none" stroke="${pal.main}" stroke-width="${B.armW * 0.8 + 1.5}" stroke-linecap="round"/>
+          <path d="M${exd(1)},243 Q${150 + (sh + 13)},268 ${hxd(1)},290" fill="none" stroke="${pal.main}" stroke-width="${B.armW * 0.8 + 1.5}" stroke-linecap="round"/>`,
+      };
+    }
+    return {
+      shoes: boot(cxL) + boot(cxR),
+      behind: `
+        <path d="M${150 - w - 1},236 L${150 + w + 1},236 L${150 + hip},${L - 60} L${150 - hip},${L - 60} Z" fill="${pal.main}" opacity="0.92"/>
+        <path d="M${150 - hip + 10},268 L${150 - 6},268 L${150 - 8},${L - 4} L${150 - legHalf(B)},${L - 4} Z" fill="${pal.trim}"/>
+        <path d="M${150 + 6},268 L${150 + hip - 10},268 L${150 + legHalf(B)},${L - 4} L${150 + 8},${L - 4} Z" fill="${pal.trim}"/>
+        <path d="M${150 - sh + 2},186 Q150,178 ${150 + sh - 2},186 L${150 + w + 1},236 L${150 - w - 1},236 Z" fill="${pal.light}" stroke="#151020" stroke-width="1.2"/>
+        <path d="M${150 - 12},198 L${150 + 12},210 M${150 + 12},198 L${150 - 12},210" stroke="${pal.accent}" stroke-width="2"/>
+        <rect x="${150 - 28}" y="228" width="56" height="8" rx="2" fill="${pal.accent}"/>`,
+      over: `
+        <path d="M${exd(-1)},243 Q${150 - (sh + 12)},268 ${hxd(-1)},288" fill="none" stroke="${pal.main}" stroke-width="${B.armW * 0.82 + 1.8}" stroke-linecap="round"/>
+        <path d="M${exd(1)},243 Q${150 + (sh + 12)},268 ${hxd(1)},288" fill="none" stroke="${pal.main}" stroke-width="${B.armW * 0.82 + 1.8}" stroke-linecap="round"/>`,
+    };
+  }
 
   if (idx === 0) {
     const pump = (cx) => `
@@ -191,7 +261,26 @@ function outfitSet(idx, uid, B, pal) {
   };
 }
 
-function accessorySVG(idx) {
+function legHalf(B) {
+  return B.legW * 0.55;
+}
+
+function accessorySVG(idx, gender = "female") {
+  if (gender === "male") {
+    if (idx === 0) {
+      return `<circle cx="168" cy="210" r="5" fill="#e8c34f" stroke="#c9a256" stroke-width="1.2"/>
+        <path d="M168,204 l2,4 4,.3 -3,2.6.8,4 -3.8,-2.2 -3.8,2.2.8,-4 -3,-2.6 4,-.3 z" fill="#fff"/>`;
+    }
+    if (idx === 1) {
+      return `<circle cx="130" cy="110" r="11" fill="none" stroke="#5c4a6e" stroke-width="2.2"/>
+        <circle cx="170" cy="110" r="11" fill="none" stroke="#5c4a6e" stroke-width="2.2"/>
+        <path d="M141,110 H159" stroke="#5c4a6e" stroke-width="2"/>`;
+    }
+    if (idx === 2) {
+      return `<path d="M192,108 Q200,116 194,126" fill="none" stroke="#e8c34f" stroke-width="2.4"/>`;
+    }
+    return `<path d="M150,150 L150,188" stroke="#c9a256" stroke-width="1.6"/><circle cx="150" cy="194" r="5" fill="#a98ade" stroke="#e8c34f" stroke-width="1"/>`;
+  }
   if (idx === 0) {
     return `<g transform="translate(185,50) rotate(18)">
       <path d="M0,0 Q-16,-11 -7,-20 Q2,-13 0,0 Q16,-11 7,-20 Q-2,-13 0,0 Z" fill="#f4a0b8" stroke="#d4788f" stroke-width="1.3"/>
@@ -213,21 +302,23 @@ function accessorySVG(idx) {
  * @param {string} [uid]
  */
 export function buildAvatarSVG(cfg, uid = "main") {
-  const B = BODY_PARAMS[cfg.bodyType] || BODY_PARAMS.balanced;
+  const gender = cfg.gender === "male" ? "male" : "female";
+  const B = bodyFor(cfg);
   const H = findById(HAIR_COLORS, cfg.hairColor);
   const S = findById(SKIN_TONES, cfg.skinTone);
   const E = findById(EYE_STYLES, cfg.eyeStyle);
   const O = findById(STARTER_OUTFITS, cfg.starterOutfit);
+  const pal = outfitPalette(O, gender);
   const hair = hairSet(HAIR_STYLE_IDX[cfg.hairStyle] ?? 0, uid, H);
-  const fit = outfitSet(OUTFIT_IDX[cfg.starterOutfit] ?? 0, uid, B, O.pal);
+  const fit = outfitSet(OUTFIT_IDX[cfg.starterOutfit] ?? 0, uid, B, pal, gender);
   const faceI = FACE_IDX[cfg.faceShape] ?? 0;
   const accI = cfg.accessory == null ? -1 : (ACC_IDX[cfg.accessory] ?? -1);
   const hip = B.hip;
   const cxL = 150 - hip * 0.42, cxR = 150 + hip * 0.42;
   const t = B.legW / 2, k = B.legW * 0.36, a = B.legW * 0.24;
   const L = B.legLen;
-  const skirtTop = cfg.starterOutfit === "traveler" ? "#ffffff" : O.pal.light;
-  const skirtBot = cfg.starterOutfit === "traveler" ? O.pal.trim : O.pal.main;
+  const skirtTop = cfg.starterOutfit === "traveler" ? "#ffffff" : pal.light;
+  const skirtBot = cfg.starterOutfit === "traveler" ? pal.trim : pal.main;
   const sh = B.sh, w = B.waist;
 
   const leg = (cx, dir) => `
@@ -243,7 +334,7 @@ export function buildAvatarSVG(cfg, uid = "main") {
       <ellipse cx="${hx}" cy="299" rx="${B.armW * 0.5}" ry="${B.armW * 0.62}" fill="${S.base}"/>`;
   };
 
-  return `<svg class="avatar-svg" viewBox="0 0 300 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="角色形象预览">
+  return `<svg class="avatar-svg" viewBox="0 0 300 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${gender === "male" ? "男性" : "女性"}角色形象预览">
     <defs>
       <radialGradient id="iris-${uid}" cx="50%" cy="40%" r="62%">
         <stop offset="0%" stop-color="${E.iris}"/><stop offset="100%" stop-color="${E.rim}"/>
@@ -264,16 +355,18 @@ export function buildAvatarSVG(cfg, uid = "main") {
     ${fit.behind}
     <path d="${facePath(faceI)}" fill="${S.base}" stroke="${S.shade}" stroke-width="1.4"/>
     ${eyes(uid, E, faceI)}
-    ${browsAndMouth(H, S, faceI)}
+    ${browsAndMouth(H, S, faceI, gender)}
     ${arm(-1)}${arm(1)}
     ${fit.over}
     ${hair.front}
-    ${accessorySVG(accI)}
+    ${accessorySVG(accI, gender)}
   </svg>`;
 }
 
-export function outfitAura(outfitId) {
-  return findById(STARTER_OUTFITS, outfitId).aura;
+export function outfitAura(outfitId, gender = "female") {
+  const o = findById(STARTER_OUTFITS, outfitId);
+  if (gender === "male" && o.auraMale) return o.auraMale;
+  return o.aura;
 }
 
 export function bodyLabel(id) {

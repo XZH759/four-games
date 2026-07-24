@@ -1,0 +1,30 @@
+/* Route B companion UI tokens — light lavender glass, not dark cyberpunk */
+:root {
+  --comp-bg-0: #fbfaff;
+  --comp-bg-1: #f2effb;
+  --comp-bg-2: #e8e3f6;
+  --comp-ink: #262b55;
+  --comp-muted: #71789e;
+  --comp-accent: #8e7cff;
+  --comp-pink: #ff8ccf;
+  --comp-cyan: #8fe7ff;
+  --comp-gold: #d4af37;
+  --glass-bg: rgba(255,255,255,.72);
+  --glass-border: rgba(140,120,210,.22);
+  --glass-blur: 16px;
+  --card-radius: 24px;
+  --card-shadow: 0 14px 40px rgba(76,67,132,.12);
+  --selected-glow: 0 0 0 2px rgba(255,140,207,.72), 0 0 28px rgba(255,140,207,.35);
+}
+
+.companion-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--card-radius);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--card-shadow);
+}
+
+.companion-card[data-selected="true"] { box-shadow: var(--selected-glow); }
+.companion-art { object-fit: contain; object-position: 50% 50%; user-select: none; pointer-events: none; }

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 素养挑战赛</title>
+  <meta name="description" content="Kahoot 风格 AI 素养限时答题：加入房间、抢答计分、实时排行。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/kahoot/kahoot.css" />
+</head>
+<body>
+  <div class="space-bg" aria-hidden="true"></div>
+  <div class="space-grid" aria-hidden="true"></div>
+
+  <!-- JOIN -->
+  <section class="screen is-on" id="screen-join" aria-labelledby="join-title">
+    <header class="topbar">
+      <div class="brand">
+        <h1 id="join-title" class="join-title">JOIN GAME</h1>
+        <img class="brand-bot" src="/assets/bot-buddy.png" alt="" width="44" height="44" />
+      </div>
+      <div class="top-actions">
+        <a class="icon-btn" href="/" title="返回大厅" aria-label="返回大厅">←</a>
+        <button type="button" class="icon-btn" id="help-btn" title="如何加入？">?</button>
+        <button type="button" class="icon-btn" id="sound-btn" title="音效" aria-pressed="true">🔊</button>
+      </div>
+    </header>
+
+    <div class="join-layout">
+      <div class="join-panel tech-frame">
+        <div class="step">
+          <h2><span class="step-num">1</span> 输入 6 位数游戏 PIN 码</h2>
+          <div class="pin-row" id="pin-row" aria-label="游戏 PIN">
+            <input class="pin-box" maxlength="1" inputmode="text" placeholder="—" aria-label="PIN 第1位" />
+            <input class="pin-box" maxlength="1" inputmode="text" placeholder="—" aria-label="PIN 第2位" />
+            <input class="pin-box" maxlength="1" inputmode="text" placeholder="—" aria-label="PIN 第3位" />
+            <input class="pin-box" maxlength="1" inputmode="text" placeholder="—" aria-label="PIN 第4位" />
+            <input class="pin-box" maxlength="1" inputmode="text" placeholder="—" aria-label="PIN 第5位" />
+            <input class="pin-box" maxlength="1" inputmode="text" placeholder="—" aria-label="PIN 第6位" />
+          </div>
+          <p class="hint-line">演示房可用默认 PIN：<button type="button" class="linkish" id="fill-pin">AI2025</button></p>
+        </div>
+
+        <div class="step">
+          <h2><span class="step-num">2</span> 设定你的昵称与头像</h2>
+          <label class="nick-field">
+            <span class="sr-only">昵称</span>
+            <span class="nick-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"/></svg>
+            </span>
+            <input id="nickname" maxlength="10" minlength="2" placeholder="输入你的昵称（2-10 字）" autocomplete="nickname" required />
+          </label>
+          <div class="avatar-row" id="avatar-row" role="listbox" aria-label="选择头像"></div>
+        </div>
+
+        <div class="join-actions">
+          <label class="round-pick">
+            <span>本场题量</span>
+            <select id="round-size">
+              <option value="5">5 题 · 快闪</option>
+              <option value="8" selected>8 题 · 标准</option>
+              <option value="10">10 题 · 挑战</option>
+            </select>
+          </label>
+          <button type="button" class="btn-primary btn-join" id="join-btn">
+            加入游戏
+            <span class="btn-arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+
+      <aside class="join-side">
+        <div class="mascot-card tech-frame soft-glass">
+          <p class="speech">准备好了吗？一起挑战 AI 素养，成为数位小达人吧！</p>
+          <img src="/assets/bot-hero.png" alt="" class="mascot-img" />
+        </div>
+        <div class="tips tech-frame soft-glass">
+          <h3>老师小提醒</h3>
+          <ul>
+            <li><span class="tip-ico">①</span> 请先准备好 6 位数 PIN</li>
+            <li><span class="tip-ico">②</span> 使用友善积极的昵称</li>
+            <li><span class="tip-ico">③</span> 全员到齐后即可开赛</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="join-foot">
+      <p>准备好一起学习、一起思考、一起成长了吗？ Let's go! 🚀</p>
+      <p class="foot-tag"><span class="ai-chip">AI</span> 素养力，未来超给力！</p>
+    </footer>
+  </section>
+
+  <!-- WAITING LOBBY -->
+  <section class="screen" id="screen-wait" aria-labelledby="wait-title">
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-bot" src="/assets/bot-buddy.png" alt="" width="36" height="36" />
+        <strong id="wait-title">AI 素养挑战赛</strong>
+      </div>
+      <button type="button" class="chip-btn" id="leave-wait">离开房间</button>
+    </header>
+
+    <div class="wait-layout">
+      <div class="wait-left glass-panel">
+        <div class="qr-box" aria-hidden="true">
+          <div class="qr-fake"></div>
+          <span>扫描加入游戏</span>
+        </div>
+      </div>
+
+      <div class="wait-main">
+        <div class="room-code glass-panel">
+          <span class="label">房间代码</span>
+          <strong id="room-code">AI2025</strong>
+          <button type="button" class="chip-btn" id="copy-code">复制</button>
+          <p>邀请同学输入房间代码一起加入！</p>
+        </div>
+        <div class="topic-box glass-panel">
+          <span class="label">本场题目</span>
+          <strong>AI 素养挑战赛</strong>
+          <p>一起挑战 AI 时代必备素养！📚</p>
+        </div>
+
+        <h2 class="section-h">参赛同学 <small id="player-count">1 / 12</small></h2>
+        <div class="player-grid" id="player-grid"></div>
+      </div>
+
+      <aside class="wait-right">
+        <div class="glass-panel meta-card">
+          <span class="label">在线人数</span>
+          <strong id="online-count">1 / 12</strong>
+        </div>
+        <div class="cat-stack" id="cat-stack">
+          <span class="cat is-cyan">AI 基础概念</span>
+          <span class="cat is-violet">资料与数据</span>
+          <span class="cat is-orange">AI 伦理与社会</span>
+          <span class="cat is-green">安全与责任使用</span>
+        </div>
+      </aside>
+    </div>
+
+    <div class="wait-bottom">
+      <button type="button" class="chip-btn" id="room-settings">房间设定</button>
+      <button type="button" class="btn-primary btn-xl" id="start-btn">开始挑战 →</button>
+      <div class="wait-mascot">
+        <img src="/assets/bot-buddy.png" alt="" width="72" height="72" />
+        <span class="speech-mini">准备好了吗？一起开启挑战吧！</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen screen-play" id="screen-play">
+    <header class="play-top">
+      <div class="brand">
+        <img class="brand-bot" src="/assets/bot-buddy.png" alt="" width="32" height="32" />
+        <strong>AI 素养挑战赛</strong>
+      </div>
+      <div class="play-center-meta">
+        <span id="q-index">第 1 / 8 题</span>
+        <div class="timer-ring" id="timer-ring">
+          <svg viewBox="0 0 72 72" aria-hidden="true">
+            <circle class="track" cx="36" cy="36" r="30" />
+            <circle class="prog" id="timer-prog" cx="36" cy="36" r="30" />
+          </svg>
+          <strong id="timer-text">00:20</strong>
+        </div>
+      </div>
+      <div class="play-score-meta">
+        <span>本题分数 <strong id="q-points-hint">最高 1000</strong></span>
+      </div>
+    </header>
+
+    <div class="play-grid">
+      <aside class="side-left">
+        <div class="glass-panel player-card">
+          <div class="avatar-lg" id="you-avatar"></div>
+          <div>
+            <strong id="you-name">玩家</strong>
+            <p class="score-line"><span id="you-score">0</span> 分</p>
+            <p class="streak-line" id="you-streak">连续答对 0 题</p>
+          </div>
+          <div class="xp-bar"><i id="xp-fill"></i></div>
+          <small id="xp-label">Lv.1 初学者</small>
+        </div>
+        <div class="glass-panel buff-card">
+          <h3>能力加成</h3>
+          <ul id="buff-list">
+            <li><span>📘</span> 知识加成 <b>+0%</b></li>
+            <li><span>🛡️</span> 护盾 <b id="buff-shield">未启用</b></li>
+            <li><span>⏱️</span> 延时 <b id="buff-time">—</b></li>
+          </ul>
+        </div>
+      </aside>
+
+      <main class="play-main">
+        <article class="q-card glass-panel">
+          <span class="q-tag" id="q-domain">AI 基础概念</span>
+          <h2 id="q-stem"></h2>
+          <img class="q-mascot" src="/assets/bot-buddy.png" alt="" width="64" height="64" />
+        </article>
+        <div class="answers" id="answers" role="group" aria-label="选项"></div>
+      </main>
+
+      <aside class="side-right">
+        <div class="glass-panel board-card">
+          <h3>即时排行榜</h3>
+          <ol class="live-board" id="live-board"></ol>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="play-foot">
+      <div class="combo-box" id="combo-box">
+        <strong id="combo-text">0 连击</strong>
+      </div>
+      <div class="timeline">
+        <div class="timeline-track" id="timeline-track"></div>
+        <p class="timeline-tip" id="timeline-tip">保持节奏，冲向满分！</p>
+      </div>
+      <div class="items" id="items">
+        <button type="button" class="item-btn" data-item="hint" title="提示">💡<small id="item-hint">×2</small></button>
+        <button type="button" class="item-btn" data-item="fifty" title="去掉两个错误选项">50:50<small id="item-fifty">×1</small></button>
+        <button type="button" class="item-btn" data-item="time" title="加时 5 秒">⏱️<small id="item-time">×1</small></button>
+      </div>
+    </footer>
+  </section>
+
+  <!-- REVEAL -->
+  <section class="screen" id="screen-reveal">
+    <header class="play-top compact">
+      <div class="brand">
+        <img class="brand-bot" src="/assets/bot-buddy.png" alt="" width="32" height="32" />
+        <strong>AI 素养挑战赛</strong>
+      </div>
+      <span id="reveal-index">第 1 / 8 题</span>
+      <span class="gold" id="reveal-gain">本题获得 ★+0 分</span>
+    </header>
+
+    <div class="reveal-layout">
+      <aside class="side-left">
+        <div class="glass-panel player-card mini">
+          <div class="avatar-lg" id="reveal-avatar"></div>
+          <div>
+            <strong id="reveal-name">玩家</strong>
+            <p class="score-line"><span id="reveal-total">0</span> 分</p>
+            <p class="streak-line" id="reveal-streak">连续 0</p>
+          </div>
+        </div>
+      </aside>
+
+      <div class="reveal-center">
+        <div class="confetti" aria-hidden="true"></div>
+        <img class="reveal-bot" src="/assets/bot-hero.png" alt="" />
+        <h2 class="reveal-title" id="reveal-title">答对了！</h2>
+        <p class="reveal-sub" id="reveal-sub">太棒了！你展现了超强的学习力！</p>
+        <div class="reveal-cards">
+          <div class="glass-panel soft">
+            <span class="label">正确答案</span>
+            <p id="reveal-answer"></p>
+          </div>
+          <div class="glass-panel soft">
+            <span class="label">本题获得</span>
+            <p class="big-gold" id="reveal-points">+0 分</p>
+          </div>
+        </div>
+        <p class="reveal-explain" id="reveal-explain"></p>
+        <div class="combo-bar glass-panel soft">
+          <strong id="reveal-combo">0 COMBO!</strong>
+          <div class="xp-bar"><i id="reveal-combo-fill"></i></div>
+          <span id="reveal-combo-tip">继续保持气势！</span>
+        </div>
+        <button type="button" class="btn-primary btn-xl" id="reveal-next">下一题 →</button>
+      </div>
+
+      <aside class="side-right">
+        <div class="glass-panel board-card">
+          <h3>即时排行榜</h3>
+          <ol class="live-board" id="reveal-board"></ol>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- PODIUM -->
+  <section class="screen" id="screen-podium" aria-labelledby="podium-title">
+    <p class="eyebrow">FINAL STANDINGS</p>
+    <h2 id="podium-title">决赛颁奖</h2>
+    <div class="podium" id="podium"></div>
+    <ol class="live-board final" id="final-list"></ol>
+    <div class="podium-actions">
+      <button type="button" class="chip-btn" id="again">再来一局</button>
+      <a class="btn-primary" href="/">返回大厅</a>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/kahoot/kahoot.js"></script>
+</body>
+</html>

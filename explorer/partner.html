@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>選擇夥伴 · AI Literacy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/explorer/explorer.css" />
+  <style>
+    .partner-main { max-width: 720px; margin: 2rem auto; text-align: center; }
+    .partner-preview { width: min(220px, 50vw); margin: 1.5rem auto; }
+    .partner-card {
+      display: grid; gap: 0.75rem; justify-items: center;
+      padding: 1.5rem; border-radius: 16px;
+      background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow);
+    }
+    .partner-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 1.25rem; }
+  </style>
+</head>
+<body>
+  <div class="page" style="padding-bottom: 2rem;">
+    <header class="topbar">
+      <a class="brand-link" href="/explorer" aria-label="返回角色建立">← 返回編輯角色</a>
+      <nav class="steps" aria-label="建立流程">
+        <span class="pill">步驟 1 · 角色建立</span>
+        <span class="sep" aria-hidden="true">→</span>
+        <span class="pill is-current">步驟 2 / 2 · 選擇夥伴</span>
+        <span class="sep" aria-hidden="true">→</span>
+        <span class="pill">開始探索</span>
+      </nav>
+    </header>
+
+    <main class="partner-main">
+      <div class="page-head" style="text-align:center;">
+        <h1>選擇學習夥伴</h1>
+        <p>夥伴選擇頁為後續介面預留。你的探索者已就緒，可先進入章節地圖，或返回修改造型。</p>
+      </div>
+
+      <div class="partner-card">
+        <p id="status" style="margin:0;color:var(--muted);font-size:0.95rem;">讀取探索者資料中…</p>
+        <div class="partner-preview" id="mini" aria-label="你的探索者"></div>
+        <p style="margin:0;font-size:0.85rem;color:var(--muted);">夥伴系統與章節地圖將接上遊戲化測驗流程。外觀與測驗能力無關。</p>
+        <div class="partner-actions">
+          <a class="btn btn-ghost" href="/explorer" style="display:inline-grid;place-items:center;text-decoration:none;">返回編輯角色</a>
+          <a class="btn btn-primary" href="/collect" style="display:inline-grid;place-items:center;text-decoration:none;">進入章節地圖（暫接 collect）</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { loadFinal, DEFAULT_CONFIG, normalizeConfig } from "/js/explorer/character-config.js";
+    import { buildCharacterSVG } from "/js/explorer/character-preview.js";
+
+    const cfg = normalizeConfig(loadFinal() || DEFAULT_CONFIG);
+    const fromDefault = new URLSearchParams(location.search).get("from") === "default";
+    document.getElementById("status").textContent = fromDefault
+      ? "已使用預設探索者，可以開始探索。"
+      : "探索者建立完成！可以開始探索，或返回微調造型。";
+    document.getElementById("mini").innerHTML = buildCharacterSVG(cfg, 0, "partner");
+  </script>
+</body>
+</html>

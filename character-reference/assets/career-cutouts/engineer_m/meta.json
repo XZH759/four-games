@@ -1,0 +1,105 @@
+{
+  "char": "engineer_m",
+  "status": "ok",
+  "parts": {
+    "body": {
+      "w": 149,
+      "h": 415
+    },
+    "outfit": {
+      "w": 173,
+      "h": 389
+    },
+    "hairBack": {
+      "w": 71,
+      "h": 75
+    },
+    "face": {
+      "w": 52,
+      "h": 63
+    },
+    "eyes": {
+      "w": 71,
+      "h": 16
+    },
+    "hairFront": {
+      "w": 89,
+      "h": 68
+    },
+    "accessory": [
+      {
+        "file": "accessory_01.png",
+        "w": 101,
+        "h": 109
+      },
+      {
+        "file": "accessory_02.png",
+        "w": 90,
+        "h": 111
+      },
+      {
+        "file": "accessory_03.png",
+        "w": 57,
+        "h": 150
+      },
+      {
+        "file": "accessory_04.png",
+        "w": 82,
+        "h": 106
+      },
+      {
+        "file": "accessory_05.png",
+        "w": 87,
+        "h": 41
+      }
+    ]
+  },
+  "preview": {
+    "card_box": [
+      81,
+      235,
+      344,
+      882
+    ]
+  },
+  "canvas": {
+    "body": {
+      "scale": 3.0097
+    },
+    "outfit": {
+      "scale": 3.0097
+    },
+    "composite": {
+      "scale": 1.9345
+    },
+    "experimental": {
+      "face": {
+        "scale": 2.5467,
+        "top": 200,
+        "h": 160
+      },
+      "eyes": {
+        "scale": 0.9699,
+        "top": 272,
+        "h": 15
+      },
+      "hairFront": {
+        "scale": 1.9343,
+        "top": 144,
+        "h": 131
+      },
+      "hairBack": {
+        "scale": 2.518,
+        "top": 138,
+        "h": 188
+      }
+    }
+  },
+  "head": {
+    "top": 11,
+    "bot": 423,
+    "figh": 412,
+    "headw": 44,
+    "headcx": 109.5
+  }
+}

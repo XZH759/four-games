@@ -1,0 +1,94 @@
+{
+  "project": "AI Character System",
+  "version": "1.1-career-cutouts",
+  "type": "career-cutout-package",
+  "note": "Runtime previews use single-figure transparent composites (1024x1536). Multi-person reference sheets remain for art direction only.",
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "anchor": {
+    "type": "foot_center",
+    "x": 512,
+    "y": 1440
+  },
+  "layer_order": [
+    "body",
+    "outfit",
+    "hairBack",
+    "face",
+    "eyes",
+    "hairFront",
+    "accessory"
+  ],
+  "master_lineup": "assets/reference_sheets/master_lineup/master_lineup.png",
+  "cutouts_root": "assets/career-cutouts",
+  "characters": [
+    {
+      "id": "researcher_female",
+      "role": "researcher",
+      "gender": "female",
+      "display_name_cn": "研究员·女",
+      "display_name_en": "Researcher · Female",
+      "height_cm": 168,
+      "preview": "assets/career-cutouts/researcher_f/canvas/composite.png",
+      "thumb": "assets/career-cutouts/researcher_f/preview_card.png",
+      "sheet": "assets/reference_sheets/researcher/female/sheet.png"
+    },
+    {
+      "id": "researcher_male",
+      "role": "researcher",
+      "gender": "male",
+      "display_name_cn": "研究员·男",
+      "display_name_en": "Researcher · Male",
+      "height_cm": 178,
+      "preview": "assets/career-cutouts/researcher_m/canvas/composite.png",
+      "thumb": "assets/career-cutouts/researcher_m/preview_card.png",
+      "sheet": "assets/reference_sheets/researcher/male/sheet.png"
+    },
+    {
+      "id": "programmer_female",
+      "role": "programmer",
+      "gender": "female",
+      "display_name_cn": "程序员·女",
+      "display_name_en": "Programmer · Female",
+      "height_cm": 168,
+      "preview": "assets/career-cutouts/programmer_f/canvas/composite.png",
+      "thumb": "assets/career-cutouts/programmer_f/preview_card.png",
+      "sheet": "assets/reference_sheets/programmer/female/sheet.png"
+    },
+    {
+      "id": "programmer_male",
+      "role": "programmer",
+      "gender": "male",
+      "display_name_cn": "程序员·男",
+      "display_name_en": "Programmer · Male",
+      "height_cm": 178,
+      "preview": "assets/career-cutouts/programmer_m/canvas/composite.png",
+      "thumb": "assets/career-cutouts/programmer_m/preview_card.png",
+      "sheet": "assets/reference_sheets/programmer/male/sheet.png"
+    },
+    {
+      "id": "engineer_female",
+      "role": "engineer",
+      "gender": "female",
+      "display_name_cn": "工程师·女",
+      "display_name_en": "Engineer · Female",
+      "height_cm": 168,
+      "preview": "assets/career-cutouts/engineer_f/canvas/composite.png",
+      "thumb": "assets/career-cutouts/engineer_f/preview_card.png",
+      "sheet": "assets/reference_sheets/engineer/female/sheet.png"
+    },
+    {
+      "id": "engineer_male",
+      "role": "engineer",
+      "gender": "male",
+      "display_name_cn": "工程师·男",
+      "display_name_en": "Engineer · Male",
+      "height_cm": 178,
+      "preview": "assets/career-cutouts/engineer_m/canvas/composite.png",
+      "thumb": "assets/career-cutouts/engineer_m/preview_card.png",
+      "sheet": "assets/reference_sheets/engineer/male/sheet.png"
+    }
+  ]
+}

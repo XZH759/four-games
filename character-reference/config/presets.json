@@ -1,0 +1,40 @@
+{
+  "presets": [
+    {
+      "preset_id": "RF_001",
+      "character": "researcher_female",
+      "use": "lab_ui_avatar",
+      "sheet": "assets/reference_sheets/researcher/female/sheet.png"
+    },
+    {
+      "preset_id": "RM_001",
+      "character": "researcher_male",
+      "use": "lab_ui_avatar",
+      "sheet": "assets/reference_sheets/researcher/male/sheet.png"
+    },
+    {
+      "preset_id": "PF_001",
+      "character": "programmer_female",
+      "use": "code_ui_avatar",
+      "sheet": "assets/reference_sheets/programmer/female/sheet.png"
+    },
+    {
+      "preset_id": "PM_001",
+      "character": "programmer_male",
+      "use": "code_ui_avatar",
+      "sheet": "assets/reference_sheets/programmer/male/sheet.png"
+    },
+    {
+      "preset_id": "EF_001",
+      "character": "engineer_female",
+      "use": "tools_ui_avatar",
+      "sheet": "assets/reference_sheets/engineer/female/sheet.png"
+    },
+    {
+      "preset_id": "EM_001",
+      "character": "engineer_male",
+      "use": "tools_ui_avatar",
+      "sheet": "assets/reference_sheets/engineer/male/sheet.png"
+    }
+  ]
+}

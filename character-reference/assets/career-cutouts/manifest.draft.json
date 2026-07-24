@@ -1,0 +1,590 @@
+{
+  "canvas": {
+    "w": 1024,
+    "h": 1536,
+    "footBaselineY": 1440,
+    "figureHeight": 1240
+  },
+  "zOrder": [
+    "body",
+    "outfit",
+    "hairBack",
+    "face",
+    "eyes",
+    "hairFront",
+    "accessory"
+  ],
+  "note": "Extracted from AI-generated asset sheets (1448x1086). parts/=raw trimmed cutouts at native scale; canvas/=contract-compliant 1024x1536 (body/outfit/composite only); canvas_experimental/=heuristic head placement, NOT production-ready.",
+  "characters": {
+    "engineer_m": {
+      "previewCard": "engineer_m/preview_card.png",
+      "previewCutout": "engineer_m/preview_cutout.png",
+      "layers": {
+        "body": {
+          "src": "engineer_m/parts/body.png",
+          "px": [
+            149,
+            415
+          ],
+          "status": "canvas",
+          "canvas": "engineer_m/canvas/body.png"
+        },
+        "outfit": {
+          "src": "engineer_m/parts/outfit.png",
+          "px": [
+            173,
+            389
+          ],
+          "status": "canvas",
+          "canvas": "engineer_m/canvas/outfit.png"
+        },
+        "hairBack": {
+          "src": "engineer_m/parts/hairBack.png",
+          "px": [
+            71,
+            75
+          ],
+          "status": "raw"
+        },
+        "face": {
+          "src": "engineer_m/parts/face.png",
+          "px": [
+            52,
+            63
+          ],
+          "status": "raw"
+        },
+        "eyes": {
+          "src": "engineer_m/parts/eyes.png",
+          "px": [
+            71,
+            16
+          ],
+          "status": "raw"
+        },
+        "hairFront": {
+          "src": "engineer_m/parts/hairFront.png",
+          "px": [
+            89,
+            68
+          ],
+          "status": "raw"
+        }
+      },
+      "accessories": [
+        {
+          "src": "engineer_m/parts/accessory_01.png",
+          "px": [
+            101,
+            109
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "engineer_m/parts/accessory_02.png",
+          "px": [
+            90,
+            111
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "engineer_m/parts/accessory_03.png",
+          "px": [
+            57,
+            150
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "engineer_m/parts/accessory_04.png",
+          "px": [
+            82,
+            106
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "engineer_m/parts/accessory_05.png",
+          "px": [
+            87,
+            41
+          ],
+          "status": "raw"
+        }
+      ],
+      "composite": "engineer_m/canvas/composite.png"
+    },
+    "engineer_f": {
+      "previewCard": "engineer_f/preview_card.png",
+      "previewCutout": "engineer_f/preview_cutout.png",
+      "layers": {
+        "body": {
+          "src": "engineer_f/parts/body.png",
+          "px": [
+            148,
+            535
+          ],
+          "status": "canvas",
+          "canvas": "engineer_f/canvas/body.png"
+        },
+        "outfit": {
+          "src": "engineer_f/parts/outfit.png",
+          "px": [
+            117,
+            498
+          ],
+          "status": "canvas",
+          "canvas": "engineer_f/canvas/outfit.png"
+        },
+        "hairBack": {
+          "src": "engineer_f/parts/hairBack.png",
+          "px": [
+            120,
+            437
+          ],
+          "status": "raw"
+        },
+        "face": {
+          "src": "engineer_f/parts/face.png",
+          "px": [
+            62,
+            80
+          ],
+          "status": "raw"
+        },
+        "eyes": {
+          "src": "engineer_f/parts/eyes.png",
+          "px": [
+            76,
+            25
+          ],
+          "status": "raw"
+        },
+        "hairFront": {
+          "src": "engineer_f/parts/hairFront.png",
+          "px": [
+            110,
+            151
+          ],
+          "status": "raw"
+        }
+      },
+      "accessories": [
+        {
+          "src": "engineer_f/parts/accessory_01.png",
+          "px": [
+            129,
+            123
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "engineer_f/parts/accessory_02.png",
+          "px": [
+            111,
+            115
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "engineer_f/parts/accessory_03.png",
+          "px": [
+            117,
+            45
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "engineer_f/parts/accessory_04.png",
+          "px": [
+            47,
+            98
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "engineer_f/parts/accessory_05.png",
+          "px": [
+            117,
+            37
+          ],
+          "status": "raw"
+        }
+      ],
+      "composite": "engineer_f/canvas/composite.png"
+    },
+    "programmer_m": {
+      "previewCard": "programmer_m/preview_card.png",
+      "previewCutout": "programmer_m/preview_cutout.png",
+      "layers": {
+        "body": {
+          "src": "programmer_m/parts/body.png",
+          "px": [
+            142,
+            394
+          ],
+          "status": "canvas",
+          "canvas": "programmer_m/canvas/body.png"
+        },
+        "outfit": {
+          "src": "programmer_m/parts/outfit.png",
+          "px": [
+            172,
+            379
+          ],
+          "status": "canvas",
+          "canvas": "programmer_m/canvas/outfit.png"
+        },
+        "hairBack": {
+          "src": "programmer_m/parts/hairBack.png",
+          "px": [
+            92,
+            96
+          ],
+          "status": "raw"
+        },
+        "face": {
+          "src": "programmer_m/parts/face.png",
+          "px": [
+            82,
+            124
+          ],
+          "status": "raw"
+        },
+        "eyes": {
+          "src": "programmer_m/parts/eyes.png",
+          "px": [
+            101,
+            34
+          ],
+          "status": "raw"
+        },
+        "hairFront": {
+          "src": "programmer_m/parts/hairFront.png",
+          "px": [
+            152,
+            123
+          ],
+          "status": "raw"
+        }
+      },
+      "accessories": [
+        {
+          "src": "programmer_m/parts/accessory_01.png",
+          "px": [
+            137,
+            178
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "programmer_m/parts/accessory_02.png",
+          "px": [
+            127,
+            110
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "programmer_m/parts/accessory_03.png",
+          "px": [
+            71,
+            174
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "programmer_m/parts/accessory_04.png",
+          "px": [
+            111,
+            31
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "programmer_m/parts/accessory_05.png",
+          "px": [
+            59,
+            76
+          ],
+          "status": "raw"
+        }
+      ],
+      "composite": "programmer_m/canvas/composite.png"
+    },
+    "programmer_f": {
+      "previewCard": "programmer_f/preview_card.png",
+      "previewCutout": "programmer_f/preview_cutout.png",
+      "layers": {
+        "body": {
+          "src": "programmer_f/parts/body.png",
+          "px": [
+            166,
+            441
+          ],
+          "status": "canvas",
+          "canvas": "programmer_f/canvas/body.png"
+        },
+        "outfit": {
+          "src": "programmer_f/parts/outfit.png",
+          "px": [
+            187,
+            428
+          ],
+          "status": "canvas",
+          "canvas": "programmer_f/canvas/outfit.png"
+        },
+        "hairBack": {
+          "src": "programmer_f/parts/hairBack.png",
+          "px": [
+            105,
+            110
+          ],
+          "status": "raw"
+        },
+        "face": {
+          "src": "programmer_f/parts/face.png",
+          "px": [
+            67,
+            83
+          ],
+          "status": "raw"
+        },
+        "eyes": {
+          "src": "programmer_f/parts/eyes.png",
+          "px": [
+            92,
+            29
+          ],
+          "status": "raw"
+        },
+        "hairFront": {
+          "src": "programmer_f/parts/hairFront.png",
+          "px": [
+            130,
+            132
+          ],
+          "status": "raw"
+        }
+      },
+      "accessories": [
+        {
+          "src": "programmer_f/parts/accessory_01.png",
+          "px": [
+            147,
+            116
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "programmer_f/parts/accessory_02.png",
+          "px": [
+            156,
+            99
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "programmer_f/parts/accessory_03.png",
+          "px": [
+            80,
+            140
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "programmer_f/parts/accessory_04.png",
+          "px": [
+            81,
+            65
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "programmer_f/parts/accessory_05.png",
+          "px": [
+            112,
+            35
+          ],
+          "status": "raw"
+        }
+      ],
+      "composite": "programmer_f/canvas/composite.png"
+    },
+    "researcher_m": {
+      "previewCard": "researcher_m/preview_card.png",
+      "previewCutout": "researcher_m/preview_cutout.png",
+      "layers": {
+        "body": {
+          "src": "researcher_m/parts/body.png",
+          "px": [
+            141,
+            488
+          ],
+          "status": "canvas",
+          "canvas": "researcher_m/canvas/body.png"
+        },
+        "outfit": {
+          "src": "researcher_m/parts/outfit.png",
+          "px": [
+            150,
+            421
+          ],
+          "status": "canvas",
+          "canvas": "researcher_m/canvas/outfit.png"
+        },
+        "hairBack": {
+          "src": "researcher_m/parts/hairBack.png",
+          "px": [
+            97,
+            100
+          ],
+          "status": "raw"
+        },
+        "face": {
+          "src": "researcher_m/parts/face.png",
+          "px": [
+            65,
+            95
+          ],
+          "status": "raw"
+        },
+        "eyes": {
+          "src": "researcher_m/parts/eyes.png",
+          "px": [
+            77,
+            26
+          ],
+          "status": "raw"
+        },
+        "hairFront": {
+          "src": "researcher_m/parts/hairFront.png",
+          "px": [
+            99,
+            83
+          ],
+          "status": "raw"
+        }
+      },
+      "accessories": [
+        {
+          "src": "researcher_m/parts/accessory_01.png",
+          "px": [
+            94,
+            122
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "researcher_m/parts/accessory_02.png",
+          "px": [
+            56,
+            133
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "researcher_m/parts/accessory_03.png",
+          "px": [
+            80,
+            30
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "researcher_m/parts/accessory_04.png",
+          "px": [
+            23,
+            85
+          ],
+          "status": "raw"
+        }
+      ],
+      "composite": "researcher_m/canvas/composite.png"
+    },
+    "researcher_f": {
+      "previewCard": "researcher_f/preview_card.png",
+      "previewCutout": "researcher_f/preview_cutout.png",
+      "layers": {
+        "body": {
+          "src": "researcher_f/parts/body.png",
+          "px": [
+            170,
+            433
+          ],
+          "status": "canvas",
+          "canvas": "researcher_f/canvas/body.png"
+        },
+        "outfit": {
+          "src": "researcher_f/parts/outfit.png",
+          "px": [
+            183,
+            399
+          ],
+          "status": "canvas",
+          "canvas": "researcher_f/canvas/outfit.png"
+        },
+        "hairBack": {
+          "src": "researcher_f/parts/hairBack.png",
+          "px": [
+            162,
+            251
+          ],
+          "status": "raw"
+        },
+        "face": {
+          "src": "researcher_f/parts/face.png",
+          "px": [
+            97,
+            131
+          ],
+          "status": "raw"
+        },
+        "eyes": {
+          "src": "researcher_f/parts/eyes.png",
+          "px": [
+            92,
+            36
+          ],
+          "status": "raw"
+        },
+        "hairFront": {
+          "src": "researcher_f/parts/hairFront.png",
+          "px": [
+            126,
+            187
+          ],
+          "status": "raw"
+        }
+      },
+      "accessories": [
+        {
+          "src": "researcher_f/parts/accessory_01.png",
+          "px": [
+            170,
+            235
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "researcher_f/parts/accessory_02.png",
+          "px": [
+            68,
+            150
+          ],
+          "status": "raw"
+        },
+        {
+          "src": "researcher_f/parts/accessory_03.png",
+          "px": [
+            119,
+            42
+          ],
+          "status": "raw"
+        }
+      ],
+      "composite": "researcher_f/canvas/composite.png"
+    }
+  }
+}

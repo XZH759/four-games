@@ -1,0 +1,12 @@
+{
+  "id": "avatar-fixtures",
+  "canvas": { "width": 1024, "height": 1536 },
+  "anchor": { "type": "foot_center", "x": 512, "y": 1440 },
+  "zOrder": ["body", "outfit", "hairFront"],
+  "layers": {
+    "body": "body.svg",
+    "outfit": "outfit.svg",
+    "hairFront": "hairFront.svg"
+  },
+  "note": "Contract acceptance fixtures. Enable with ?fixtures=1 on /nuannuan/create"
+}

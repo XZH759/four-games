@@ -4,6 +4,7 @@
  */
 
 const UI = "/assets/ui/nine-slice";
+const CREATE_CONTROLS = "/assets/nuannuan/character-create-kit/01_ui_controls";
 
 /** 九宫格默认切片边距（px，相对源图） */
 export const NINE_SLICE_INSETS = {
@@ -24,15 +25,15 @@ export const UI_ASSETS = {
   cardDisabled: `${UI}/card-disabled.9.webp`,
   cardLoading: `${UI}/card-loading.9.webp`,
 
-  buttonPrimaryDefault: `${UI}/button-primary-default.webp`,
-  buttonPrimaryHover: `${UI}/button-primary-hover.webp`,
-  buttonPrimaryPressed: `${UI}/button-primary-pressed.webp`,
-  buttonPrimaryDisabled: `${UI}/button-primary-disabled.webp`,
+  buttonPrimaryDefault: `${CREATE_CONTROLS}/004_large_button_pink_1.png`,
+  buttonPrimaryHover: `${CREATE_CONTROLS}/005_large_button_pink_glow.png`,
+  buttonPrimaryPressed: `${CREATE_CONTROLS}/004_large_button_pink_1.png`,
+  buttonPrimaryDisabled: `${CREATE_CONTROLS}/006_large_button_pale_pink.png`,
 
-  buttonSecondaryDefault: `${UI}/button-secondary-default.webp`,
-  buttonSecondaryHover: `${UI}/button-secondary-hover.webp`,
-  buttonSecondaryPressed: `${UI}/button-secondary-pressed.webp`,
-  buttonSecondaryDisabled: `${UI}/button-secondary-disabled.webp`,
+  buttonSecondaryDefault: `${CREATE_CONTROLS}/001_large_button_purple_1.png`,
+  buttonSecondaryHover: `${CREATE_CONTROLS}/002_large_button_purple_glow.png`,
+  buttonSecondaryPressed: `${CREATE_CONTROLS}/001_large_button_purple_1.png`,
+  buttonSecondaryDisabled: `${CREATE_CONTROLS}/003_large_button_pale.png`,
 
   titleRibbon: `${UI}/title-ribbon.9.webp`,
 
@@ -40,9 +41,11 @@ export const UI_ASSETS = {
   nameScrollFocus: `${UI}/name-scroll-focus.webp`,
   nameScrollError: `${UI}/name-scroll-error.webp`,
 
-  selectedCheck: `${UI}/selected-check.webp`,
-  diceDefault: `${UI}/dice-button-default.webp`,
-  diceHover: `${UI}/dice-button-hover.webp`,
+  selectedCheck: `${CREATE_CONTROLS}/013_circle_check.png`,
+  diceDefault: `${CREATE_CONTROLS}/012_circle_dice.png`,
+  diceHover: `${CREATE_CONTROLS}/012_circle_dice.png`,
+  arrowPrev: `${CREATE_CONTROLS}/010_circle_prev.png`,
+  arrowNext: `${CREATE_CONTROLS}/011_circle_next.png`,
 };
 
 /** 供 CSS 注入的自定义属性映射 */

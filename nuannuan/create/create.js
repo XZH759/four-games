@@ -1,12 +1,8 @@
 /**
  * 界面 01 · 初始形象创建
- * 仅本页逻辑；确认进入 → /nuannuan/partner
- * 不改路由与保存契约
+ * 接入 /character-assets 分层素材：asset_id 状态 + 固定层序渲染
  */
 import {
-  getAppearanceFields,
-  BODY_TYPES,
-  STARTER_OUTFITS,
   GENDERS,
   DEFAULT_AVATAR,
   normalizeAvatar,
@@ -16,21 +12,38 @@ import {
   saveFinal,
   loadByGenderMap,
   saveByGenderMap,
-  randomAvatar,
   randomName,
   validateName,
-  cycleOption,
-  findById,
-  switchGender,
+  toSavedCharacter,
 } from "/js/nuannuan/avatar-config.js";
 import { renderAvatar } from "/js/nuannuan/AvatarRenderer.js";
 import { outfitAura } from "/js/nuannuan/avatar-manifest.js";
 import { UI_ASSETS, uiCssVars } from "/js/nuannuan/ui-manifest.js";
+import {
+  APPEARANCE_LAYER_META,
+  createDefaultSelection,
+  cycleHairPair,
+  cycleLayer,
+  getAssetIndexSync,
+  getAssetsByIdSync,
+  getAssetsForLayer,
+  getAssetUrl,
+  labelForAsset,
+  loadAssetIndex,
+  preloadImages,
+  randomizeSelection,
+} from "/js/nuannuan/character-assets.js";
+import {
+  careerOptionsForGender,
+  findReference,
+  getReferenceSheetUrl,
+  loadReferenceIndex,
+} from "/js/nuannuan/character-reference.js";
 
 const NEXT_URL = "/nuannuan/partner";
 const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const USE_FIXTURES = new URLSearchParams(location.search).get("fixtures") === "1";
 
-/** 注入 UI 资源 CSS 变量（路径唯一来自 ui-manifest） */
 (function injectUiVars() {
   const style = document.createElement("style");
   style.id = "ui-manifest-vars";
@@ -38,26 +51,25 @@ const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.head.appendChild(style);
 })();
 
+if (USE_FIXTURES) {
+  document.body.classList.add("is-fixtures");
+}
+
 const state = {
   avatar: normalizeAvatar(loadDraft() || loadFinal() || DEFAULT_AVATAR),
   byGender: loadByGenderMap(),
+  assetIndex: null,
   busy: false,
   confirmLock: false,
+  ready: false,
 };
-
-// 用当前草稿回填分性别缓存
-if (state.avatar) {
-  state.byGender[state.avatar.gender] = { ...state.avatar };
-}
 
 const els = {
   doll: document.getElementById("doll"),
   stage: document.getElementById("stage"),
   appear: document.getElementById("appear-opts"),
   genderList: document.getElementById("gender-list"),
-  bodyList: document.getElementById("body-list"),
-  outfitList: document.getElementById("outfit-list"),
-  pager: document.getElementById("pager"),
+  careerList: document.getElementById("career-list"),
   name: document.getElementById("name"),
   nameError: document.getElementById("name-error"),
   nameScroll: document.getElementById("name-scroll"),
@@ -65,6 +77,8 @@ const els = {
   confirm: document.getElementById("confirm"),
   random: document.getElementById("random"),
   placeholderNote: document.getElementById("placeholder-note"),
+  loadError: document.getElementById("load-error"),
+  pageSub: document.getElementById("page-sub"),
 };
 
 function toast(msg) {
@@ -74,10 +88,36 @@ function toast(msg) {
   toast._t = setTimeout(() => els.toast.classList.remove("show"), 1800);
 }
 
+function ensureSelection(gender = state.avatar.gender) {
+  const index = getAssetIndexSync();
+  if (!index) return null;
+  if (
+    !state.avatar.selection ||
+    state.avatar.gender !== gender ||
+    !state.avatar.selection.body ||
+    !state.avatar.selection.face ||
+    !state.avatar.selection.eyes
+  ) {
+    state.avatar.selection = createDefaultSelection(index, gender);
+  }
+  return state.avatar.selection;
+}
+
 function persist() {
   saveDraft(state.avatar);
-  state.byGender[state.avatar.gender] = { ...state.avatar };
+  state.byGender[state.avatar.gender] = toSavedCharacter(state.avatar);
   saveByGenderMap(state.byGender);
+}
+
+function applyGenderTheme() {
+  const male = state.avatar.gender === "male";
+  document.body.classList.toggle("is-male", male);
+  document.body.classList.toggle("is-female", !male);
+  if (els.pageSub) {
+    els.pageSub.textContent = male
+      ? "→ 选择你的专属学习伙伴（少年形象）"
+      : "→ 选择你的专属学习伙伴";
+  }
 }
 
 function setNameError(msg) {
@@ -87,49 +127,126 @@ function setNameError(msg) {
   els.name?.classList.toggle("is-invalid", Boolean(msg));
   els.name?.setAttribute("aria-invalid", msg ? "true" : "false");
   els.nameScroll?.classList.toggle("is-error", Boolean(msg));
-  els.nameScroll?.classList.toggle("is-focus", false);
+}
+
+function clearCareerReference() {
+  state.avatar.role = null;
+  state.avatar.characterId = null;
+  state.avatar.referenceSheet = null;
+}
+
+function applyCareerReference(role) {
+  const asset = findReference(role, state.avatar.gender);
+  if (!asset) return false;
+  state.avatar.role = asset.role;
+  state.avatar.characterId = asset.id;
+  state.avatar.referenceSheet = getReferenceSheetUrl(asset);
+  return true;
 }
 
 async function paintPreview() {
   if (!els.doll) return;
-  els.stage?.style.setProperty("--aura", outfitAura(state.avatar.starterOutfit));
-  const result = await renderAvatar(els.doll, state.avatar, {
+  if (!USE_FIXTURES && !state.avatar.selection && !state.avatar.referenceSheet) return;
+  els.stage?.style.setProperty("--aura", outfitAura("scholar", state.avatar.gender));
+  const payload = USE_FIXTURES
+    ? { ...state.avatar, useFixtures: true, referenceSheet: null }
+    : state.avatar;
+  const result = await renderAvatar(els.doll, payload, {
     uid: "main",
     showBadge: false,
-    allowSvgFallback: true,
+    allowSvgFallback: !USE_FIXTURES,
   });
   if (els.placeholderNote) {
-    els.placeholderNote.hidden = !result?.placeholder;
+    if (USE_FIXTURES) {
+      els.placeholderNote.hidden = false;
+      els.placeholderNote.textContent =
+        "开发验收模式（?fixtures=1）：body / outfit / hairFront 契约剪影，脚底基线 y=1440。";
+    } else {
+      const usingCareerSheet = Boolean(state.avatar.referenceSheet) && !result?.placeholder;
+      if (usingCareerSheet) {
+        els.placeholderNote.hidden = false;
+        els.placeholderNote.textContent =
+          "当前为职业风格预览。正式单人立绘到位后将替换。";
+      } else {
+        els.placeholderNote.hidden = !result?.placeholder;
+        if (result?.placeholder) {
+          els.placeholderNote.innerHTML =
+            `角色分层素材未就绪，已临时使用 SVG fallback。运行时素材位于 <code>/character-assets/</code>。`;
+        }
+      }
+    }
   }
 }
 
+function currentAssetLabel(layer) {
+  const id = state.avatar.selection?.[layer];
+  if (!id) return "无";
+  return labelForAsset(getAssetsByIdSync().get(id));
+}
+
+function layerPreviewSrc(layer) {
+  const id = state.avatar.selection?.[layer];
+  if (!id) return "";
+  const asset = getAssetsByIdSync().get(id);
+  return asset ? getAssetUrl(asset) : "";
+}
+
+async function preloadLayerCandidates(layerKeys) {
+  const index = getAssetIndexSync();
+  if (!index) return;
+  const urls = [];
+  layerKeys.forEach((layer) => {
+    getAssetsForLayer(index, state.avatar.gender, layer).forEach((asset) => {
+      urls.push(getAssetUrl(asset));
+    });
+  });
+  await preloadImages(urls.slice(0, 12));
+}
+
 function paintAppear() {
+  if (!els.appear || !state.avatar.selection) return;
   els.appear.innerHTML = "";
-  const fields = getAppearanceFields(state.avatar.gender);
-  fields.forEach((field) => {
-    const opts = field.options;
-    const cur = findById(opts, state.avatar[field.key]);
+
+  APPEARANCE_LAYER_META.forEach((field) => {
+    const primary = field.layers[0];
+    const src = layerPreviewSrc(field.key === "hair" ? "hairFront" : primary);
     const row = document.createElement("div");
     row.className = "opt-row";
-    const swatch =
-      field.swatch && cur?.base
-        ? `<span class="dot" style="background:${cur.base}"></span>`
-        : field.swatchKey && cur?.[field.swatchKey]
-          ? `<span class="dot" style="background:${cur[field.swatchKey]}"></span>`
-          : "";
-
     row.innerHTML = `
       <span class="opt-label">${field.label}</span>
       <button type="button" class="arrow game-focus" data-dir="-1" aria-label="上一个${field.label}">◀</button>
-      <span class="opt-value" id="val-${field.key}">${swatch}${cur?.label || ""}</span>
+      <span class="opt-value">
+        ${src ? `<span class="opt-preview has-layer" aria-hidden="true"><img src="${src}" alt="" /></span>` : `<span class="opt-preview is-acc" aria-hidden="true">◇</span>`}
+        <span class="opt-text">${currentAssetLabel(primary)}</span>
+      </span>
       <button type="button" class="arrow game-focus" data-dir="1" aria-label="下一个${field.label}">▶</button>`;
 
     row.querySelectorAll(".arrow").forEach((btn) => {
       btn.addEventListener("click", async () => {
-        if (state.busy) return;
-        state.avatar[field.key] = cycleOption(opts, state.avatar[field.key], Number(btn.dataset.dir));
+        if (state.busy || !state.ready) return;
+        const dir = Number(btn.dataset.dir);
+        const index = getAssetIndexSync();
+        await preloadLayerCandidates(field.layers);
+        if (field.key === "hair") {
+          state.avatar.selection = cycleHairPair(
+            index,
+            state.avatar.gender,
+            state.avatar.selection,
+            dir,
+          );
+        } else {
+          state.avatar.selection = cycleLayer(
+            index,
+            state.avatar.gender,
+            state.avatar.selection,
+            primary,
+            dir,
+          );
+        }
+        clearCareerReference();
         persist();
         paintAppear();
+        paintCareers();
         await paintPreview();
         paintThumbs();
       });
@@ -159,128 +276,98 @@ function paintGenders() {
     btn.className = `choice game-card${on ? " is-on is-selected" : ""}`;
     btn.setAttribute("role", "option");
     btn.setAttribute("aria-selected", on ? "true" : "false");
-    btn.setAttribute("aria-pressed", on ? "true" : "false");
-    btn.setAttribute("aria-label", g.label);
+    btn.setAttribute("aria-label", `${g.label}${g.hint ? `，${g.hint}` : ""}`);
     btn.innerHTML = `
       <span class="mini" data-thumb="gender-${g.id}"></span>
       <span class="choice-label">${g.label}</span>
       <span class="check" aria-hidden="true"></span>`;
     bindCardPress(btn);
     btn.addEventListener("click", async () => {
-      if (state.busy || on) return;
-      const { avatar, byGender } = switchGender(state.avatar, g.id, state.byGender);
-      state.avatar = avatar;
-      state.byGender = byGender;
+      if (state.busy || on || !state.ready) return;
+      state.byGender[state.avatar.gender] = toSavedCharacter(state.avatar);
+      const sharedName = state.avatar.name;
+      const remembered = state.byGender[g.id];
+      if (remembered?.selection) {
+        state.avatar = normalizeAvatar({ ...remembered, gender: g.id, name: sharedName });
+      } else {
+        state.avatar = normalizeAvatar({
+          gender: g.id,
+          name: sharedName,
+          selection: createDefaultSelection(getAssetIndexSync(), g.id),
+        });
+      }
+      ensureSelection(g.id);
+      if (state.avatar.role) {
+        if (!applyCareerReference(state.avatar.role)) clearCareerReference();
+      }
       persist();
+      applyGenderTheme();
       paintAppear();
       paintGenders();
-      paintBodies();
-      paintOutfits();
+      paintCareers();
       await paintPreview();
       paintThumbs();
+      toast(g.id === "male" ? "已切换为男性形象" : "已切换为女性形象");
     });
     els.genderList.appendChild(btn);
   });
 }
 
-function paintBodies() {
-  els.bodyList.innerHTML = "";
-  BODY_TYPES.forEach((b) => {
-    const on = state.avatar.bodyType === b.id;
+function paintCareers() {
+  if (!els.careerList) return;
+  els.careerList.innerHTML = "";
+  careerOptionsForGender(state.avatar.gender).forEach((career) => {
+    const on = state.avatar.role === career.id;
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = `choice game-card${on ? " is-on is-selected" : ""}`;
+    btn.className = `choice career-choice${on ? " is-on is-selected" : ""}${career.disabled ? " is-disabled" : ""}`;
+    btn.disabled = Boolean(career.disabled);
     btn.setAttribute("role", "option");
     btn.setAttribute("aria-selected", on ? "true" : "false");
-    btn.setAttribute("aria-pressed", on ? "true" : "false");
-    btn.setAttribute("aria-label", `${b.label}，${b.hint}`);
+    btn.setAttribute("aria-disabled", career.disabled ? "true" : "false");
     btn.innerHTML = `
-      <span class="mini" data-thumb="body-${b.id}"></span>
-      <span class="choice-label">${b.label}</span>
+      ${career.thumbUrl || career.sheetUrl ? `<span class="career-thumb" aria-hidden="true"><img src="${career.thumbUrl || career.sheetUrl}" alt="" /></span>` : ""}
+      <span class="choice-label">${career.label}</span>
+      <span class="choice-hint">${career.hint}</span>
       <span class="check" aria-hidden="true"></span>`;
-    bindCardPress(btn);
-    btn.addEventListener("click", async () => {
-      if (state.busy) return;
-      state.avatar.bodyType = b.id;
-      persist();
-      paintBodies();
-      await paintPreview();
-      paintThumbs();
-    });
-    els.bodyList.appendChild(btn);
+    if (!career.disabled) {
+      bindCardPress(btn);
+      btn.addEventListener("click", async () => {
+        if (state.busy || !state.ready) return;
+        if (on) {
+          clearCareerReference();
+          toast("已回到分层自定义");
+        } else {
+          applyCareerReference(career.id);
+          toast(`已选用${career.label}`);
+        }
+        persist();
+        paintCareers();
+        await paintPreview();
+      });
+    }
+    els.careerList.appendChild(btn);
   });
-}
-
-function paintOutfits() {
-  els.outfitList.innerHTML = "";
-  STARTER_OUTFITS.forEach((o, i) => {
-    const on = state.avatar.starterOutfit === o.id;
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = `choice game-card${on ? " is-on is-selected" : ""}`;
-    btn.setAttribute("role", "option");
-    btn.setAttribute("aria-selected", on ? "true" : "false");
-    btn.setAttribute("aria-pressed", on ? "true" : "false");
-    btn.setAttribute("aria-label", o.label);
-    btn.innerHTML = `
-      <span class="mini" data-thumb="outfit-${o.id}"></span>
-      <span class="choice-label">${o.label}</span>
-      <span class="check" aria-hidden="true"></span>`;
-    bindCardPress(btn);
-    btn.addEventListener("click", async () => {
-      if (state.busy) return;
-      state.avatar.starterOutfit = o.id;
-      els.pager.textContent = `${i + 1} / ${STARTER_OUTFITS.length}`;
-      persist();
-      paintOutfits();
-      await paintPreview();
-      paintThumbs();
-    });
-    els.outfitList.appendChild(btn);
-  });
-  const idx = Math.max(0, STARTER_OUTFITS.findIndex((o) => o.id === state.avatar.starterOutfit));
-  els.pager.textContent = `${idx + 1} / ${STARTER_OUTFITS.length}`;
 }
 
 function paintThumbs() {
   GENDERS.forEach((g) => {
     const el = document.querySelector(`[data-thumb="gender-${g.id}"]`);
-    if (!el) return;
+    if (!el || !getAssetIndexSync()) return;
     const cfg =
       g.id === state.avatar.gender
         ? state.avatar
-        : state.byGender[g.id] ||
-          normalizeAvatar({
-            ...(g.id === "male"
-              ? { gender: "male", hairStyle: "short_neat", accessory: "glasses", starterOutfit: "traveler" }
-              : { gender: "female" }),
+        : normalizeAvatar({
+            ...(state.byGender[g.id] || {}),
+            gender: g.id,
             name: state.avatar.name,
+            selection:
+              state.byGender[g.id]?.selection ||
+              createDefaultSelection(getAssetIndexSync(), g.id),
           });
     el.classList.add("is-loading");
-    renderAvatar(el, { ...cfg, gender: g.id }, {
+    renderAvatar(el, cfg, {
       uid: `g-${g.id}`,
-      compact: true,
-      showBadge: false,
-    }).finally(() => el.classList.remove("is-loading"));
-  });
-
-  BODY_TYPES.forEach((b) => {
-    const el = document.querySelector(`[data-thumb="body-${b.id}"]`);
-    if (!el) return;
-    el.classList.add("is-loading");
-    renderAvatar(el, { ...state.avatar, bodyType: b.id }, {
-      uid: `b-${b.id}`,
-      compact: true,
-      showBadge: false,
-    }).finally(() => el.classList.remove("is-loading"));
-  });
-
-  STARTER_OUTFITS.forEach((o) => {
-    const el = document.querySelector(`[data-thumb="outfit-${o.id}"]`);
-    if (!el) return;
-    el.classList.add("is-loading");
-    renderAvatar(el, { ...state.avatar, starterOutfit: o.id }, {
-      uid: `o-${o.id}`,
       compact: true,
       showBadge: false,
     }).finally(() => el.classList.remove("is-loading"));
@@ -292,43 +379,21 @@ function wait(ms) {
 }
 
 async function onRandom() {
-  if (state.busy || state.confirmLock) return;
+  if (state.busy || state.confirmLock || !state.ready) return;
   state.busy = true;
   els.random.disabled = true;
   els.random.classList.add("is-saving");
-  const base = randomAvatar(state.avatar.name, state.avatar.gender);
-
   try {
-    state.avatar.name = base.name;
-    els.name.value = base.name;
+    state.avatar.name = randomName(state.avatar.gender);
+    els.name.value = state.avatar.name;
     setNameError("");
-    persist();
-    await wait(120);
-
-    state.avatar = {
-      ...state.avatar,
-      bodyType: base.bodyType,
-      hairStyle: base.hairStyle,
-      hairColor: base.hairColor,
-      skinTone: base.skinTone,
-      eyeStyle: base.eyeStyle,
-      faceShape: base.faceShape,
-      accessory: base.accessory,
-    };
+    state.avatar.selection = randomizeSelection(getAssetIndexSync(), state.avatar.gender);
+    clearCareerReference();
     persist();
     paintAppear();
-    paintBodies();
+    paintCareers();
     await paintPreview();
     paintThumbs();
-    await wait(200);
-
-    state.avatar.starterOutfit = base.starterOutfit;
-    persist();
-    paintOutfits();
-    await paintPreview();
-    paintThumbs();
-    await wait(180);
-
     toast("随机形象已生成");
   } finally {
     state.busy = false;
@@ -338,7 +403,7 @@ async function onRandom() {
 }
 
 async function onConfirm() {
-  if (state.confirmLock || state.busy) return;
+  if (state.confirmLock || state.busy || !state.ready) return;
   const check = validateName(els.name.value);
   if (!check.ok) {
     setNameError(check.message);
@@ -388,16 +453,8 @@ els.name.addEventListener("input", () => {
   if (els.name.value.trim()) setNameError("");
   persist();
 });
-els.name.addEventListener("focus", () => {
-  els.nameScroll?.classList.add("is-focus");
-  els.nameScroll?.classList.remove("is-error");
-});
-els.name.addEventListener("blur", () => {
-  els.nameScroll?.classList.remove("is-focus");
-});
-
 document.getElementById("dice")?.addEventListener("click", () => {
-  els.name.value = randomName();
+  els.name.value = randomName(state.avatar.gender);
   state.avatar.name = els.name.value;
   setNameError("");
   persist();
@@ -406,13 +463,40 @@ els.random?.addEventListener("click", onRandom);
 els.confirm?.addEventListener("click", onConfirm);
 bindMobileToggles();
 
-// 预加载勾章，避免选中态闪空白
 const checkPreload = new Image();
 checkPreload.src = UI_ASSETS.selectedCheck;
 
-paintAppear();
-paintGenders();
-paintBodies();
-paintOutfits();
-paintPreview().then(paintThumbs);
-persist();
+async function boot() {
+  try {
+    const [layeredIndex] = await Promise.all([
+      loadAssetIndex(),
+      loadReferenceIndex().catch((error) => {
+        console.warn(error);
+        return null;
+      }),
+    ]);
+    state.assetIndex = layeredIndex;
+    ensureSelection(state.avatar.gender);
+    if (state.avatar.role && !state.avatar.referenceSheet) {
+      applyCareerReference(state.avatar.role);
+    }
+    state.ready = true;
+    if (els.loadError) els.loadError.hidden = true;
+    applyGenderTheme();
+    paintAppear();
+    paintGenders();
+    paintCareers();
+    persist();
+    await paintPreview();
+    paintThumbs();
+  } catch (error) {
+    console.error(error);
+    if (els.loadError) {
+      els.loadError.hidden = false;
+      els.loadError.textContent = error.message || "角色素材加载失败";
+    }
+    toast("角色素材加载失败");
+  }
+}
+
+boot();

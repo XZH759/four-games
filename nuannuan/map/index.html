@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI知识之旅 · 关卡地图</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/nuannuan/map/map.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <a class="back" href="/nuannuan/partner" aria-label="返回伙伴编成">←</a>
+      <div>
+        <h1>AI知识之旅</h1>
+        <p>关卡地图 · 完成节点推进旅程</p>
+      </div>
+      <button type="button" class="help-btn" id="help-open" aria-label="地图说明">?</button>
+    </div>
+
+    <div class="currency" aria-label="资源">
+      <span class="chip">
+        <img src="/nuannuan/map/assets/kit/icon-star.png" alt="" />
+        <strong id="star-count">0</strong>
+      </span>
+      <span class="chip">
+        <img src="/nuannuan/map/assets/kit/icon-gem.png" alt="" />
+        <strong id="gem-count">0</strong>
+      </span>
+    </div>
+
+    <nav class="top-nav" aria-label="快捷入口">
+      <a href="/nuannuan"><img src="/nuannuan/map/assets/kit/icon-book.png" alt="" /><span>图鉴</span></a>
+      <a href="/nuannuan"><img src="/nuannuan/map/assets/kit/icon-wardrobe.png" alt="" /><span>衣柜</span></a>
+      <a href="/nuannuan/partner"><img src="/nuannuan/map/assets/kit/icon-partner.png" alt="" /><span>伙伴</span></a>
+      <a href="/"><img src="/nuannuan/map/assets/kit/icon-hall.png" alt="" /><span>大厅</span></a>
+      <a href="/nuannuan"><img src="/nuannuan/map/assets/kit/icon-settings.png" alt="" /><span>设置</span></a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <aside class="side side-left">
+      <div class="panel-skin" aria-hidden="true">
+        <img src="/nuannuan/map/assets/kit/panel-left.png" alt="" />
+      </div>
+      <div class="profile">
+        <div class="profile-frame" id="profile-avatar">
+          <img class="frame-art" src="/nuannuan/map/assets/kit/avatar-frame.png" alt="" />
+        </div>
+        <span class="lv-tag" id="player-lv">Lv.1</span>
+        <strong class="profile-name" id="player-name">旅人</strong>
+      </div>
+      <blockquote class="bubble" id="companion-line">选择关卡，开始你的 AI 知识旅程吧！</blockquote>
+      <div class="tips">
+        <h2>旅途小贴士</h2>
+        <p>完成关卡可获得星星与装扮奖励。灰色节点需先通过前一关。</p>
+      </div>
+      <div class="region-dock" id="region-dock" aria-label="区域导航"></div>
+    </aside>
+
+    <section class="map-panel" aria-labelledby="map-title">
+      <h2 id="map-title" class="sr-only">关卡地图</h2>
+      <div class="map-toolbar">
+        <button type="button" class="tool-img" id="zoom-out" aria-label="缩小">
+          <img src="/nuannuan/map/assets/kit/btn-minus.png" alt="" />
+        </button>
+        <button type="button" class="tool-img tool-locate" id="locate" aria-label="定位当前关卡">
+          <img src="/nuannuan/map/assets/kit/btn-locate.png" alt="" />
+        </button>
+        <button type="button" class="tool-img" id="zoom-in" aria-label="放大">
+          <img src="/nuannuan/map/assets/kit/btn-plus.png" alt="" />
+        </button>
+      </div>
+
+      <div class="map-viewport" id="map-viewport">
+        <div class="map-stage" id="map-stage">
+          <img class="map-bg" src="/nuannuan/map/assets/world-map.png" alt="" draggable="false" />
+
+          <div class="map-decors" aria-hidden="true">
+            <img class="decor bird b1" src="/nuannuan/map/assets/kit/decor-bird-1.png" alt="" />
+            <img class="decor bird b2" src="/nuannuan/map/assets/kit/decor-bird-2.png" alt="" />
+            <img class="decor bird b3" src="/nuannuan/map/assets/kit/decor-bird-3.png" alt="" />
+            <img class="decor star s1" src="/nuannuan/map/assets/kit/decor-star-1.png" alt="" />
+            <img class="decor star s2" src="/nuannuan/map/assets/kit/decor-star-2.png" alt="" />
+            <img class="decor star s3" src="/nuannuan/map/assets/kit/decor-sparkle-1.png" alt="" />
+          </div>
+
+          <div class="region-titles" id="region-titles" aria-hidden="true"></div>
+
+          <svg class="map-links" id="map-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <div class="map-nodes" id="map-nodes" role="list"></div>
+          <div class="map-chests" id="map-chests" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <button type="button" class="compass-btn" id="compass" aria-label="回到当前关卡">
+        <img src="/nuannuan/map/assets/kit/compass.png" alt="" />
+      </button>
+
+      <div class="legend" aria-label="图例">
+        <span><img src="/nuannuan/map/assets/kit/node-done.png" alt="" />已完成</span>
+        <span><img src="/nuannuan/map/assets/kit/node-current.png" alt="" />进行中</span>
+        <span><img src="/nuannuan/map/assets/kit/node-open.png" alt="" />可进入</span>
+        <span><img src="/nuannuan/map/assets/kit/node-locked.png" alt="" />未解锁</span>
+        <span><img src="/nuannuan/map/assets/kit/chest-claimable.png" alt="" />奖励关</span>
+      </div>
+    </section>
+
+    <aside class="side side-right">
+      <div class="panel-skin" aria-hidden="true">
+        <img src="/nuannuan/map/assets/kit/panel-right.png" alt="" />
+      </div>
+      <div class="progress-card">
+        <div class="ring" id="progress-ring" style="--p: 0">
+          <strong id="progress-pct">0%</strong>
+          <small>总完成度</small>
+        </div>
+        <p class="star-line"><span id="done-count">0</span> / 50 关</p>
+      </div>
+
+      <div class="reward-card">
+        <h2>下一阶段奖励</h2>
+        <div class="reward-list" id="reward-list"></div>
+      </div>
+
+      <div class="detail-card" id="detail-card" hidden>
+        <div class="detail-badge" id="detail-badge">1</div>
+        <p class="detail-kicker" id="detail-status">可进入</p>
+        <h3 id="detail-title">关卡</h3>
+        <p id="detail-summary"></p>
+        <p class="detail-reward" id="detail-reward"></p>
+        <div class="detail-actions">
+          <button type="button" class="img-btn" id="detail-close" aria-label="关闭">
+            <img src="/nuannuan/map/assets/kit/btn-close.png" alt="关闭" />
+          </button>
+          <button type="button" class="img-btn" id="detail-enter" aria-label="进入关卡">
+            <img src="/nuannuan/map/assets/kit/btn-enter.png" alt="进入关卡" />
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="img-btn img-btn-continue" id="continue-journey" aria-label="继续旅程">
+        <img src="/nuannuan/map/assets/kit/btn-continue.png" alt="继续旅程" />
+      </button>
+    </aside>
+  </main>
+
+  <dialog class="help-dialog" id="help-dialog">
+    <form method="dialog" class="help-card">
+      <h2>地图说明</h2>
+      <ul>
+        <li>共 5 个区域、50 个关卡节点，需按顺序解锁。</li>
+        <li>点击节点可查看详情，不会立刻开题。</li>
+        <li>金色节点为已完成，蓝色为当前，灰色为锁定。</li>
+        <li>宝箱节点通关后发放装扮奖励。</li>
+      </ul>
+      <button class="btn-ok" value="ok">知道了</button>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/nuannuan/map/map.js"></script>
+</body>
+</html>

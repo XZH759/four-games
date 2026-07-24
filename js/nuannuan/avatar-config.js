@@ -13,15 +13,24 @@
  * @property {string} starterOutfit
  */
 
-export const STORAGE_DRAFT = "nn_avatar_draft_v1";
-export const STORAGE_FINAL = "nn_avatar_v1";
-export const STORAGE_BY_GENDER = "nn_avatar_by_gender_v1";
-/** 兼容旧商城门禁 */
+export const STORAGE_DRAFT = "nn_avatar_draft_v2";
+export const STORAGE_FINAL = "nn_avatar_v2";
+export const STORAGE_BY_GENDER = "nn_avatar_by_gender_v2";
+/** 兼容旧商城门禁 / 旧草稿 */
 export const STORAGE_LEGACY = "nn_profile_v1";
+export const STORAGE_DRAFT_V1 = "nn_avatar_draft_v1";
+export const STORAGE_FINAL_V1 = "nn_avatar_v1";
 
 export const GENDERS = [
-  { id: "female", label: "女性探索者" },
-  { id: "male", label: "男性探索者" },
+  { id: "female", label: "女性", hint: "星语少女形象" },
+  { id: "male", label: "男性", hint: "晨光少年形象" },
+];
+
+/** 职业预设：单人透明立绘（career-cutouts composite） */
+export const CAREER_PRESETS = [
+  { id: "researcher", label: "研究员", hint: "实验室路线" },
+  { id: "programmer", label: "程序员", hint: "代码探索路线" },
+  { id: "engineer", label: "工程师", hint: "工程实践路线" },
 ];
 
 export const HAIR_STYLES_BY_GENDER = {
@@ -96,36 +105,75 @@ export const BODY_TYPES = [
   { id: "lively", label: "活泼型", hint: "轻快体态", aliases: [] },
 ];
 
-/** 初始套装：轮廓明显不同，名称不暗示能力 */
+/** 初始套装：轮廓明显不同，名称不暗示能力；男女共用 id，展示文案可分性别 */
 export const STARTER_OUTFITS = [
   {
     id: "scholar",
     label: "星语学者",
+    labelFemale: "星语礼裙",
+    labelMale: "星徽学袍",
     aura: "rgba(244, 184, 200, 0.45)",
+    auraMale: "rgba(170, 150, 230, 0.48)",
     pal: { main: "#f6c0d6", light: "#fdeaf2", accent: "#a98ade", trim: "#ffffff", deep: "#e296b8" },
+    palMale: { main: "#c8b6e8", light: "#efe8fb", accent: "#7a6ab8", trim: "#ffffff", deep: "#9a84c8" },
   },
   {
     id: "traveler",
     label: "晨光旅者",
+    labelFemale: "晨光旅裙",
+    labelMale: "晨光旅装",
     aura: "rgba(150, 180, 235, 0.5)",
+    auraMale: "rgba(120, 170, 220, 0.52)",
     pal: { main: "#e9eefb", light: "#ffffff", accent: "#7f9fdf", trim: "#cfdcf6", deep: "#b9c9ec" },
+    palMale: { main: "#d8e6f8", light: "#ffffff", accent: "#5a8fd0", trim: "#b8d0ec", deep: "#8aafd8" },
   },
   {
     id: "night",
     label: "夜幕礼装",
+    labelFemale: "夜幕礼裙",
+    labelMale: "夜幕礼袍",
     aura: "rgba(140, 60, 90, 0.5)",
+    auraMale: "rgba(60, 80, 140, 0.5)",
     pal: { main: "#3c2c40", light: "#5c4358", accent: "#a83050", trim: "#241b2c", deep: "#2c2032" },
+    palMale: { main: "#2c3450", light: "#445070", accent: "#6a90d0", trim: "#1a2038", deep: "#222840" },
   },
 ];
 
-export const NAME_POOL = [
+export const NAME_POOL_FEMALE = [
   "暖暖", "星璃", "雪见", "岚音", "桃夭", "月见草",
   "绮罗", "苏芮", "小鹿", "菱纱", "云裳", "清歌",
-  "景行", "清川", "夜白", "朔风", "拾光", "归晚",
 ];
+
+export const NAME_POOL_MALE = [
+  "景行", "清川", "夜白", "朔风", "拾光", "归晚",
+  "北辰", "澄空", "言蹊", "予安", "望舒", "澈川",
+];
+
+/** @deprecated 使用 randomName(gender) */
+export const NAME_POOL = [...NAME_POOL_FEMALE, ...NAME_POOL_MALE];
+
+export function outfitLabel(outfit, gender = "female") {
+  if (!outfit) return "";
+  if (gender === "male") return outfit.labelMale || outfit.label;
+  return outfit.labelFemale || outfit.label;
+}
+
+export function outfitPalette(outfit, gender = "female") {
+  if (!outfit) return STARTER_OUTFITS[0].pal;
+  if (gender === "male" && outfit.palMale) return outfit.palMale;
+  return outfit.pal;
+}
+
+export function outfitsFor(gender = "female") {
+  return STARTER_OUTFITS.map((o) => ({
+    ...o,
+    label: outfitLabel(o, gender),
+  }));
+}
 
 /** @type {AvatarConfig} */
 export const DEFAULT_AVATAR = {
+  schemaVersion: 1,
   name: "",
   gender: "female",
   bodyType: "balanced",
@@ -136,19 +184,28 @@ export const DEFAULT_AVATAR = {
   faceShape: "standard",
   accessory: "bow",
   starterOutfit: "scholar",
+  selection: null,
+  role: null,
+  characterId: null,
+  referenceSheet: null,
 };
 
 export const DEFAULT_AVATAR_MALE = {
+  schemaVersion: 1,
   name: "",
   gender: "male",
   bodyType: "balanced",
   hairStyle: "short_neat",
   hairColor: "tea",
   skinTone: "natural",
-  eyeStyle: "lake",
-  faceShape: "oval",
-  accessory: "glasses",
-  starterOutfit: "traveler",
+  eyeStyle: "violet",
+  faceShape: "standard",
+  accessory: "brooch",
+  starterOutfit: "scholar",
+  selection: null,
+  role: null,
+  characterId: null,
+  referenceSheet: null,
 };
 
 export function hairStylesFor(gender) {
@@ -190,6 +247,7 @@ export function normalizeAvatar(partial) {
   const base = cloneAvatar(genderHint === "male" ? DEFAULT_AVATAR_MALE : DEFAULT_AVATAR);
   if (!partial || typeof partial !== "object") return base;
 
+  base.schemaVersion = 1;
   if (typeof partial.name === "string") base.name = partial.name.slice(0, 8);
   if (partial.gender === "male" || partial.gender === "female") base.gender = partial.gender;
 
@@ -203,6 +261,16 @@ export function normalizeAvatar(partial) {
     base.accessory = partial.accessory;
   }
   if (typeof partial.starterOutfit === "string") base.starterOutfit = partial.starterOutfit;
+  if (partial.selection && typeof partial.selection === "object") {
+    base.selection = { ...partial.selection };
+  }
+  if (partial.role === null || typeof partial.role === "string") base.role = partial.role;
+  if (partial.characterId === null || typeof partial.characterId === "string") {
+    base.characterId = partial.characterId;
+  }
+  if (partial.referenceSheet === null || typeof partial.referenceSheet === "string") {
+    base.referenceSheet = partial.referenceSheet;
+  }
 
   // 旧 nn_profile_v1 数字索引兼容
   if (typeof partial.body === "number") {
@@ -260,16 +328,40 @@ export function normalizeAvatar(partial) {
   return base;
 }
 
+export function toSavedCharacter(cfg) {
+  const avatar = normalizeAvatar(cfg);
+  return {
+    schemaVersion: 1,
+    gender: avatar.gender,
+    name: avatar.name,
+    role: avatar.role || null,
+    characterId: avatar.characterId || null,
+    referenceSheet: avatar.referenceSheet || null,
+    selection: avatar.selection
+      ? { ...avatar.selection }
+      : null,
+    // 兼容旧字段，便于 SVG fallback / 迁移
+    bodyType: avatar.bodyType,
+    hairStyle: avatar.hairStyle,
+    hairColor: avatar.hairColor,
+    skinTone: avatar.skinTone,
+    eyeStyle: avatar.eyeStyle,
+    faceShape: avatar.faceShape,
+    accessory: avatar.accessory,
+    starterOutfit: avatar.starterOutfit,
+  };
+}
+
 export function loadDraft() {
   try {
-    const raw = localStorage.getItem(STORAGE_DRAFT);
+    const raw = localStorage.getItem(STORAGE_DRAFT) || localStorage.getItem(STORAGE_DRAFT_V1);
     if (raw) return normalizeAvatar(JSON.parse(raw));
   } catch { /* ignore */ }
   return null;
 }
 
 export function saveDraft(cfg) {
-  localStorage.setItem(STORAGE_DRAFT, JSON.stringify(normalizeAvatar(cfg)));
+  localStorage.setItem(STORAGE_DRAFT, JSON.stringify(toSavedCharacter(cfg)));
 }
 
 export function loadByGenderMap() {
@@ -288,15 +380,15 @@ export function loadByGenderMap() {
 
 export function saveByGenderMap(map) {
   const payload = {
-    female: map.female ? normalizeAvatar({ ...map.female, gender: "female" }) : null,
-    male: map.male ? normalizeAvatar({ ...map.male, gender: "male" }) : null,
+    female: map.female ? toSavedCharacter({ ...map.female, gender: "female" }) : null,
+    male: map.male ? toSavedCharacter({ ...map.male, gender: "male" }) : null,
   };
   localStorage.setItem(STORAGE_BY_GENDER, JSON.stringify(payload));
 }
 
 export function loadFinal() {
   try {
-    const raw = localStorage.getItem(STORAGE_FINAL);
+    const raw = localStorage.getItem(STORAGE_FINAL) || localStorage.getItem(STORAGE_FINAL_V1);
     if (raw) return normalizeAvatar(JSON.parse(raw));
   } catch { /* ignore */ }
   try {
@@ -307,7 +399,7 @@ export function loadFinal() {
 }
 
 export function saveFinal(cfg) {
-  const avatar = { ...normalizeAvatar(cfg), savedAt: Date.now() };
+  const avatar = { ...toSavedCharacter(cfg), savedAt: Date.now() };
   localStorage.setItem(STORAGE_FINAL, JSON.stringify(avatar));
   localStorage.setItem(STORAGE_LEGACY, JSON.stringify(avatar));
   const map = loadByGenderMap();
@@ -317,8 +409,9 @@ export function saveFinal(cfg) {
   return avatar;
 }
 
-export function randomName() {
-  return NAME_POOL[Math.floor(Math.random() * NAME_POOL.length)];
+export function randomName(gender = "female") {
+  const pool = gender === "male" ? NAME_POOL_MALE : NAME_POOL_FEMALE;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 /** 随机外观：倾向协调配色，不绑定能力 */
@@ -329,7 +422,7 @@ export function randomAvatar(keepName = "", gender = "female") {
   const hairPool = Math.random() < 0.7 ? naturalHair : softHair;
   const g = gender === "male" ? "male" : "female";
   return normalizeAvatar({
-    name: keepName || randomName(),
+    name: keepName || randomName(g),
     gender: g,
     bodyType: pick(BODY_TYPES).id,
     hairStyle: pick(hairStylesFor(g)).id,

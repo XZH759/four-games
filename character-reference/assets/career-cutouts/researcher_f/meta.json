@@ -1,0 +1,95 @@
+{
+  "char": "researcher_f",
+  "status": "ok",
+  "parts": {
+    "body": {
+      "w": 170,
+      "h": 433
+    },
+    "outfit": {
+      "w": 183,
+      "h": 399
+    },
+    "hairBack": {
+      "w": 162,
+      "h": 251
+    },
+    "face": {
+      "w": 97,
+      "h": 131
+    },
+    "eyes": {
+      "w": 92,
+      "h": 36
+    },
+    "hairFront": {
+      "w": 126,
+      "h": 187
+    },
+    "accessory": [
+      {
+        "file": "accessory_01.png",
+        "w": 170,
+        "h": 235
+      },
+      {
+        "file": "accessory_02.png",
+        "w": 68,
+        "h": 150
+      },
+      {
+        "file": "accessory_03.png",
+        "w": 119,
+        "h": 42
+      }
+    ]
+  },
+  "preview": {
+    "card_box": [
+      78,
+      169,
+      342,
+      844
+    ]
+  },
+  "canvas": {
+    "body": {
+      "scale": 2.8972
+    },
+    "outfit": {
+      "scale": 2.8972
+    },
+    "composite": {
+      "scale": 1.8507
+    },
+    "experimental": {
+      "face": {
+        "scale": 1.4635,
+        "top": 200,
+        "h": 191
+      },
+      "eyes": {
+        "scale": 0.8024,
+        "top": 285,
+        "h": 28
+      },
+      "hairFront": {
+        "scale": 1.4647,
+        "top": 144,
+        "h": 273
+      },
+      "hairBack": {
+        "scale": 1.183,
+        "top": 138,
+        "h": 296
+      }
+    }
+  },
+  "head": {
+    "top": 18,
+    "bot": 446,
+    "figh": 428,
+    "headw": 49,
+    "headcx": 113.0
+  }
+}

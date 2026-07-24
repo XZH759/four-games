@@ -1,0 +1,28 @@
+{
+  "roles": {
+    "researcher": {
+      "label_cn": "研究员",
+      "label_en": "Researcher",
+      "members": [
+        "researcher_female",
+        "researcher_male"
+      ]
+    },
+    "programmer": {
+      "label_cn": "程序员",
+      "label_en": "Programmer",
+      "members": [
+        "programmer_female",
+        "programmer_male"
+      ]
+    },
+    "engineer": {
+      "label_cn": "工程师",
+      "label_en": "Engineer",
+      "members": [
+        "engineer_female",
+        "engineer_male"
+      ]
+    }
+  }
+}

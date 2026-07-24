@@ -1,0 +1,29 @@
+{
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "anchor": {
+    "type": "foot_center",
+    "x": 512,
+    "y": 1216
+  },
+  "layer_order": [
+    "body",
+    "outfit",
+    "hairBack",
+    "face",
+    "eyes",
+    "hairFront",
+    "accessory"
+  ],
+  "layer_labels": {
+    "body": "基础身体层",
+    "outfit": "服装层",
+    "hairBack": "后发层",
+    "face": "面部层（无眼睛）",
+    "eyes": "眼睛层",
+    "hairFront": "前发/刘海层",
+    "accessory": "配件层"
+  }
+}
