@@ -60,20 +60,25 @@
           <ellipse cx="320" cy="270" rx="175" ry="125" fill="none" stroke="url(#g-path)" stroke-width="28" />
           <ellipse cx="320" cy="270" rx="175" ry="125" fill="none" stroke="#fff6d8" stroke-width="8" opacity="0.55" />
 
-          <!-- 中央城堡枢纽 -->
-          <g filter="url(#soft)" transform="translate(320 250)">
-            <ellipse cx="0" cy="42" rx="48" ry="14" fill="#2f7a38" opacity="0.25" />
-            <rect x="-38" y="0" width="76" height="40" rx="4" fill="#f4f0e6" stroke="#5b4636" stroke-width="2" />
-            <rect x="-48" y="-28" width="30" height="36" rx="3" fill="#ffe8a8" stroke="#5b4636" stroke-width="2" />
-            <rect x="18" y="-28" width="30" height="36" rx="3" fill="#ffe8a8" stroke="#5b4636" stroke-width="2" />
-            <polygon points="-48,-28 -33,-52 -18,-28" fill="#e85d4c" stroke="#5b4636" stroke-width="2" />
-            <polygon points="18,-28 33,-52 48,-28" fill="#e85d4c" stroke="#5b4636" stroke-width="2" />
-            <rect x="-14" y="-55" width="28" height="55" rx="3" fill="#fff8ea" stroke="#5b4636" stroke-width="2" />
-            <polygon points="-18,-55 0,-82 18,-55" fill="#e85d4c" stroke="#5b4636" stroke-width="2" />
-            <circle cx="0" cy="-88" r="5" fill="#ffd45a" stroke="#5b4636" stroke-width="1.5" />
-            <rect x="-6" y="18" width="12" height="22" fill="#5b4636" />
-          </g>
+          <!-- 中央城堡枢纽（可点进积分兑换） -->
+          <a class="map-pin castle-hub" href="/castle" data-pin="0" transform="translate(320 250)" aria-label="知识城堡积分兑换">
+            <g filter="url(#soft)">
+              <ellipse cx="0" cy="42" rx="48" ry="14" fill="#2f7a38" opacity="0.25" />
+              <rect x="-38" y="0" width="76" height="40" rx="4" fill="#f4f0e6" stroke="#5b4636" stroke-width="2" />
+              <rect x="-48" y="-28" width="30" height="36" rx="3" fill="#ffe8a8" stroke="#5b4636" stroke-width="2" />
+              <rect x="18" y="-28" width="30" height="36" rx="3" fill="#ffe8a8" stroke="#5b4636" stroke-width="2" />
+              <polygon points="-48,-28 -33,-52 -18,-28" fill="#e85d4c" stroke="#5b4636" stroke-width="2" />
+              <polygon points="18,-28 33,-52 48,-28" fill="#e85d4c" stroke="#5b4636" stroke-width="2" />
+              <rect x="-14" y="-55" width="28" height="55" rx="3" fill="#fff8ea" stroke="#5b4636" stroke-width="2" />
+              <polygon points="-18,-55 0,-82 18,-55" fill="#e85d4c" stroke="#5b4636" stroke-width="2" />
+              <circle cx="0" cy="-88" r="5" fill="#ffd45a" stroke="#5b4636" stroke-width="1.5" />
+              <rect x="-6" y="18" width="12" height="22" fill="#5b4636" />
+            </g>
+          </a>
           <text x="320" y="318" text-anchor="middle" class="zone-label hub">知识城堡</text>
+          <a class="map-pin" href="/castle" data-pin="11" transform="translate(320 288)">
+            <circle r="14" class="pin-bg z-arena" /><text class="pin-num" text-anchor="middle" dy="5">11</text>
+          </a>
 
           <!-- 入园广场（南） -->
           <g class="zone-land" data-zone="plaza">
@@ -170,6 +175,17 @@
       </div>
 
       <div class="legend-scroll">
+        <section class="legend-zone" data-zone="castle">
+          <h3><span class="dot arena"></span>知识城堡</h3>
+          <a class="legend-item" href="/castle" data-pin="11">
+            <span class="num arena">11</span>
+            <span class="meta">
+              <strong>积分兑换区</strong>
+              <small>1–5 级奖池 · 等级越高越精致</small>
+            </span>
+          </a>
+        </section>
+
         <section class="legend-zone" data-zone="plaza">
           <h3><span class="dot plaza"></span>入园广场</h3>
           <a class="legend-item" href="/plain" data-pin="1">

@@ -220,6 +220,11 @@ body {
 .dot.arena { background: var(--arena); }
 .dot.town { background: var(--town); }
 
+.map-pin.castle-hub:hover g,
+.map-pin.castle-hub.is-hot g {
+  filter: brightness(1.08);
+}
+
 .legend-item {
   display: flex;
   align-items: center;

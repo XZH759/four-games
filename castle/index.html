@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>知识城堡 · 积分兑换区</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/castle/castle.css" />
+</head>
+<body>
+  <div class="wash" aria-hidden="true"></div>
+
+  <header class="top">
+    <a class="back" href="/">← 返回导览</a>
+    <div class="title-block">
+      <p class="eyebrow">KNOWLEDGE CASTLE</p>
+      <h1>知识城堡 · 积分兑换</h1>
+    </div>
+    <div class="wallet" aria-live="polite">
+      <span>可用积分</span>
+      <strong id="points-now">0</strong>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="intro card">
+      <p>用各游戏获得的积分解锁兑换等级。等级越高，奖池越精致，高稀有概率也越大。每次抽取消耗对应等级积分。</p>
+      <div class="demo-row">
+        <button type="button" class="btn-ghost" id="demo-add">体验：+800 积分</button>
+        <span class="hint" id="lifetime-hint">累计获得 0</span>
+      </div>
+    </section>
+
+    <section class="tiers" id="tiers" aria-label="兑换等级"></section>
+
+    <section class="draw-panel card" id="draw-panel">
+      <div class="draw-head">
+        <h2 id="tier-title">选择等级后抽取</h2>
+        <p id="tier-sub">点击上方 1–5 级卡片</p>
+      </div>
+      <div class="odds" id="odds"></div>
+      <div class="pool" id="pool"></div>
+      <button type="button" class="btn-draw" id="draw-btn" disabled>抽取一次</button>
+      <p class="draw-msg" id="draw-msg" role="status"></p>
+    </section>
+
+    <section class="bag card">
+      <h2>我的收藏</h2>
+      <ul id="inventory" class="inventory"></ul>
+      <p class="empty" id="inv-empty">还没有兑换到物品</p>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" hidden></div>
+  <div class="reveal" id="reveal" hidden>
+    <div class="reveal-card">
+      <p class="rarity" id="reveal-rarity"></p>
+      <h3 id="reveal-name"></h3>
+      <p id="reveal-desc"></p>
+      <button type="button" class="btn-draw" id="reveal-close">收下</button>
+    </div>
+  </div>
+
+  <script type="module" src="/castle/castle.js"></script>
+</body>
+</html>
