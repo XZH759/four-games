@@ -12,7 +12,7 @@ import { findById, STARTER_OUTFITS } from "./avatar-config.js";
 
 export const AVATAR_CANVAS = { width: 1024, height: 1536, footY: 1216, footX: 512 };
 export const FIXTURE_CANVAS = { width: 1024, height: 1536, footY: 1440, footX: 512 };
-export const FIXTURE_BASE = "/public/avatar/_fixtures";
+export const FIXTURE_BASE = "/avatar/_fixtures";
 
 /** 与接入包 LAYER_ORDER 对齐的渲染顺序 */
 export const AVATAR_LAYER_ORDER = [...LAYER_ORDER];
