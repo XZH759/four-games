@@ -1,0 +1,8 @@
+﻿gender,layer,asset_id,relative_png_path
+female,body,F_BODY_001,female/body/F_BODY_001.png
+female,outfit,F_OUTFIT_001,female/outfit/F_OUTFIT_001.png
+female,hairBack,F_HAIRBACK_001,female/hairBack/F_HAIRBACK_001.png
+female,hairFront,F_HAIRFRONT_001,female/hairFront/F_HAIRFRONT_001.png
+female,face,F_FACE_001,female/face/F_FACE_001.png
+female,eyes,F_EYES_001,female/eyes/F_EYES_001.png
+female,accessory,F_ACCESSORY_001,female/accessory/F_ACCESSORY_001.png

@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CharacterAsset",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "researcher",
+        "programmer",
+        "engineer"
+      ]
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "female",
+        "male"
+      ]
+    },
+    "display_name_cn": {
+      "type": "string"
+    },
+    "display_name_en": {
+      "type": "string"
+    },
+    "sheet": {
+      "type": "string"
+    },
+    "canvas": {
+      "type": "object"
+    },
+    "anchor": {
+      "type": "object"
+    },
+    "layer_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "role",
+    "gender",
+    "sheet"
+  ]
+}

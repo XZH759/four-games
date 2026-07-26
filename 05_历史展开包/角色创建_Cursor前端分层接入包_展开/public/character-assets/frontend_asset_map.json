@@ -1,0 +1,1294 @@
+{
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "anchor": {
+    "type": "foot_center",
+    "x": 512,
+    "y": 1216
+  },
+  "layer_order": [
+    "body",
+    "outfit",
+    "hairBack",
+    "face",
+    "eyes",
+    "hairFront",
+    "accessory"
+  ],
+  "genders": {
+    "female": {
+      "body": [
+        {
+          "asset_id": "F_BODY_001",
+          "file_name": "F_BODY_001.png",
+          "relative_path": "assets/female/body/F_BODY_001.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "body",
+          "layer_code": "BODY",
+          "variant": 1,
+          "z_index": 0,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "body",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "F_BODY_002",
+          "file_name": "F_BODY_002.png",
+          "relative_path": "assets/female/body/F_BODY_002.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "body",
+          "layer_code": "BODY",
+          "variant": 2,
+          "z_index": 0,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "body",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "F_BODY_003",
+          "file_name": "F_BODY_003.png",
+          "relative_path": "assets/female/body/F_BODY_003.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "body",
+          "layer_code": "BODY",
+          "variant": 3,
+          "z_index": 0,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "body",
+            "variant_003"
+          ]
+        }
+      ],
+      "outfit": [
+        {
+          "asset_id": "F_OUTFIT_001",
+          "file_name": "F_OUTFIT_001.png",
+          "relative_path": "assets/female/outfit/F_OUTFIT_001.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "outfit",
+          "layer_code": "OUTFIT",
+          "variant": 1,
+          "z_index": 1,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "outfit",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "F_OUTFIT_002",
+          "file_name": "F_OUTFIT_002.png",
+          "relative_path": "assets/female/outfit/F_OUTFIT_002.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "outfit",
+          "layer_code": "OUTFIT",
+          "variant": 2,
+          "z_index": 1,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "outfit",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "F_OUTFIT_003",
+          "file_name": "F_OUTFIT_003.png",
+          "relative_path": "assets/female/outfit/F_OUTFIT_003.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "outfit",
+          "layer_code": "OUTFIT",
+          "variant": 3,
+          "z_index": 1,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "outfit",
+            "variant_003"
+          ]
+        }
+      ],
+      "hairBack": [
+        {
+          "asset_id": "F_HAIRBACK_001",
+          "file_name": "F_HAIRBACK_001.png",
+          "relative_path": "assets/female/hairBack/F_HAIRBACK_001.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 1,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairBack",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "F_HAIRBACK_002",
+          "file_name": "F_HAIRBACK_002.png",
+          "relative_path": "assets/female/hairBack/F_HAIRBACK_002.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 2,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairBack",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "F_HAIRBACK_003",
+          "file_name": "F_HAIRBACK_003.png",
+          "relative_path": "assets/female/hairBack/F_HAIRBACK_003.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 3,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairBack",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "F_HAIRBACK_004",
+          "file_name": "F_HAIRBACK_004.png",
+          "relative_path": "assets/female/hairBack/F_HAIRBACK_004.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 4,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairBack",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "F_HAIRBACK_005",
+          "file_name": "F_HAIRBACK_005.png",
+          "relative_path": "assets/female/hairBack/F_HAIRBACK_005.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 5,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairBack",
+            "variant_005"
+          ]
+        }
+      ],
+      "face": [
+        {
+          "asset_id": "F_FACE_001",
+          "file_name": "F_FACE_001.png",
+          "relative_path": "assets/female/face/F_FACE_001.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 1,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "face",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "F_FACE_002",
+          "file_name": "F_FACE_002.png",
+          "relative_path": "assets/female/face/F_FACE_002.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 2,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "face",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "F_FACE_003",
+          "file_name": "F_FACE_003.png",
+          "relative_path": "assets/female/face/F_FACE_003.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 3,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "face",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "F_FACE_004",
+          "file_name": "F_FACE_004.png",
+          "relative_path": "assets/female/face/F_FACE_004.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 4,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "face",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "F_FACE_005",
+          "file_name": "F_FACE_005.png",
+          "relative_path": "assets/female/face/F_FACE_005.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 5,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "face",
+            "variant_005"
+          ]
+        }
+      ],
+      "eyes": [
+        {
+          "asset_id": "F_EYES_001",
+          "file_name": "F_EYES_001.png",
+          "relative_path": "assets/female/eyes/F_EYES_001.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 1,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "eyes",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "F_EYES_002",
+          "file_name": "F_EYES_002.png",
+          "relative_path": "assets/female/eyes/F_EYES_002.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 2,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "eyes",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "F_EYES_003",
+          "file_name": "F_EYES_003.png",
+          "relative_path": "assets/female/eyes/F_EYES_003.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 3,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "eyes",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "F_EYES_004",
+          "file_name": "F_EYES_004.png",
+          "relative_path": "assets/female/eyes/F_EYES_004.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 4,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "eyes",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "F_EYES_005",
+          "file_name": "F_EYES_005.png",
+          "relative_path": "assets/female/eyes/F_EYES_005.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 5,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "eyes",
+            "variant_005"
+          ]
+        }
+      ],
+      "hairFront": [
+        {
+          "asset_id": "F_HAIRFRONT_001",
+          "file_name": "F_HAIRFRONT_001.png",
+          "relative_path": "assets/female/hairFront/F_HAIRFRONT_001.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 1,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairFront",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "F_HAIRFRONT_002",
+          "file_name": "F_HAIRFRONT_002.png",
+          "relative_path": "assets/female/hairFront/F_HAIRFRONT_002.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 2,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairFront",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "F_HAIRFRONT_003",
+          "file_name": "F_HAIRFRONT_003.png",
+          "relative_path": "assets/female/hairFront/F_HAIRFRONT_003.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 3,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairFront",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "F_HAIRFRONT_004",
+          "file_name": "F_HAIRFRONT_004.png",
+          "relative_path": "assets/female/hairFront/F_HAIRFRONT_004.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 4,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairFront",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "F_HAIRFRONT_005",
+          "file_name": "F_HAIRFRONT_005.png",
+          "relative_path": "assets/female/hairFront/F_HAIRFRONT_005.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 5,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "hairFront",
+            "variant_005"
+          ]
+        }
+      ],
+      "accessory": [
+        {
+          "asset_id": "F_ACCESSORY_001",
+          "file_name": "F_ACCESSORY_001.png",
+          "relative_path": "assets/female/accessory/F_ACCESSORY_001.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 1,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "accessory",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "F_ACCESSORY_002",
+          "file_name": "F_ACCESSORY_002.png",
+          "relative_path": "assets/female/accessory/F_ACCESSORY_002.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 2,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "accessory",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "F_ACCESSORY_003",
+          "file_name": "F_ACCESSORY_003.png",
+          "relative_path": "assets/female/accessory/F_ACCESSORY_003.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 3,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "accessory",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "F_ACCESSORY_004",
+          "file_name": "F_ACCESSORY_004.png",
+          "relative_path": "assets/female/accessory/F_ACCESSORY_004.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 4,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "accessory",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "F_ACCESSORY_005",
+          "file_name": "F_ACCESSORY_005.png",
+          "relative_path": "assets/female/accessory/F_ACCESSORY_005.png",
+          "gender": "female",
+          "gender_code": "F",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 5,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "female",
+            "accessory",
+            "variant_005"
+          ]
+        }
+      ]
+    },
+    "male": {
+      "body": [
+        {
+          "asset_id": "M_BODY_001",
+          "file_name": "M_BODY_001.png",
+          "relative_path": "assets/male/body/M_BODY_001.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "body",
+          "layer_code": "BODY",
+          "variant": 1,
+          "z_index": 0,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "body",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "M_BODY_002",
+          "file_name": "M_BODY_002.png",
+          "relative_path": "assets/male/body/M_BODY_002.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "body",
+          "layer_code": "BODY",
+          "variant": 2,
+          "z_index": 0,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "body",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "M_BODY_003",
+          "file_name": "M_BODY_003.png",
+          "relative_path": "assets/male/body/M_BODY_003.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "body",
+          "layer_code": "BODY",
+          "variant": 3,
+          "z_index": 0,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "body",
+            "variant_003"
+          ]
+        }
+      ],
+      "outfit": [
+        {
+          "asset_id": "M_OUTFIT_001",
+          "file_name": "M_OUTFIT_001.png",
+          "relative_path": "assets/male/outfit/M_OUTFIT_001.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "outfit",
+          "layer_code": "OUTFIT",
+          "variant": 1,
+          "z_index": 1,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "outfit",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "M_OUTFIT_002",
+          "file_name": "M_OUTFIT_002.png",
+          "relative_path": "assets/male/outfit/M_OUTFIT_002.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "outfit",
+          "layer_code": "OUTFIT",
+          "variant": 2,
+          "z_index": 1,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "outfit",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "M_OUTFIT_003",
+          "file_name": "M_OUTFIT_003.png",
+          "relative_path": "assets/male/outfit/M_OUTFIT_003.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "outfit",
+          "layer_code": "OUTFIT",
+          "variant": 3,
+          "z_index": 1,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "outfit",
+            "variant_003"
+          ]
+        }
+      ],
+      "hairBack": [
+        {
+          "asset_id": "M_HAIRBACK_001",
+          "file_name": "M_HAIRBACK_001.png",
+          "relative_path": "assets/male/hairBack/M_HAIRBACK_001.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 1,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairBack",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "M_HAIRBACK_002",
+          "file_name": "M_HAIRBACK_002.png",
+          "relative_path": "assets/male/hairBack/M_HAIRBACK_002.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 2,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairBack",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "M_HAIRBACK_003",
+          "file_name": "M_HAIRBACK_003.png",
+          "relative_path": "assets/male/hairBack/M_HAIRBACK_003.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 3,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairBack",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "M_HAIRBACK_004",
+          "file_name": "M_HAIRBACK_004.png",
+          "relative_path": "assets/male/hairBack/M_HAIRBACK_004.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 4,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairBack",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "M_HAIRBACK_005",
+          "file_name": "M_HAIRBACK_005.png",
+          "relative_path": "assets/male/hairBack/M_HAIRBACK_005.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairBack",
+          "layer_code": "HAIRBACK",
+          "variant": 5,
+          "z_index": 2,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairBack",
+            "variant_005"
+          ]
+        }
+      ],
+      "face": [
+        {
+          "asset_id": "M_FACE_001",
+          "file_name": "M_FACE_001.png",
+          "relative_path": "assets/male/face/M_FACE_001.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 1,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "face",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "M_FACE_002",
+          "file_name": "M_FACE_002.png",
+          "relative_path": "assets/male/face/M_FACE_002.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 2,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "face",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "M_FACE_003",
+          "file_name": "M_FACE_003.png",
+          "relative_path": "assets/male/face/M_FACE_003.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 3,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "face",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "M_FACE_004",
+          "file_name": "M_FACE_004.png",
+          "relative_path": "assets/male/face/M_FACE_004.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 4,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "face",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "M_FACE_005",
+          "file_name": "M_FACE_005.png",
+          "relative_path": "assets/male/face/M_FACE_005.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "face",
+          "layer_code": "FACE",
+          "variant": 5,
+          "z_index": 3,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "face",
+            "variant_005"
+          ]
+        }
+      ],
+      "eyes": [
+        {
+          "asset_id": "M_EYES_001",
+          "file_name": "M_EYES_001.png",
+          "relative_path": "assets/male/eyes/M_EYES_001.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 1,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "eyes",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "M_EYES_002",
+          "file_name": "M_EYES_002.png",
+          "relative_path": "assets/male/eyes/M_EYES_002.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 2,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "eyes",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "M_EYES_003",
+          "file_name": "M_EYES_003.png",
+          "relative_path": "assets/male/eyes/M_EYES_003.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 3,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "eyes",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "M_EYES_004",
+          "file_name": "M_EYES_004.png",
+          "relative_path": "assets/male/eyes/M_EYES_004.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 4,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "eyes",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "M_EYES_005",
+          "file_name": "M_EYES_005.png",
+          "relative_path": "assets/male/eyes/M_EYES_005.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "eyes",
+          "layer_code": "EYES",
+          "variant": 5,
+          "z_index": 4,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "eyes",
+            "variant_005"
+          ]
+        }
+      ],
+      "hairFront": [
+        {
+          "asset_id": "M_HAIRFRONT_001",
+          "file_name": "M_HAIRFRONT_001.png",
+          "relative_path": "assets/male/hairFront/M_HAIRFRONT_001.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 1,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairFront",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "M_HAIRFRONT_002",
+          "file_name": "M_HAIRFRONT_002.png",
+          "relative_path": "assets/male/hairFront/M_HAIRFRONT_002.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 2,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairFront",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "M_HAIRFRONT_003",
+          "file_name": "M_HAIRFRONT_003.png",
+          "relative_path": "assets/male/hairFront/M_HAIRFRONT_003.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 3,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairFront",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "M_HAIRFRONT_004",
+          "file_name": "M_HAIRFRONT_004.png",
+          "relative_path": "assets/male/hairFront/M_HAIRFRONT_004.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 4,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairFront",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "M_HAIRFRONT_005",
+          "file_name": "M_HAIRFRONT_005.png",
+          "relative_path": "assets/male/hairFront/M_HAIRFRONT_005.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "hairFront",
+          "layer_code": "HAIRFRONT",
+          "variant": 5,
+          "z_index": 5,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "hairFront",
+            "variant_005"
+          ]
+        }
+      ],
+      "accessory": [
+        {
+          "asset_id": "M_ACCESSORY_001",
+          "file_name": "M_ACCESSORY_001.png",
+          "relative_path": "assets/male/accessory/M_ACCESSORY_001.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 1,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "accessory",
+            "variant_001"
+          ]
+        },
+        {
+          "asset_id": "M_ACCESSORY_002",
+          "file_name": "M_ACCESSORY_002.png",
+          "relative_path": "assets/male/accessory/M_ACCESSORY_002.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 2,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "accessory",
+            "variant_002"
+          ]
+        },
+        {
+          "asset_id": "M_ACCESSORY_003",
+          "file_name": "M_ACCESSORY_003.png",
+          "relative_path": "assets/male/accessory/M_ACCESSORY_003.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 3,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "accessory",
+            "variant_003"
+          ]
+        },
+        {
+          "asset_id": "M_ACCESSORY_004",
+          "file_name": "M_ACCESSORY_004.png",
+          "relative_path": "assets/male/accessory/M_ACCESSORY_004.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 4,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "accessory",
+            "variant_004"
+          ]
+        },
+        {
+          "asset_id": "M_ACCESSORY_005",
+          "file_name": "M_ACCESSORY_005.png",
+          "relative_path": "assets/male/accessory/M_ACCESSORY_005.png",
+          "gender": "male",
+          "gender_code": "M",
+          "layer": "accessory",
+          "layer_code": "ACCESSORY",
+          "variant": 5,
+          "z_index": 6,
+          "canvas_width": 1024,
+          "canvas_height": 1536,
+          "anchor_x": 512,
+          "anchor_y": 1216,
+          "tags": [
+            "male",
+            "accessory",
+            "variant_005"
+          ]
+        }
+      ]
+    }
+  }
+}

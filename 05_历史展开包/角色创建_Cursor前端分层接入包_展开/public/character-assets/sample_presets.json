@@ -1,0 +1,78 @@
+{
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "anchor": {
+    "type": "foot_center",
+    "x": 512,
+    "y": 1216
+  },
+  "layer_order": [
+    "body",
+    "outfit",
+    "hairBack",
+    "face",
+    "eyes",
+    "hairFront",
+    "accessory"
+  ],
+  "presets": [
+    {
+      "preset_id": "F_PRESET_001",
+      "gender": "female",
+      "display_name": "Female Base Look 01",
+      "assets": {
+        "body": "F_BODY_001",
+        "outfit": "F_OUTFIT_001",
+        "hairBack": "F_HAIRBACK_001",
+        "face": "F_FACE_001",
+        "eyes": "F_EYES_001",
+        "hairFront": "F_HAIRFRONT_001",
+        "accessory": "F_ACCESSORY_001"
+      }
+    },
+    {
+      "preset_id": "F_PRESET_002",
+      "gender": "female",
+      "display_name": "Female Base Look 02",
+      "assets": {
+        "body": "F_BODY_002",
+        "outfit": "F_OUTFIT_002",
+        "hairBack": "F_HAIRBACK_002",
+        "face": "F_FACE_002",
+        "eyes": "F_EYES_002",
+        "hairFront": "F_HAIRFRONT_002",
+        "accessory": "F_ACCESSORY_002"
+      }
+    },
+    {
+      "preset_id": "M_PRESET_001",
+      "gender": "male",
+      "display_name": "Male Base Look 01",
+      "assets": {
+        "body": "M_BODY_001",
+        "outfit": "M_OUTFIT_001",
+        "hairBack": "M_HAIRBACK_001",
+        "face": "M_FACE_001",
+        "eyes": "M_EYES_001",
+        "hairFront": "M_HAIRFRONT_001",
+        "accessory": "M_ACCESSORY_001"
+      }
+    },
+    {
+      "preset_id": "M_PRESET_002",
+      "gender": "male",
+      "display_name": "Male Base Look 02",
+      "assets": {
+        "body": "M_BODY_002",
+        "outfit": "M_OUTFIT_002",
+        "hairBack": "M_HAIRBACK_002",
+        "face": "M_FACE_002",
+        "eyes": "M_EYES_002",
+        "hairFront": "M_HAIRFRONT_002",
+        "accessory": "M_ACCESSORY_004"
+      }
+    }
+  ]
+}

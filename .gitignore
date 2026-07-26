@@ -17,3 +17,7 @@ gamification/
 
 .vercel
 .env*
+
+# Editor / local backups — not needed for the site
+.cursor/
+*.bak

@@ -1,0 +1,36 @@
+{
+  "status": "template_only",
+  "warning": "Do not activate until matching profession asset files have been exported and added to asset_index.json.",
+  "presets": [
+    {
+      "preset_id": "F_RESEARCHER_001",
+      "gender": "female",
+      "role": "researcher",
+      "display_name": "女性实验室研究员",
+      "assets": {
+        "body": "F_BODY_001",
+        "outfit": "F_OUTFIT_RESEARCHER_001",
+        "hairBack": "F_HAIRBACK_001",
+        "face": "F_FACE_001",
+        "eyes": "F_EYES_001",
+        "hairFront": "F_HAIRFRONT_001",
+        "accessory": "F_ACCESSORY_RESEARCHER_001"
+      }
+    },
+    {
+      "preset_id": "M_PROGRAMMER_001",
+      "gender": "male",
+      "role": "programmer",
+      "display_name": "男性程序开发者",
+      "assets": {
+        "body": "M_BODY_001",
+        "outfit": "M_OUTFIT_PROGRAMMER_001",
+        "hairBack": "M_HAIRBACK_001",
+        "face": "M_FACE_001",
+        "eyes": "M_EYES_001",
+        "hairFront": "M_HAIRFRONT_001",
+        "accessory": "M_ACCESSORY_PROGRAMMER_001"
+      }
+    }
+  ]
+}

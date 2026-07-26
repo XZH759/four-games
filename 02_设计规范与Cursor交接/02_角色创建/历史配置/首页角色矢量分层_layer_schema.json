@@ -1,0 +1,25 @@
+{
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "anchor": {
+    "type": "foot_center",
+    "x": 512,
+    "y": 1216
+  },
+  "layer_order": [
+    "body",
+    "outfit",
+    "hairBack",
+    "face",
+    "eyes",
+    "hairFront",
+    "accessory"
+  ],
+  "notes": [
+    "当前包为基于最新确认首页高画质角色界面的标准化分层文件。",
+    "每个部件均输出整张透明 PNG 与对应透明 SVG 容器文件。",
+    "SVG 为可直接用于前端与设计交付的透明矢量容器格式，内部嵌入透明图层素材。"
+  ]
+}

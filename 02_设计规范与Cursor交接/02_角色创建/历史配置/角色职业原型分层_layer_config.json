@@ -1,0 +1,73 @@
+{
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "anchor": {
+    "type": "foot_center",
+    "x": 512,
+    "y": 1216
+  },
+  "layer_order": [
+    "body",
+    "outfit",
+    "hairBack",
+    "face",
+    "eyes",
+    "hairFront",
+    "accessory"
+  ],
+  "presets": [
+    {
+      "preset_id": "F_RESEARCHER_001",
+      "gender": "female",
+      "role": "researcher",
+      "display_name": "实验室研究员",
+      "assets": {
+        "body": "F_RESEARCHER_001_body.png",
+        "outfit": "F_RESEARCHER_001_outfit.png",
+        "hairBack": "F_RESEARCHER_001_hairBack.png",
+        "face": "F_RESEARCHER_001_face.png",
+        "eyes": "F_RESEARCHER_001_eyes.png",
+        "hairFront": "F_RESEARCHER_001_hairFront.png",
+        "accessory": "F_RESEARCHER_001_accessory.png"
+      }
+    },
+    {
+      "preset_id": "M_PROGRAMMER_001",
+      "gender": "male",
+      "role": "programmer",
+      "display_name": "程序开发者",
+      "assets": {
+        "body": "M_PROGRAMMER_001_body.png",
+        "outfit": "M_PROGRAMMER_001_outfit.png",
+        "hairBack": "M_PROGRAMMER_001_hairBack.png",
+        "face": "M_PROGRAMMER_001_face.png",
+        "eyes": "M_PROGRAMMER_001_eyes.png",
+        "hairFront": "M_PROGRAMMER_001_hairFront.png",
+        "accessory": "M_PROGRAMMER_001_accessory.png"
+      }
+    },
+    {
+      "preset_id": "M_ENGINEER_001",
+      "gender": "male",
+      "role": "engineer",
+      "display_name": "智能工程师",
+      "assets": {
+        "body": "M_ENGINEER_001_body.png",
+        "outfit": "M_ENGINEER_001_outfit.png",
+        "hairBack": "M_ENGINEER_001_hairBack.png",
+        "face": "M_ENGINEER_001_face.png",
+        "eyes": "M_ENGINEER_001_eyes.png",
+        "hairFront": "M_ENGINEER_001_hairFront.png",
+        "accessory": "M_ENGINEER_001_accessory.png"
+      }
+    }
+  ],
+  "notes": [
+    "This package is a prototype layered export built from a flattened preview board.",
+    "Current role cards are upper-body card art rather than full-body orthographic source, so the fixed foot-center anchor is a virtual baseline at the bottom of the visible character crop.",
+    "Layers are approximate cutouts for compositing tests only.",
+    "For true production-ready full-body layered assets, please provide full-body source art or PSD/AI files."
+  ]
+}

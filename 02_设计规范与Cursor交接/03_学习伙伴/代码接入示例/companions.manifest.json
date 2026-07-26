@@ -1,0 +1,221 @@
+{
+  "version": "2.0-route-b",
+  "assetContract": {
+    "heroCanvas": [
+      1024,
+      1536
+    ],
+    "cardCanvas": [
+      512,
+      640
+    ],
+    "iconCanvas": [
+      320,
+      320
+    ],
+    "background": "transparent with intentional holographic medallion",
+    "renderRule": "Use <img>; never redraw companions with CSS/SVG.",
+    "nameLanguage": "English only",
+    "skillLanguage": "Chinese"
+  },
+  "companions": [
+    {
+      "id": "bella",
+      "order": 1,
+      "name": "BELLA",
+      "role": "优雅守护型",
+      "traits": [
+        "优雅",
+        "坚韧"
+      ],
+      "skills": [
+        {
+          "name": "从容提示",
+          "description": "用简洁提示帮助你稳定推进，不制造紧迫感。"
+        },
+        {
+          "name": "坚持鼓励",
+          "description": "在连续作答时提供节奏与毅力支持。"
+        }
+      ],
+      "tagline": "以从容与韧性陪你完成每一步。",
+      "mechaCore": "菱晶翼装",
+      "palette": {
+        "accent": "#8E7CFF",
+        "secondary": "#D9D2FF",
+        "dark": "#3E376A"
+      },
+      "assets": {
+        "hero": "/companions/bella/hero.png",
+        "card": "/companions/bella/card.png",
+        "selectedCard": "/companions/bella/card-selected.png",
+        "icon": "/companions/bella/icon.png"
+      }
+    },
+    {
+      "id": "ava",
+      "order": 2,
+      "name": "AVA",
+      "role": "节奏探索型",
+      "traits": [
+        "节奏",
+        "勇气"
+      ],
+      "skills": [
+        {
+          "name": "节奏校准",
+          "description": "在章节切换时帮助你重置节奏与注意力。"
+        },
+        {
+          "name": "勇气助推",
+          "description": "遇到困难时给予积极但不泄题的鼓励。"
+        }
+      ],
+      "tagline": "跟着节奏前进，把未知变成下一次探索。",
+      "mechaCore": "潮汐声呐装",
+      "palette": {
+        "accent": "#59C8FF",
+        "secondary": "#CDEFFF",
+        "dark": "#315E9B"
+      },
+      "assets": {
+        "hero": "/companions/ava/hero.png",
+        "card": "/companions/ava/card.png",
+        "selectedCard": "/companions/ava/card-selected.png",
+        "icon": "/companions/ava/icon.png"
+      }
+    },
+    {
+      "id": "eileen",
+      "order": 3,
+      "name": "EILEEN",
+      "role": "智慧分析型",
+      "traits": [
+        "智慧",
+        "分析"
+      ],
+      "skills": [
+        {
+          "name": "结构梳理",
+          "description": "提醒你识别题干重点与信息层级。"
+        },
+        {
+          "name": "思路复核",
+          "description": "鼓励检查理解过程，不直接判断答案。"
+        }
+      ],
+      "tagline": "清晰拆解复杂信息，陪你稳步分析。",
+      "mechaCore": "银翼解析装",
+      "palette": {
+        "accent": "#79A9FF",
+        "secondary": "#E6EEFF",
+        "dark": "#55658F"
+      },
+      "assets": {
+        "hero": "/companions/eileen/hero.png",
+        "card": "/companions/eileen/card.png",
+        "selectedCard": "/companions/eileen/card-selected.png",
+        "icon": "/companions/eileen/icon.png"
+      }
+    },
+    {
+      "id": "fiona",
+      "order": 4,
+      "name": "FIONA",
+      "role": "温暖鼓舞型",
+      "traits": [
+        "鼓舞",
+        "温暖"
+      ],
+      "skills": [
+        {
+          "name": "元气补给",
+          "description": "用正向反馈维持信心与参与感。"
+        },
+        {
+          "name": "情绪缓冲",
+          "description": "在疲劳时提供短暂舒缓与继续作答提醒。"
+        }
+      ],
+      "tagline": "让每次挑战都成为充满能量的成长机会。",
+      "mechaCore": "心能支援装",
+      "palette": {
+        "accent": "#FF78C7",
+        "secondary": "#FFD9EF",
+        "dark": "#7B3D70"
+      },
+      "assets": {
+        "hero": "/companions/fiona/hero.png",
+        "card": "/companions/fiona/card.png",
+        "selectedCard": "/companions/fiona/card-selected.png",
+        "icon": "/companions/fiona/icon.png"
+      }
+    },
+    {
+      "id": "gladys",
+      "order": 5,
+      "name": "GLADYS",
+      "role": "逻辑校准型",
+      "traits": [
+        "逻辑",
+        "精准"
+      ],
+      "skills": [
+        {
+          "name": "细节扫描",
+          "description": "提醒你留意限制词、否定词和遗漏项。"
+        },
+        {
+          "name": "精度校准",
+          "description": "在提交前提示完成一次快速复查。"
+        }
+      ],
+      "tagline": "用逻辑和精度，守住每一个关键细节。",
+      "mechaCore": "镜阵校准装",
+      "palette": {
+        "accent": "#896DFF",
+        "secondary": "#CFC5FF",
+        "dark": "#29233F"
+      },
+      "assets": {
+        "hero": "/companions/gladys/hero.png",
+        "card": "/companions/gladys/card.png",
+        "selectedCard": "/companions/gladys/card-selected.png",
+        "icon": "/companions/gladys/icon.png"
+      }
+    },
+    {
+      "id": "diana",
+      "order": 6,
+      "name": "DIANA",
+      "role": "活力好奇型",
+      "traits": [
+        "活力",
+        "好奇"
+      ],
+      "skills": [
+        {
+          "name": "活力增幅",
+          "description": "在章节推进时提供轻量动力反馈。"
+        },
+        {
+          "name": "好奇引导",
+          "description": "鼓励尝试与探索，但不提供正确答案。"
+        }
+      ],
+      "tagline": "把每个问题变成一次轻快而勇敢的探索。",
+      "mechaCore": "跃迁兔耳装",
+      "palette": {
+        "accent": "#FF8CCF",
+        "secondary": "#9BEAFF",
+        "dark": "#62406F"
+      },
+      "assets": {
+        "hero": "/companions/diana/hero.png",
+        "card": "/companions/diana/card.png",
+        "selectedCard": "/companions/diana/card-selected.png",
+        "icon": "/companions/diana/icon.png"
+      }
+    }
+  ]
+}

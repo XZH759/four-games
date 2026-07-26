@@ -1,0 +1,602 @@
+已生成一套可直接交给 Cursor 使用的**游戏视觉与交互精美化实施包**，其中包含：
+
+* 分阶段 Cursor 指令；
+* 人物与三套服装的图像生成提示词；
+* 暖暖风设计变量与按钮、卡片样式；
+* 角色切换、勾选、交叉淡化动画；
+* React 分层人物渲染组件；
+* 角色资源清单模板；
+* 星光拱门、金色面板、罗盘星、选中勾章等原创 SVG；
+* 图片尺寸与透明通道检查脚本；
+* 桌面、平板、手机最终验收清单。
+
+[下载完整 Cursor 游戏精美化实施包](sandbox:/mnt/data/cursor_game_polish_kit.zip)
+
+也可以单独查看：
+
+[先看这里：完整使用说明](sandbox:/mnt/data/cursor_game_polish_kit/README_先看这里.md)
+
+[人物和三套服装生成提示词](sandbox:/mnt/data/cursor_game_polish_kit/prompts/image_generation_prompts.md)
+
+[暖暖风视觉样式文件](sandbox:/mnt/data/cursor_game_polish_kit/styles/game-theme.css)
+
+[人物动画与切换效果](sandbox:/mnt/data/cursor_game_polish_kit/styles/avatar-motion.css)
+
+[AvatarRenderer 分层人物组件](sandbox:/mnt/data/cursor_game_polish_kit/src/avatar/AvatarRenderer.tsx)
+
+---
+
+# 一、先把实施包放入项目
+
+下载并解压后，把整个文件夹复制到游戏项目根目录，改名为：
+
+```text
+design-kit
+```
+
+项目结构大致应变成：
+
+```text
+your-game-project/
+├── src/
+├── public/
+├── package.json
+├── design-kit/
+│   ├── prompts/
+│   ├── styles/
+│   ├── assets/
+│   ├── src/
+│   ├── scripts/
+│   └── checklists/
+```
+
+然后把你现有的参考图放入：
+
+```text
+design-kit/references/
+```
+
+建议放入：
+
+```text
+initial-avatar-reference.png
+shop-reference.png
+achievement-reference.png
+companion-reference.png
+chapter-complete-reference.png
+```
+
+不要只把图片粘贴进 Cursor 聊天窗口。放入项目目录后，Cursor 才能持续读取和比较这些参考文件。
+
+---
+
+# 二、不要一次把所有要求发给 Cursor
+
+要让 Cursor 做出精美效果，必须分阶段操作。
+
+一次发送几千字的总指令，Cursor 很容易：
+
+* 忽略部分要求；
+* 只改 CSS；
+* 继续使用简陋人物；
+* 破坏已有功能；
+* 在没有素材时假装完成。
+
+正确方式是依次执行 6 个阶段。
+
+---
+
+# 三、第一步：让 Cursor 只检查项目
+
+在 Cursor 中打开项目，然后把以下文件完整复制给 Cursor：
+
+```text
+design-kit/prompts/01_master_audit.md
+```
+
+此时明确告诉它：
+
+```text
+先不要修改代码，只检查项目并给出实施计划。
+```
+
+Cursor 应该回答：
+
+* 初始形象页面在哪里；
+* 当前人物是 SVG、Canvas、图片还是 CSS；
+* 哪些组件需要修改；
+* 当前路由和状态管理是什么；
+* 需要新增哪些文件。
+
+先检查它有没有正确找到页面。
+
+如果找错页面，直接回复：
+
+```text
+你定位的页面不正确。请重新搜索包含“初始形象创建”“体型选择”“初始套装”“随机生成”“确认进入”的页面和组件。
+```
+
+只有定位正确后，才进入下一阶段。
+
+---
+
+# 四、第二步：重构人物系统
+
+把下面文件交给 Cursor：
+
+```text
+design-kit/prompts/02_asset_architecture.md
+```
+
+同时告诉它：
+
+```text
+现在开始实施人物分层架构。保留现有页面和路由，不要重新创建独立项目。
+```
+
+这一阶段 Cursor 应完成：
+
+```text
+AvatarConfig
+AvatarRenderer
+avatar-manifest
+角色资源目录
+图片预加载
+交叉淡化
+localStorage
+```
+
+检查项目中是否出现类似结构：
+
+```text
+src/
+├── avatar/
+│   ├── AvatarRenderer.tsx
+│   ├── avatar-manifest.ts
+│   └── avatar-types.ts
+```
+
+以及：
+
+```text
+public/assets/avatar/
+├── base/
+├── faces/
+├── hair/
+├── outfits/
+└── accessories/
+```
+
+## 必须检查的一点
+
+中央角色、体型卡和套装卡必须都调用：
+
+```tsx
+<AvatarRenderer />
+```
+
+而不是：
+
+```tsx
+<img src="character1.png" />
+<img src="character2.png" />
+<img src="character3.png" />
+```
+
+否则以后换脸、换头发、换服装时，几个区域会出现不同人物。
+
+---
+
+# 五、第三步：生成正式角色素材
+
+实施包中已经包含详细提示词：
+
+```text
+design-kit/prompts/image_generation_prompts.md
+```
+
+正确顺序不是一次生成所有角色，而是：
+
+## 1. 先生成母版角色
+
+只生成一名角色，确定：
+
+* 脸；
+* 眼睛；
+* 身材比例；
+* 站姿；
+* 发型；
+* 光线；
+* 脚底位置。
+
+母版要求：
+
+```text
+正面全身
+透明背景
+1600 × 2400 px
+双脚完整
+角色居中
+6头身左右
+同一固定站姿
+```
+
+不要一开始生成十几个不同人物。否则三种体型和三套服装会完全不像同一个人。
+
+## 2. 使用图像编辑模式生成服装
+
+基于母版角色，依次只替换服装：
+
+```text
+星语学者
+晨光旅者
+夜幕礼装
+```
+
+每次都明确：
+
+```text
+保持人物脸部、发型、姿势、镜头、画布和脚底位置完全不变，只改变服装。
+```
+
+## 3. 再生成人体型
+
+三种体型仍然基于同一个母版：
+
+```text
+slender
+balanced
+lively
+```
+
+不能把一张图横向拉宽或压窄。
+
+每种体型都应重新自然绘制：
+
+* 肩宽；
+* 四肢长度；
+* 腰线；
+* 站姿重心；
+* 服装褶皱。
+
+## 4. 最后生成头发和配饰
+
+先把最重要的三套服装跑通，再补：
+
+* 发型；
+* 发色；
+* 眼睛；
+* 配饰。
+
+这样能避免在原型阶段制作大量无法使用的素材。
+
+---
+
+# 六、人物素材必须按照统一画布导出
+
+所有人物图层都使用：
+
+```text
+1600 × 2400 px
+透明 PNG 或透明 WebP
+sRGB
+相同脚底基线
+相同人物中心点
+```
+
+禁止使用自动裁切。
+
+错误情况：
+
+```text
+hair-front.webp        820 × 970
+body.webp              1600 × 2400
+outfit.webp            1100 × 2050
+```
+
+这样在 Cursor 中叠加一定会错位。
+
+正确情况：
+
+```text
+hair-front.webp        1600 × 2400
+body.webp              1600 × 2400
+outfit-main.webp       1600 × 2400
+outfit-front.webp      1600 × 2400
+```
+
+即使某一层只有一个小发饰，也仍然保留完整透明画布。
+
+---
+
+# 七、放入项目的具体路径
+
+以星语学者套装为例：
+
+```text
+public/assets/avatar/
+├── base/
+│   ├── balanced/
+│   │   ├── body-skin-03.webp
+│   │   └── face-soft-oval-skin-03.webp
+├── faces/
+│   ├── eyes/
+│   │   └── soft-oval-violet.webp
+│   ├── eyebrows/
+│   │   └── gentle-01.webp
+│   └── mouths/
+│       └── soft-smile-01.webp
+├── hair/
+│   └── cloud-curl/
+│       ├── silver-lilac-back.webp
+│       ├── silver-lilac-side.webp
+│       └── silver-lilac-front.webp
+├── outfits/
+│   └── star-scholar/
+│       ├── balanced-back.webp
+│       ├── balanced-main.webp
+│       ├── balanced-front.webp
+│       └── balanced-shoes.webp
+└── accessories/
+    └── star-book/
+        ├── head.webp
+        └── hand.webp
+```
+
+资源路径不要直接散落在页面组件中，要统一写入：
+
+```text
+avatar-manifest.ts
+```
+
+---
+
+# 八、检查素材尺寸
+
+如果项目可以使用 Node.js，在终端运行：
+
+```bash
+npm install sharp --save-dev
+```
+
+然后运行：
+
+```bash
+node design-kit/scripts/validate-avatar-assets.mjs public/assets/avatar
+```
+
+正确输出类似：
+
+```text
+✓ body-skin-03.webp
+✓ silver-lilac-back.webp
+✓ balanced-main.webp
+
+共检查 18 个文件，异常 0 个。
+```
+
+发现问题时会显示：
+
+```text
+✗ outfit-main.webp
+  - 尺寸 1400x2100，应为 1600x2400
+```
+
+先修正所有尺寸，再让 Cursor 接入。
+
+---
+
+# 九、第四步：让 Cursor 精修视觉
+
+把下面文件发给 Cursor：
+
+```text
+design-kit/prompts/03_visual_polish.md
+```
+
+并补充：
+
+```text
+请优先复用 design-kit/styles/game-theme.css 和 design-kit/assets/ui/ 中的视觉资产，根据现有技术栈转换，不要重复创造一套不一致的颜色系统。
+```
+
+Cursor 应接入这些原创素材：
+
+```text
+starlight-arch.svg
+panel-frame.svg
+compass-star.svg
+selected-check.svg
+sparkle.svg
+```
+
+它们位于：
+
+```text
+design-kit/assets/ui/
+```
+
+建议复制到：
+
+```text
+public/assets/ui/
+```
+
+然后用于：
+
+* 页面背景；
+* 中央人物拱门；
+* 卡片内框；
+* 选中勾章；
+* 星盘展示台；
+* 标题装饰。
+
+---
+
+# 十、第五步：让 Cursor 精修操作效果
+
+把下面文件发给 Cursor：
+
+```text
+design-kit/prompts/04_interaction_polish.md
+```
+
+Cursor 必须实现以下操作效果。
+
+## 选项卡
+
+点击后：
+
+```text
+0ms       按钮按下反馈
+60ms      金色边框出现
+100ms     勾选章缩放出现
+150–220ms 人物完成切换
+```
+
+## 人物换装
+
+不要使用：
+
+* 翻牌；
+* 大幅旋转；
+* 全屏闪光；
+* 角色消失后再出现。
+
+使用：
+
+```text
+旧角色保持显示
+新图层后台加载
+加载完成
+旧层淡出
+新层淡入
+轻微向上移动 2px
+总时长约 220ms
+```
+
+## 随机生成
+
+推荐节奏：
+
+```text
+0–100ms    按钮按下
+100–250ms  名字变化
+180–420ms  外观选项变化
+300–600ms  套装完成切换
+```
+
+总时长不要超过：
+
+```text
+650ms
+```
+
+否则学生会觉得拖沓。
+
+---
+
+# 十一、第六步：正式接入素材
+
+确认所有角色图已经放进项目后，把以下文件发给 Cursor：
+
+```text
+design-kit/prompts/05_integrate_assets.md
+```
+
+告诉它：
+
+```text
+正式人物素材已经位于 public/assets/avatar。请按 avatar-manifest 接入，并运行资源检查，不得重新绘制或替换这些素材。
+```
+
+特别检查：
+
+* 切换套装后发型是否保留；
+* 切换体型后脸是否改变；
+* 头发是否压住眼睛；
+* 裙摆是否露出错误底层；
+* 鞋子是否漂浮；
+* 卡片人物脚底是否对齐；
+* 快速点击是否闪白。
+
+---
+
+# 十二、最后执行完整验收
+
+将以下文件交给 Cursor：
+
+```text
+design-kit/prompts/06_final_qa.md
+```
+
+要求它测试：
+
+```text
+1440 × 900
+1024 × 768
+390 × 844
+```
+
+并让 Cursor 输出：
+
+* 桌面截图；
+* 手机截图；
+* 修改文件列表；
+* 已修复问题；
+* 剩余占位素材；
+* 性能问题。
+
+然后按照：
+
+[视觉与交互验收清单](sandbox:/mnt/data/cursor_game_polish_kit/checklists/visual-qa.md)
+
+逐项检查。
+
+---
+
+# 十三、最容易导致效果变差的错误
+
+不要直接对 Cursor 说：
+
+```text
+把人物做精美一点。
+```
+
+也不要说：
+
+```text
+参考暖暖风格重新设计。
+```
+
+这种模糊指令通常只会得到：
+
+* 更多阴影；
+* 更亮的渐变；
+* 更大的眼睛；
+* 更多星星；
+* 原有粗糙人物仍未改变。
+
+正确的表达方式是：
+
+```text
+人物本体不得继续使用简单 SVG 和 CSS 几何图形。请接入固定 1600×2400 透明分层人物资产，所有预览复用 AvatarRenderer。视觉精修和人物素材是两个独立任务。
+```
+
+---
+
+# 十四、最终建议的 Cursor 对话顺序
+
+在同一个 Cursor Agent 对话中依次发送：
+
+```text
+1. 读取 design-kit/prompts/01_master_audit.md，只审计。
+2. 按审计结果实施 design-kit/prompts/02_asset_architecture.md。
+3. 接入 design-kit/styles/ 和 design-kit/assets/ui/。
+4. 实施 design-kit/prompts/03_visual_polish.md。
+5. 实施 design-kit/prompts/04_interaction_polish.md。
+6. 我放入正式角色图片后，实施 05_integrate_assets.md。
+7. 最后实施 06_final_qa.md 并截图验收。
+```
+
+这样处理后，Cursor 负责的是**精致游戏界面、分层渲染和操作效果**；人物图像生成工具负责的是**真正的高质量角色与服装立绘**。两部分结合，才可能接近你提供的设计模板，而不是只得到一个加了金色边框的普通网页。

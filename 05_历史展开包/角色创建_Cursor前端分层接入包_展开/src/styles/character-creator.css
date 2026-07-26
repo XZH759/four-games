@@ -1,0 +1,125 @@
+:root {
+  --creator-gold: #d8b868;
+  --creator-purple: #8d6bd3;
+  --creator-lavender: #eee8ff;
+  --creator-ink: #4e4268;
+  --creator-panel: rgba(255, 252, 248, 0.88);
+}
+
+.creator-shell {
+  display: grid;
+  grid-template-columns: minmax(250px, 320px) minmax(320px, 560px) minmax(250px, 320px);
+  align-items: center;
+  gap: clamp(16px, 3vw, 42px);
+  width: min(1480px, 100%);
+  margin-inline: auto;
+  padding: clamp(20px, 3vw, 52px);
+  color: var(--creator-ink);
+}
+
+.creator-panel,
+.creator-stage {
+  border: 1px solid color-mix(in srgb, var(--creator-gold) 75%, white);
+  border-radius: 28px;
+  background: var(--creator-panel);
+  box-shadow: 0 18px 60px rgba(116, 88, 166, 0.13);
+}
+
+.creator-panel {
+  padding: 22px;
+}
+
+.creator-panel h2 {
+  margin: 0 0 18px;
+  text-align: center;
+}
+
+.creator-row {
+  display: grid;
+  grid-template-columns: 76px 38px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+  min-height: 62px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(216, 184, 104, 0.24);
+}
+
+.creator-row code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.creator-row button,
+.gender-options button,
+.creator-actions button {
+  min-height: 40px;
+  border: 1px solid rgba(216, 184, 104, 0.75);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff, #f2ecff);
+  color: var(--creator-ink);
+  cursor: pointer;
+}
+
+.creator-stage {
+  display: grid;
+  justify-items: center;
+  padding: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(179, 148, 255, 0.24), transparent 48%),
+    rgba(255, 255, 255, 0.66);
+}
+
+.layered-character {
+  position: relative;
+  width: min(100%, 520px);
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.layered-character__layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.creator-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(130px, 1fr));
+  gap: 14px;
+  width: min(100%, 440px);
+  padding: 10px 0 4px;
+}
+
+.creator-actions__primary {
+  background: linear-gradient(180deg, #f7b5d4, #dc86b4) !important;
+  color: white !important;
+}
+
+.gender-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.gender-options .is-selected {
+  outline: 3px solid rgba(141, 107, 211, 0.28);
+  background: linear-gradient(180deg, #efe8ff, #dfd1ff);
+}
+
+@media (max-width: 980px) {
+  .creator-shell {
+    grid-template-columns: 1fr;
+  }
+  .creator-stage {
+    grid-row: 1;
+  }
+}

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>彩虹学习岛｜儿童教育问卷游戏化原型</title>
+  <style>
+    :root{
+      --bg1:#f4fbff; --bg2:#fff7e8; --card:#ffffff; --ink:#273142; --muted:#667085;
+      --primary:#5b8def; --primary2:#7c5cff; --good:#13b981; --warn:#f59e0b; --danger:#ef4444;
+      --line:#e7edf6; --shadow:0 16px 50px rgba(44,62,90,.14); --radius:24px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Inter","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;color:var(--ink);
+      background: radial-gradient(circle at top left,#e8f2ff 0,#f7fbff 26%,transparent 43%), linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100vh;}
+    .app{max-width:1180px;margin:0 auto;padding:24px;}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px;}
+    .brand{display:flex;gap:14px;align-items:center}.logo{width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,#68d391,#60a5fa,#a78bfa);display:grid;place-items:center;box-shadow:var(--shadow);font-size:30px}.brand h1{font-size:26px;margin:0}.brand p{margin:3px 0 0;color:var(--muted);font-size:14px}.pill{border:1px solid var(--line);background:rgba(255,255,255,.78);border-radius:999px;padding:8px 13px;color:#475467;font-size:13px;white-space:nowrap}
+    .layout{display:grid;grid-template-columns:1fr 360px;gap:18px}.card{background:rgba(255,255,255,.92);border:1px solid rgba(231,237,246,.9);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}.hero{min-height:640px;position:relative;overflow:hidden}.sky{position:absolute;inset:0;pointer-events:none;opacity:.48;background:radial-gradient(circle at 86% 12%,#ffe7a7 0 42px,transparent 43px),radial-gradient(circle at 18% 18%,#d7ebff 0 75px,transparent 76px)}
+    .screen{position:relative;z-index:1}.hidden{display:none!important}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.tab,.btn{border:0;border-radius:16px;padding:11px 15px;font-weight:700;cursor:pointer;transition:.15s transform,.15s box-shadow,.15s background;background:#eef4ff;color:#2952a3}.tab.active{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;box-shadow:0 10px 22px rgba(91,141,239,.28)}.btn{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;box-shadow:0 10px 22px rgba(91,141,239,.25)}.btn.secondary{background:#f2f4f7;color:#344054;box-shadow:none}.btn.ghost{background:transparent;color:#344054;border:1px solid var(--line);box-shadow:none}.btn:active,.tab:active{transform:translateY(1px)}.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.notice{padding:14px 16px;border:1px dashed #b8c7e8;background:#f7faff;border-radius:18px;color:#43546c;line-height:1.65}.scene-title{font-size:30px;margin:0 0 10px}.scene-text{font-size:17px;color:#455468;line-height:1.75;margin:0 0 18px}.world{height:196px;border-radius:24px;background:linear-gradient(#b9e7ff 0 55%,#a7e6b4 56% 100%);position:relative;overflow:hidden;border:1px solid #dbeafe;margin:16px 0}.island{position:absolute;left:7%;right:7%;bottom:10%;height:62px;background:#67c56d;border-radius:50%;box-shadow:inset 0 -18px 0 rgba(74,130,45,.14)}.path{position:absolute;left:13%;right:13%;bottom:31%;height:16px;background:#f6dca7;border-radius:999px}.avatar{position:absolute;bottom:41%;left:calc(11% + var(--p,0)*74%);font-size:44px;filter:drop-shadow(0 7px 7px rgba(0,0,0,.18));transition:left .5s ease}.cloud{position:absolute;background:white;border-radius:999px;opacity:.92}.cloud:before,.cloud:after{content:"";position:absolute;background:white;border-radius:50%}.cloud.c1{width:90px;height:28px;left:10%;top:22px}.cloud.c1:before{width:38px;height:38px;left:14px;top:-18px}.cloud.c1:after{width:50px;height:50px;left:38px;top:-26px}.cloud.c2{width:72px;height:24px;right:11%;top:48px}.cloud.c2:before{width:30px;height:30px;left:12px;top:-12px}.cloud.c2:after{width:42px;height:42px;left:30px;top:-22px}.options{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.option{padding:16px;border:2px solid #e6edf8;border-radius:20px;background:#fff;cursor:pointer;min-height:154px;display:flex;flex-direction:column;gap:8px;transition:.15s transform,.15s border,.15s box-shadow}.option:hover{transform:translateY(-2px);border-color:#a8c2ff;box-shadow:0 10px 24px rgba(74,101,148,.14)}.option .emoji{font-size:32px}.option h3{font-size:16px;margin:0}.option p{font-size:13px;color:#667085;margin:0;line-height:1.55}.progress-wrap{margin:12px 0}.progress-label{display:flex;justify-content:space-between;font-size:13px;color:#667085;margin-bottom:8px}.progress{height:10px;background:#edf2f7;border-radius:999px;overflow:hidden}.progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#57c7ff,#7c5cff);border-radius:999px;transition:width .35s}.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.mini{padding:13px;border-radius:16px;background:#f7faff;border:1px solid #e4ecfb;text-align:center}.mini b{display:block;font-size:20px}.mini span{font-size:12px;color:#667085}.side h2{margin:0 0 12px;font-size:18px}.map-item{display:flex;gap:10px;align-items:center;padding:10px;border-radius:15px;border:1px solid var(--line);background:#fff;margin-bottom:8px}.map-item.done{background:#effdf5;border-color:#bdebd3}.dot{width:28px;height:28px;border-radius:50%;background:#edf2f7;display:grid;place-items:center;font-size:13px;font-weight:800;color:#475467}.done .dot{background:#16a34a;color:white}.map-item small{color:#667085}.bars{display:grid;gap:9px;margin-top:10px}.barrow{display:grid;grid-template-columns:94px 1fr 36px;gap:8px;align-items:center;font-size:13px}.barbox{height:9px;background:#eff4fb;border-radius:999px;overflow:hidden}.barbox i{display:block;height:100%;background:linear-gradient(90deg,#60a5fa,#a78bfa);width:0;border-radius:999px}.log{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fbfdff;padding:10px}.log p{margin:0 0 8px;font-size:12px;line-height:1.55;color:#475467}.ending{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}.badge{border-radius:22px;padding:18px;background:linear-gradient(135deg,#eff6ff,#f8f0ff);border:1px solid #dfe7ff}.badge .big{font-size:54px}.result-list{display:grid;gap:8px}.result-item{padding:11px 12px;border:1px solid var(--line);border-radius:14px;background:#fff}.result-item b{display:block;margin-bottom:4px}.muted{color:var(--muted)}.small{font-size:13px;line-height:1.6}.research-table{width:100%;border-collapse:collapse;font-size:13px}.research-table th,.research-table td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}.research-table th{color:#475467;background:#f7faff}.codebox,textarea{width:100%;border:1px solid var(--line);border-radius:16px;background:#fbfdff;padding:12px;color:#344054;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.5}textarea{min-height:190px;resize:vertical}.footer-note{margin-top:14px;color:#667085;font-size:12px;line-height:1.6}.mobile-only{display:none}
+    @media (max-width:950px){.layout{grid-template-columns:1fr}.options{grid-template-columns:1fr}.hero{min-height:auto}.ending{grid-template-columns:1fr}.mobile-only{display:block}header{align-items:flex-start;flex-direction:column}.pill{white-space:normal}.barrow{grid-template-columns:82px 1fr 32px}.app{padding:14px}.card{padding:17px}.scene-title{font-size:24px}}
+    @media print{body{background:white}.btn,.tabs,.world,.pill{display:none}.layout{display:block}.card{box-shadow:none;border:1px solid #ddd;margin-bottom:12px}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand"><div class="logo">🌈</div><div><h1>彩虹学习岛</h1><p>儿童教育问卷游戏化｜网页小游戏原型</p></div></div>
+      <div class="pill">本地演示版 · 不上传儿童数据 · 可替换题库 JSON</div>
+    </header>
+
+    <div class="layout">
+      <main class="card hero">
+        <div class="sky"></div>
+        <section id="home" class="screen">
+          <h2 class="scene-title">把“问卷题”变成一次探险任务</h2>
+          <p class="scene-text">儿童不需要直接回答“你是否喜欢合作/是否会坚持/家长是否参与”。他们只需要帮助小伙伴完成学习岛任务；每一次选择、重试、求助、合作和时间安排，都会被记录成可分析的教育行为线索。</p>
+          <div class="notice">
+            <b>研究伦理提示：</b>这个原型使用“情境化、游戏化、间接测量”，但不建议做真正的“无告知潜意识调查”。面向儿童与家长时，应明确说明：游戏会记录学习选择与互动方式，用于教育研究；数据匿名化；可随时退出。
+          </div>
+          <div class="world" aria-hidden="true">
+            <div class="cloud c1"></div><div class="cloud c2"></div><div class="island"></div><div class="path"></div><div class="avatar" style="--p:.02">🧒</div>
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="startGame()">开始儿童端试玩</button>
+            <button class="btn secondary" onclick="showScreen('research')">查看研究端映射</button>
+            <button class="btn ghost" onclick="showScreen('bank')">编辑/替换题库</button>
+          </div>
+          <div class="mini-stats">
+            <div class="mini"><b>6</b><span>游戏关卡</span></div>
+            <div class="mini"><b>9</b><span>潜在维度</span></div>
+            <div class="mini"><b>JSON</b><span>可导出记录</span></div>
+          </div>
+        </section>
+
+        <section id="game" class="screen hidden">
+          <div class="progress-wrap">
+            <div class="progress-label"><span id="stepLabel">第 1 关</span><span id="scoreLabel">星星 0</span></div>
+            <div class="progress"><i id="progressBar"></i></div>
+          </div>
+          <div class="world" aria-hidden="true">
+            <div class="cloud c1"></div><div class="cloud c2"></div><div class="island"></div><div class="path"></div><div id="avatar" class="avatar">🧒</div>
+          </div>
+          <h2 id="sceneTitle" class="scene-title"></h2>
+          <p id="sceneText" class="scene-text"></p>
+          <div id="options" class="options"></div>
+          <div class="btn-row">
+            <button class="btn ghost" onclick="undoStep()">返回上一步</button>
+            <button class="btn ghost" onclick="resetGame()">重新开始</button>
+          </div>
+        </section>
+
+        <section id="result" class="screen hidden">
+          <h2 class="scene-title">任务完成：生成学习花园</h2>
+          <p class="scene-text">以下反馈只使用积极语言，不对儿童贴负面标签。研究端可以查看完整行为路径和潜在维度分数。</p>
+          <div class="ending">
+            <div class="badge"><div class="big" id="badgeEmoji">🌳</div><h3 id="badgeTitle">成长型探索者</h3><p id="badgeText" class="small muted"></p></div>
+            <div class="result-list" id="childFeedback"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="showScreen('research')">查看研究端结果</button>
+            <button class="btn secondary" onclick="exportJSON()">导出 JSON</button>
+            <button class="btn secondary" onclick="exportCSV()">导出 CSV</button>
+            <button class="btn ghost" onclick="resetGame()">再玩一次</button>
+          </div>
+        </section>
+
+        <section id="research" class="screen hidden">
+          <h2 class="scene-title">研究端：题库—情境—行为映射</h2>
+          <p class="scene-text">这部分展示“问题立体化”的实现方式：每个传统问卷题被改写成情境任务；每个操作是一个行为节点；选择结果进入潜在维度分数与路径日志。</p>
+          <div class="tabs"><button class="tab active" onclick="switchResearchTab('scores',this)">潜在维度</button><button class="tab" onclick="switchResearchTab('mapping',this)">题库映射</button><button class="tab" onclick="switchResearchTab('logs',this)">行为日志</button><button class="tab" onclick="switchResearchTab('ethics',this)">伦理与上线建议</button></div>
+          <div id="researchScores" class="research-panel"></div>
+          <div id="researchMapping" class="research-panel hidden"></div>
+          <div id="researchLogs" class="research-panel hidden"></div>
+          <div id="researchEthics" class="research-panel hidden">
+            <div class="notice small">
+              <b>建议边界：</b>可以把游戏作为“情境化调查环境”，但不要向儿童/家长隐瞒研究目的。更稳妥的表述是：儿童在游戏中完成学习情境任务，研究者分析匿名化的选择路径、停留时间、重试次数、求助行为等，用于理解学习偏好与教育支持需求。
+            </div>
+            <table class="research-table" style="margin-top:14px">
+              <tr><th>上线前需要补充</th><th>原因</th></tr>
+              <tr><td>家长/监护人知情同意页</td><td>儿童数据属于高敏感研究数据，应明确记录内容、用途、退出方式。</td></tr>
+              <tr><td>题项效度验证</td><td>游戏行为不应直接等同心理特质，需要试点、访谈、信度/效度检验。</td></tr>
+              <tr><td>匿名 ID 与最小化采集</td><td>默认不采集姓名、学校、精确地址等识别信息。</td></tr>
+              <tr><td>教师/家长反馈版本</td><td>对儿童只给鼓励性反馈；研究者或家长端再看结构化报告。</td></tr>
+            </table>
+          </div>
+          <div class="btn-row"><button class="btn secondary" onclick="showScreen('game')">回到游戏</button><button class="btn ghost" onclick="showScreen('home')">返回首页</button></div>
+        </section>
+
+        <section id="bank" class="screen hidden">
+          <h2 class="scene-title">题库 JSON 编辑器</h2>
+          <p class="scene-text">把研究组原有问卷题改写成下方格式，即可替换游戏关卡。每个 choice 的 weights 是它对潜在维度的加权贡献。</p>
+          <textarea id="bankText" spellcheck="false"></textarea>
+          <div class="btn-row"><button class="btn" onclick="loadBankFromText()">应用题库</button><button class="btn secondary" onclick="restoreDefaultBank()">恢复默认题库</button><button class="btn ghost" onclick="showScreen('home')">返回首页</button></div>
+          <p class="footer-note">字段说明：id=题项编号；surveyItem=传统问卷题意；scene/task=儿童看到的情境；choices=可点击行动；weights=潜在维度分值；observable=可记录的行为变量。</p>
+        </section>
+      </main>
+
+      <aside class="card side">
+        <h2>游戏路径</h2>
+        <div id="map"></div>
+        <h2 style="margin-top:18px">实时维度</h2>
+        <div id="sideBars" class="bars"></div>
+        <div class="footer-note">维度分数仅用于原型演示。真实研究需要根据题库、样本和统计模型重新校准权重。</div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+const DIMENSIONS = {
+  curiosity:"好奇探索", autonomy:"自主学习", collaboration:"合作倾向", helpSeeking:"求助策略",
+  persistence:"坚持韧性", emotionReg:"情绪调节", parentSupport:"亲子支持", riskPreference:"尝试新方法", timeManagement:"时间规划"
+};
+const DEFAULT_BANK = [
+  {id:"Q01", surveyItem:"面对新的学习内容时，儿童更倾向于探索、快速完成还是与同伴一起尝试？", scene:"学习岛入口", task:"你来到彩虹码头，需要选择一种方式去第一座岛。你会怎么出发？", observable:"首选路径、是否偏好同伴、是否选择探索路线", choices:[
+    {emoji:"🎈", title:"坐热气球慢慢看", text:"先观察地图和岛上的线索，再决定去哪里。", weights:{curiosity:3, riskPreference:1, timeManagement:1}, stars:2},
+    {emoji:"🚀", title:"坐小火箭直达", text:"先冲到任务地点，边做边调整。", weights:{autonomy:2, riskPreference:3, persistence:1}, stars:2},
+    {emoji:"⛵", title:"和朋友坐小船", text:"叫上伙伴一起走，路上互相提醒。", weights:{collaboration:3, helpSeeking:1, emotionReg:1}, stars:2}
+  ]},
+  {id:"Q02", surveyItem:"遇到难题时，儿童会独立尝试、寻找示例，还是主动求助？", scene:"图书馆迷宫", task:"门上有一道看不懂的图形谜题。你需要打开门，下一步怎么做？", observable:"求助时机、是否使用示范、是否先独立尝试", choices:[
+    {emoji:"🧩", title:"先自己试三次", text:"把图形转一转，先找规律。", weights:{autonomy:2, persistence:3, curiosity:1}, stars:3},
+    {emoji:"📖", title:"看一本例题书", text:"先看类似例子，再回到这道谜题。", weights:{helpSeeking:2, timeManagement:2, persistence:1}, stars:2},
+    {emoji:"🦉", title:"问猫头鹰老师", text:"请老师给一个小提示，但不直接说答案。", weights:{helpSeeking:3, emotionReg:1, collaboration:1}, stars:2}
+  ]},
+  {id:"Q03", surveyItem:"在有限资源的合作任务中，儿童如何处理分享、竞争与协商？", scene:"合作工坊", task:"你和其他小伙伴都需要彩色积木，但蓝色积木只剩一盒。你会怎么做？", observable:"资源分配方式、协商行为、合作/竞争取向", choices:[
+    {emoji:"🤝", title:"一起设计大作品", text:"把积木合起来，大家做一个更大的桥。", weights:{collaboration:3, emotionReg:2, curiosity:1}, stars:3},
+    {emoji:"🏁", title:"先抢到再说", text:"先拿到积木，保证自己的任务能完成。", weights:{autonomy:2, riskPreference:1}, stars:1},
+    {emoji:"🔄", title:"交换材料", text:"用自己的红色积木和别人换一部分蓝色积木。", weights:{collaboration:2, timeManagement:2, emotionReg:1}, stars:2}
+  ]},
+  {id:"Q04", surveyItem:"任务失败后，儿童更可能重试、改变策略、休息恢复还是放弃？", scene:"挫折山坡", task:"你搭的桥塌了一次。小伙伴有点失望，时间也不多了。你会怎么处理？", observable:"失败后的行为、重试次数、策略转换", choices:[
+    {emoji:"🔨", title:"马上加固重搭", text:"不急着换方案，先把最弱的地方补起来。", weights:{persistence:3, autonomy:1, emotionReg:1}, stars:3},
+    {emoji:"🧭", title:"换一条路线", text:"先看为什么塌了，再改用更稳的结构。", weights:{riskPreference:2, curiosity:2, persistence:2}, stars:3},
+    {emoji:"🍪", title:"休息一下再回来", text:"先喝水吃点心，等心情稳定后再继续。", weights:{emotionReg:3, timeManagement:1, helpSeeking:1}, stars:2}
+  ]},
+  {id:"Q05", surveyItem:"家庭学习支持情境中，儿童如何使用家长帮助与自我安排？", scene:"亲子小屋", task:"晚上还有一个小任务没完成，但你也想玩。家长问你需要什么帮助。你会怎么说？", observable:"亲子沟通、计划表达、延迟满足", choices:[
+    {emoji:"🗓️", title:"一起做时间表", text:"请家长帮我把学习和玩耍时间排清楚。", weights:{parentSupport:3, timeManagement:3, helpSeeking:1}, stars:3},
+    {emoji:"🙋", title:"我先自己完成", text:"告诉家长我想自己试试，完成后再一起检查。", weights:{autonomy:3, persistence:2, parentSupport:1}, stars:3},
+    {emoji:"🎮", title:"先玩十分钟", text:"先玩一小会儿，但设一个提醒回来。", weights:{emotionReg:1, timeManagement:2, autonomy:1}, stars:2}
+  ]},
+  {id:"Q06", surveyItem:"综合任务中，儿童如何在目标、兴趣、效率和合作之间做权衡？", scene:"知识花园", task:"最后要种一棵知识树。你只能选择一种魔法肥料，会选择哪一种？", observable:"终局目标偏好、兴趣/效率/合作/坚持的综合权衡", choices:[
+    {emoji:"✨", title:"灵感肥料", text:"让知识树长出很多新奇问题。", weights:{curiosity:3, riskPreference:1}, stars:3},
+    {emoji:"🌱", title:"耐心肥料", text:"让知识树慢慢长高，不怕中途失败。", weights:{persistence:3, emotionReg:2}, stars:3},
+    {emoji:"🌟", title:"伙伴肥料", text:"让每个小伙伴都能照顾知识树的一部分。", weights:{collaboration:3, parentSupport:1, helpSeeking:1}, stars:3}
+  ]}
+];
+let bank = JSON.parse(localStorage.getItem('rainbowBank') || 'null') || DEFAULT_BANK;
+let state = freshState();
+function freshState(){return {step:0, stars:0, scores:Object.fromEntries(Object.keys(DIMENSIONS).map(k=>[k,0])), logs:[], startedAt:null, lastAt:null};}
+function qs(id){return document.getElementById(id)}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));qs(id).classList.remove('hidden'); if(id==='research') renderResearch(); if(id==='bank') qs('bankText').value = JSON.stringify(bank,null,2); renderSide();}
+function startGame(){state=freshState();state.startedAt=Date.now();state.lastAt=Date.now();showScreen('game');renderGame();}
+function resetGame(){localStorage.removeItem('rainbowSession');startGame();}
+function saveState(){localStorage.setItem('rainbowSession', JSON.stringify(state));}
+function renderGame(){ if(state.step>=bank.length){return finishGame()} const item=bank[state.step]; qs('stepLabel').textContent=`第 ${state.step+1} / ${bank.length} 关`; qs('scoreLabel').textContent=`星星 ${state.stars}`; qs('progressBar').style.width=((state.step)/bank.length*100)+'%'; qs('avatar').style.setProperty('--p', Math.max(.02,state.step/(bank.length-1||1))); qs('sceneTitle').textContent=item.scene; qs('sceneText').textContent=item.task; qs('options').innerHTML=item.choices.map((c,i)=>`<button class="option" onclick="choose(${i})"><div class="emoji">${c.emoji}</div><h3>${c.title}</h3><p>${c.text}</p></button>`).join(''); renderSide();}
+function choose(index){ const item=bank[state.step]; const choice=item.choices[index]; const now=Date.now(); const dwell = state.lastAt ? Math.round((now-state.lastAt)/1000) : 0; Object.entries(choice.weights||{}).forEach(([k,v])=>{state.scores[k]=(state.scores[k]||0)+v}); state.stars += choice.stars || 0; state.logs.push({time:new Date(now).toISOString(), step:state.step+1, id:item.id, scene:item.scene, surveyItem:item.surveyItem, choice:choice.title, observable:item.observable, weights:choice.weights, stars:choice.stars||0, dwellSeconds:dwell}); state.step++; state.lastAt=now; saveState(); renderGame();}
+function undoStep(){ if(state.logs.length===0) return; state = freshState(); const logs = JSON.parse(localStorage.getItem('rainbowSession')||'{}').logs || []; const replay = logs.slice(0,-1); localStorage.removeItem('rainbowSession'); state.startedAt=Date.now(); state.lastAt=Date.now(); replay.forEach(log=>{ const idx = bank.findIndex(b=>b.id===log.id); if(idx>=0){state.step=idx; const cidx = bank[idx].choices.findIndex(c=>c.title===log.choice); if(cidx>=0){ const choice=bank[idx].choices[cidx]; Object.entries(choice.weights||{}).forEach(([k,v])=>{state.scores[k]=(state.scores[k]||0)+v}); state.stars += choice.stars||0; state.logs.push(log);}}}); state.step=replay.length; saveState(); renderGame();}
+function finishGame(){ qs('progressBar').style.width='100%'; showScreen('result'); const top = topDimensions(3); let emoji='🌳', title='成长型探索者', text='你在学习岛上表现出多种学习力量，能根据不同情境选择不同策略。'; if(top[0]?.key==='collaboration'){emoji='🤝'; title='合作型建造师'; text='你很会把伙伴、老师和家人的力量放进任务里，适合小组式与讨论式学习。'} if(top[0]?.key==='curiosity'){emoji='🔎'; title='好奇型探险家'; text='你喜欢观察、提问和发现规律，适合探索式、项目式学习任务。'} if(top[0]?.key==='persistence'){emoji='⛰️'; title='坚持型攀登者'; text='你遇到困难时愿意继续尝试，适合分阶段挑战和可见进步反馈。'} if(top[0]?.key==='autonomy'){emoji='🚀'; title='自主型行动者'; text='你倾向于先自己尝试，适合有选择权和自我规划空间的任务。'} if(top[0]?.key==='timeManagement'){emoji='🗓️'; title='计划型小队长'; text='你能用安排和步骤帮助任务推进，适合目标清晰的学习路径。'} qs('badgeEmoji').textContent=emoji; qs('badgeTitle').textContent=title; qs('badgeText').textContent=text; qs('childFeedback').innerHTML=top.map(d=>`<div class="result-item"><b>${DIMENSIONS[d.key]}</b><span class="small muted">这次游戏中，你多次使用了与“${DIMENSIONS[d.key]}”相关的行动。下一步可以尝试把这种力量用到真实学习任务里。</span></div>`).join(''); renderSide(); renderResearch();}
+function maxPossibleScores(){ const max=Object.fromEntries(Object.keys(DIMENSIONS).map(k=>[k,0])); bank.forEach(item=>{ Object.keys(DIMENSIONS).forEach(k=>{ const m=Math.max(...item.choices.map(c=>(c.weights&&c.weights[k])||0)); max[k]+=m>0?m:0; }); }); return max;}
+function normalizedScores(){ const max=maxPossibleScores(); return Object.fromEntries(Object.keys(DIMENSIONS).map(k=>[k, max[k] ? Math.round((state.scores[k]/max[k])*100) : 0]));}
+function topDimensions(n=3){ const norm=normalizedScores(); return Object.entries(norm).map(([key,val])=>({key,val})).sort((a,b)=>b.val-a.val).slice(0,n);}
+function renderSide(){ const map = bank.map((b,i)=>`<div class="map-item ${i<state.step?'done':''}"><div class="dot">${i<state.step?'✓':i+1}</div><div><b>${b.scene}</b><br><small>${b.id} · ${i<state.step?'已完成':'未完成'}</small></div></div>`).join(''); qs('map').innerHTML=map; const norm=normalizedScores(); qs('sideBars').innerHTML=Object.entries(DIMENSIONS).map(([k,label])=>`<div class="barrow"><span>${label}</span><div class="barbox"><i style="width:${Math.min(100,norm[k])}%"></i></div><b>${norm[k]}</b></div>`).join('');}
+function renderResearch(){ const norm=normalizedScores(); qs('researchScores').innerHTML = `<div class="notice small">当前完成 ${state.step}/${bank.length} 关，星星 ${state.stars}。下列分数为按原型题库最大可能值归一化后的百分比，只用于演示研究变量如何从游戏行为生成。</div><div class="bars">${Object.entries(DIMENSIONS).map(([k,label])=>`<div class="barrow"><span>${label}</span><div class="barbox"><i style="width:${Math.min(100,norm[k])}%"></i></div><b>${norm[k]}</b></div>`).join('')}</div>`;
+ qs('researchMapping').innerHTML = `<table class="research-table"><thead><tr><th>题项</th><th>传统问卷意图</th><th>游戏化情境</th><th>可观测变量</th></tr></thead><tbody>${bank.map(b=>`<tr><td>${b.id}</td><td>${b.surveyItem}</td><td><b>${b.scene}</b><br>${b.task}<br><span class="muted">选项：${b.choices.map(c=>c.emoji+c.title).join(' / ')}</span></td><td>${b.observable}</td></tr>`).join('')}</tbody></table>`;
+ qs('researchLogs').innerHTML = state.logs.length ? `<div class="log">${state.logs.map(l=>`<p><b>${l.id} ${l.scene}</b> → ${l.choice}<br><span class="muted">停留 ${l.dwellSeconds}s；观测：${l.observable}；权重：${JSON.stringify(l.weights)}</span></p>`).join('')}</div><pre class="codebox">${escapeHTML(JSON.stringify({scores:state.scores, normalized:norm, logs:state.logs},null,2))}</pre>` : `<div class="notice">还没有行为日志。请先完成儿童端试玩。</div>`; renderSide();}
+function switchResearchTab(name,btn){ document.querySelectorAll('.research-panel').forEach(p=>p.classList.add('hidden')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); qs('research'+name[0].toUpperCase()+name.slice(1)).classList.remove('hidden'); renderResearch();}
+function exportJSON(){ const payload={project:"彩虹学习岛", exportedAt:new Date().toISOString(), dimensions:DIMENSIONS, bankVersion:"prototype-1", session:state, normalizedScores:normalizedScores()}; downloadFile('rainbow_learning_island_session.json', JSON.stringify(payload,null,2), 'application/json');}
+function exportCSV(){ const rows=[['time','step','id','scene','choice','dwellSeconds','stars','observable','weights']].concat(state.logs.map(l=>[l.time,l.step,l.id,l.scene,l.choice,l.dwellSeconds,l.stars,l.observable,JSON.stringify(l.weights)])); const csv=rows.map(r=>r.map(x=>'"'+String(x??'').replaceAll('"','""')+'"').join(',')).join('\n'); downloadFile('rainbow_learning_island_logs.csv', csv, 'text/csv;charset=utf-8');}
+function downloadFile(filename, content, mime){ const blob=new Blob([content],{type:mime}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href);}
+function loadBankFromText(){ try{ const parsed=JSON.parse(qs('bankText').value); if(!Array.isArray(parsed)||!parsed.length) throw new Error('题库必须是数组'); parsed.forEach((b,i)=>{ if(!b.id||!b.scene||!b.task||!Array.isArray(b.choices)) throw new Error('第 '+(i+1)+' 题缺少必要字段'); }); bank=parsed; localStorage.setItem('rainbowBank', JSON.stringify(bank)); state=freshState(); alert('题库已应用。'); showScreen('home'); }catch(e){ alert('JSON 解析失败：'+e.message); }}
+function restoreDefaultBank(){ bank=DEFAULT_BANK; localStorage.setItem('rainbowBank', JSON.stringify(bank)); qs('bankText').value=JSON.stringify(bank,null,2); state=freshState(); renderSide();}
+function escapeHTML(s){ return s.replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));}
+(function init(){ const saved=JSON.parse(localStorage.getItem('rainbowSession')||'null'); if(saved&&saved.logs) state=saved; renderSide(); })();
+</script>
+</body>
+</html>

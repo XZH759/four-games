@@ -1,0 +1,75 @@
+{
+  "project": "AI Character System",
+  "version": "1.0-cursor-ready",
+  "type": "reference-sheet-package",
+  "note": "These are organized reference sheets for Cursor/art-direction use. They are not yet true separated transparent PNG layers.",
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "anchor": {
+    "type": "foot_center",
+    "x": 512,
+    "y": 1216
+  },
+  "layer_order": [
+    "body",
+    "outfit",
+    "hairBack",
+    "face",
+    "eyes",
+    "hairFront",
+    "accessory"
+  ],
+  "master_lineup": "assets/reference_sheets/master_lineup/master_lineup.png",
+  "characters": [
+    {
+      "id": "researcher_female",
+      "role": "researcher",
+      "gender": "female",
+      "display_name_cn": "研究员·女",
+      "display_name_en": "Researcher · Female",
+      "sheet": "assets/reference_sheets/researcher/female/sheet.png"
+    },
+    {
+      "id": "researcher_male",
+      "role": "researcher",
+      "gender": "male",
+      "display_name_cn": "研究员·男",
+      "display_name_en": "Researcher · Male",
+      "sheet": "assets/reference_sheets/researcher/male/sheet.png"
+    },
+    {
+      "id": "programmer_female",
+      "role": "programmer",
+      "gender": "female",
+      "display_name_cn": "程序员·女",
+      "display_name_en": "Programmer · Female",
+      "sheet": "assets/reference_sheets/programmer/female/sheet.png"
+    },
+    {
+      "id": "programmer_male",
+      "role": "programmer",
+      "gender": "male",
+      "display_name_cn": "程序员·男",
+      "display_name_en": "Programmer · Male",
+      "sheet": "assets/reference_sheets/programmer/male/sheet.png"
+    },
+    {
+      "id": "engineer_female",
+      "role": "engineer",
+      "gender": "female",
+      "display_name_cn": "工程师·女",
+      "display_name_en": "Engineer · Female",
+      "sheet": "assets/reference_sheets/engineer/female/sheet.png"
+    },
+    {
+      "id": "engineer_male",
+      "role": "engineer",
+      "gender": "male",
+      "display_name_cn": "工程师·男",
+      "display_name_en": "Engineer · Male",
+      "sheet": "assets/reference_sheets/engineer/male/sheet.png"
+    }
+  ]
+}
