@@ -1,4 +1,22 @@
 import { AI_QUESTIONS } from "/monopoly/questions.js";
+import { addCastlePoints, getEquippedLoadout } from "/castle/castle.js";
+import {
+  drawFlightGear,
+  drawOrbitAura,
+  drawCape,
+  drawHeadGear,
+  drawChestCharm,
+  drawBalloons,
+  drawPet,
+  spawnWingTrail,
+  spawnBalloonTrail,
+  spawnCosmeticTrail,
+  spawnFireworkBloom,
+  plotFromCtx,
+  backAnchorX,
+  DEFAULT_FACING,
+} from "/castle/cosmetics-draw.js?v=4";
+import { resolveEquipFx, isOrbitTrail, isBloomTrail } from "/castle/equip-fx.js?v=4";
 
 const START_ANGLE = Math.PI / 2;
 const START_PROGRESS = 0.008;
@@ -193,6 +211,85 @@ let activeQuestion = null;
 let countdownToken = 0;
 let lastFrame = performance.now();
 let messageTimer = 0;
+let loadout = null;
+const cosmeticFx = [];
+let kartTrailTick = 0;
+
+function refreshLoadout() {
+  try {
+    loadout = getEquippedLoadout();
+  } catch (_) {
+    loadout = null;
+  }
+  paintRaceLoadout();
+}
+
+function paintRaceLoadout() {
+  const chip = document.getElementById("race-loadout-chip");
+  const portrait = document.getElementById("driver-portrait");
+  if (portrait) {
+    portrait.dataset.frame = loadout?.frame?.frameStyle || "";
+  }
+  if (!chip) return;
+  if (!loadout || (!loadout.title && !loadout.pet && !loadout.trail && !loadout.frame && !loadout.decor)) {
+    chip.hidden = true;
+    return;
+  }
+  chip.hidden = false;
+  const bits = [];
+  if (loadout.frame) bits.push(loadout.frame.icon);
+  if (loadout.title) bits.push(loadout.title.titleText || loadout.title.name);
+  if (loadout.pet) bits.push(loadout.pet.icon);
+  if (loadout.trail) bits.push(loadout.trail.icon);
+  chip.innerHTML = `<span>装扮实装</span><strong>${bits.join(" · ")}</strong>`;
+  chip.dataset.frame = loadout.frame?.frameStyle || "";
+}
+
+function spawnKartTrail(x, y) {
+  if (!loadout?.trailStyle || isBloomTrail(loadout.trailStyle)) return;
+  if (isOrbitTrail(loadout.trailStyle)) return;
+  if (cosmeticFx.length > 80) return;
+  spawnCosmeticTrail(cosmeticFx, x, y + 20, loadout.trailStyle, {
+    kind: undefined,
+    t: game.elapsed,
+    count: loadout.trailStyle === "aurora" ? 4 : 2,
+  });
+}
+
+function spawnRaceFireworks(cx, cy) {
+  spawnFireworkBloom(cosmeticFx, cx, cy, {
+    count: 24,
+    rings: 2,
+    speed: 110,
+    life: 0.9,
+  });
+}
+
+function updateCosmeticFx(dt) {
+  for (let i = cosmeticFx.length - 1; i >= 0; i -= 1) {
+    const p = cosmeticFx[i];
+    p.life -= dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vy += 120 * dt;
+    if (p.life <= 0) cosmeticFx.splice(i, 1);
+  }
+}
+
+function drawCosmeticFx() {
+  cosmeticFx.forEach((p) => {
+    ctx.globalAlpha = Math.max(0, p.life / p.max);
+    if (p.icon) {
+      ctx.font = `${p.size || 16}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillText(p.icon, p.x, p.y);
+    } else {
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    }
+  });
+  ctx.globalAlpha = 1;
+}
 
 function buildTrackGeometry(track) {
   const orderedRoute = track.route.map(
@@ -523,9 +620,11 @@ function applyDriverStartSkill() {
 
 function startRace() {
   countdownToken += 1;
+  refreshLoadout();
   game = createGame();
   activeQuestion = null;
   particles.length = 0;
+  cosmeticFx.length = 0;
   showOverlay(els.startScreen, false);
   showOverlay(els.pauseScreen, false);
   showOverlay(els.finishScreen, false);
@@ -806,7 +905,13 @@ function answerQuestion(optionIndex, selectedButton) {
   activeQuestion.answered = true;
   game.answered += 1;
   const correct = optionIndex === activeQuestion.question.answer;
-  if (correct) game.correct += 1;
+  if (correct) {
+    game.correct += 1;
+    if (loadout?.petBonus) {
+      // 伙伴助威：短暂涡轮倾向
+      game.player.boostTimer = Math.max(game.player.boostTimer, 1.2);
+    }
+  }
   const buttons = [...els.answers.children];
   buttons.forEach((button, displayIndex) => {
     button.disabled = true;
@@ -898,6 +1003,18 @@ function finishRace() {
   els.finishAnswers.textContent = `${game.correct} / ${game.answered}`;
   renderFinalRanking();
   showOverlay(els.finishScreen, true);
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  try {
+    const gain = 60 + game.correct * 25 + (game.finalPosition === 1 ? 100 : 0);
+    addCastlePoints(gain);
+  } catch (_) { /* ignore */ }
+  if (loadout?.trailStyle === "fireworks") {
+    spawnRaceFireworks(width / 2, height * 0.4);
+  }
+  if (loadout?.parts?.emote) {
+    announce("🦜 鹦鹉为你欢呼！装扮结算特效触发");
+  }
 }
 
 function activeEffect() {
@@ -1018,6 +1135,7 @@ function drawPseudo3D(width, height) {
   drawOpponents3D(slices, playerProgress);
   drawSpeedEffects(width, height);
   drawPlayerKart3D(width / 2 + ((input.right ? 1 : 0) - (input.left ? 1 : 0)) * 10, height - 84);
+  drawCosmeticFx();
   drawMiniMap(width, height);
 }
 
@@ -1278,6 +1396,44 @@ function drawPlayerKart3D(x, y) {
   ctx.beginPath();
   ctx.ellipse(0, 24, 77, 18, 0, 0, TAU);
   ctx.fill();
+
+  // 背后装扮（泰拉挂点）：朝右时背后在车身左侧
+  const plot = plotFromCtx(ctx);
+  const eq = resolveEquipFx(loadout, {
+    boost: game.player.boostTimer > 0,
+    speed: game.player.speed,
+    speedThreshold: 280,
+  });
+  const facing = DEFAULT_FACING;
+  const bodyCx = 0;
+  if (eq.isMount) {
+    const mountScale = eq.wingStyle === "ufo" ? 3.2 : 3.0;
+    drawFlightGear(plot, bodyCx, 26 - eq.bodyLift * 0.15, mountScale, {
+      style: eq.wingStyle || "carpet",
+      flying: eq.flying,
+      t: game.elapsed,
+      facing,
+      layer: "mount",
+    });
+  }
+  if (eq.isWings || eq.isJetpack) {
+    const gearScale = eq.isJetpack ? 2.9 : 3.25;
+    const backKind = eq.wingStyle === "rocket" ? "rocket" : eq.isJetpack ? "jetpack" : "wings";
+    const backCx = backAnchorX(bodyCx, gearScale, { facing, kind: backKind });
+    drawFlightGear(plot, backCx, eq.isJetpack ? 2 : -6 - eq.bodyLift * 0.3, gearScale, {
+      style: eq.wingStyle || "feather",
+      flying: eq.flying,
+      t: game.elapsed,
+      lean: 0,
+      facing,
+      layer: "back",
+    });
+  }
+  if (loadout?.parts?.cape) {
+    const capeCx = backAnchorX(bodyCx, 2.3, { facing, kind: "cape" });
+    drawCape(plot, capeCx, 10, 2.3, { t: game.elapsed, wind: eq.capeWind, facing });
+  }
+
   ctx.fillStyle = "#121923";
   roundRect(ctx, -72, -13, 25, 52, 7);
   ctx.fill();
@@ -1314,6 +1470,73 @@ function drawPlayerKart3D(x, y) {
   ctx.fillStyle = "#fff";
   ctx.fillRect(-35, 17, 14, 7);
   ctx.fillRect(21, 17, 14, 7);
+
+  // UFO 舱罩盖在车身前层
+  if (eq.isMount && eq.wingStyle === "ufo") {
+    drawFlightGear(plot, bodyCx, 26 - eq.bodyLift * 0.15, 3.2, {
+      style: "ufo",
+      flying: eq.flying,
+      t: game.elapsed,
+      facing,
+      layer: "overlay",
+    });
+  }
+
+  // 前层挂点：头饰 / 胸饰 / 气球 / 环绕特效 / 伙伴
+  if (loadout?.headStyle) {
+    drawHeadGear(plot, 0, -62, 1.8, { t: game.elapsed, style: loadout.headStyle });
+  }
+  if (eq.flightKind === "balloon") {
+    drawBalloons(plot, 70, -8 - eq.bodyLift * 0.4, eq.flying ? 2.4 : 2.0, {
+      t: game.elapsed,
+      flying: eq.flying,
+      side: 1,
+      attach: "hand",
+    });
+  }
+  if (loadout?.chestStyle) {
+    drawChestCharm(plot, 28, -6, 1.4, {
+      t: game.elapsed,
+      style: loadout.chestStyle,
+      framed: loadout.chestStyle === "clover",
+    });
+  } else if (loadout?.parts?.badge || loadout?.parts?.sticker) {
+    ctx.font = "16px \"Segoe UI Emoji\", \"Apple Color Emoji\", sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(loadout.decor?.icon || "🔰", 36, -8);
+  }
+  if (loadout?.decor?.icon && ["note", "coinCopper"].includes(loadout.decor.part)) {
+    ctx.font = "18px \"Segoe UI Emoji\", \"Apple Color Emoji\", sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(loadout.decor.icon, 70, 8);
+  }
+  if (loadout?.trailStyle && isOrbitTrail(loadout.trailStyle)) {
+    drawOrbitAura(plot, 0, -8, 2.2, {
+      style: loadout.trailStyle,
+      t: game.elapsed,
+      radius: 38,
+    });
+  }
+  if (loadout?.pet) {
+    const motion = loadout.petMotion || "ground";
+    drawPet(plot, -92, motion === "hover" ? -20 : 22, loadout.petStyle || "slime", {
+      t: game.elapsed,
+      scale: 2.2,
+      motion,
+    });
+  }
+  if (loadout?.title) {
+    ctx.fillStyle = "rgba(20,16,12,.82)";
+    const label = `${loadout.title.icon || ""} ${loadout.title.titleText || loadout.title.name.replace(/^称号·/, "")}`.trim();
+    ctx.font = "700 12px Fredoka, sans-serif";
+    const tw = Math.max(56, ctx.measureText(label).width + 14);
+    roundRect(ctx, -tw / 2, -92, tw, 18, 5);
+    ctx.fill();
+    ctx.fillStyle = "#ffd45a";
+    ctx.textAlign = "center";
+    ctx.fillText(label, 0, -78);
+  }
+
   if (game.player.shield) {
     ctx.strokeStyle = "rgba(91,235,255,.9)";
     ctx.lineWidth = 5;
@@ -1324,6 +1547,29 @@ function drawPlayerKart3D(x, y) {
     ctx.stroke();
   }
   ctx.restore();
+
+  // 拖尾 / 翼迹 / 喷气 / 气球彩屑
+  kartTrailTick += 1;
+  if (eq.flying && (eq.isWings || eq.isJetpack || eq.isMount) && kartTrailTick % 2 === 0) {
+    const backKind = eq.wingStyle === "rocket" ? "rocket" : eq.isJetpack ? "jetpack" : eq.isMount ? "default" : "wings";
+    const exhX = eq.isMount ? x : x + backAnchorX(0, 2.4, { facing: DEFAULT_FACING, kind: backKind });
+    const exhY = eq.isJetpack ? y + 18 : eq.isMount ? y + 24 : y + 8;
+    spawnWingTrail(cosmeticFx, exhX, exhY, eq.wingStyle || "feather", { dir: DEFAULT_FACING, count: 2 });
+  }
+  if (eq.flying && eq.flightKind === "balloon" && kartTrailTick % 2 === 0) {
+    spawnBalloonTrail(cosmeticFx, x + 40, y - 20, { dir: 1, count: 3 });
+  }
+  if (loadout?.trailStyle && isBloomTrail(loadout.trailStyle) && kartTrailTick % 16 === 0 && cosmeticFx.length < 100) {
+    spawnFireworkBloom(
+      cosmeticFx,
+      x + (Math.random() - 0.5) * 56,
+      y - 8 + (Math.random() - 0.5) * 40,
+      { count: 12, rings: 1, speed: 72, life: 0.55 },
+    );
+  }
+  if (loadout?.trailStyle && !isBloomTrail(loadout.trailStyle) && game.player.speed > 40) {
+    if (kartTrailTick % 2 === 0) spawnKartTrail(x, y + 8);
+  }
 }
 
 function drawSpeedEffects(width, height) {
@@ -1644,6 +1890,7 @@ function frame(now) {
     updateOpponents(dt);
   }
   updateParticles(dt);
+  updateCosmeticFx(dt);
   updateHud();
   render();
   requestAnimationFrame(frame);
@@ -1717,6 +1964,7 @@ paintDriverSelection();
 paintSelectedDriver();
 paintTrackSelection();
 paintSelectedTrack();
+refreshLoadout();
 resizeCanvas();
 updateOpponents(0);
 updateHud();

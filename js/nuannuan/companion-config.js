@@ -6,6 +6,7 @@ export const COMPANION_STORAGE = "nn_companion_v1";
 export const COMPANION_DRAFT_STORAGE = "nn_companion_draft_v1";
 
 const BASE = "/nuannuan/partner/assets/companions";
+const STAGE_BASE = "/nuannuan/partner/assets/stages";
 
 export const COMPANIONS = [
   {
@@ -14,10 +15,10 @@ export const COMPANIONS = [
     nameEn: "BELLA",
     role: "星辉守护型",
     tags: ["优雅", "坚韧"],
-    accent: "#9b6cff",
+    accent: "#a56bff",
     summary: "以沉稳气场稳住节奏，陪你在压力下坚持完成。",
     description:
-      "优雅而坚韧的同行者。她会在你犹豫时给予肯定，提醒你把大目标拆成小步骤，但不会替你作答。",
+      "紫辉守护的同行者。她会在你犹豫时给予肯定，提醒你把大目标拆成小步骤，但不会替你作答。",
     intro: "慢慢来也没关系。优雅地前进，本身就是一种力量。",
     traits: [
       { icon: "♛", name: "优雅", text: "用从容语气降低焦虑" },
@@ -26,6 +27,8 @@ export const COMPANIONS = [
       { icon: "✦", name: "秩序", text: "提示先完成再切换任务" },
     ],
     portrait: `${BASE}/bella.png`,
+    // 星辉夜空阳台：紫晶星辉画风
+    stage: `${STAGE_BASE}/bella.png`,
   },
   {
     id: "ava",
@@ -33,10 +36,10 @@ export const COMPANIONS = [
     nameEn: "AVA",
     role: "节奏勇气型",
     tags: ["节奏", "勇气"],
-    accent: "#5ec8ff",
+    accent: "#9bb6ff",
     summary: "用轻快节奏推动你继续尝试，减少卡住不动的时间。",
     description:
-      "节奏感强的同行者。她会用短促鼓励帮你重新起步，并提示保持舒适学习节拍，不会直接给出答案。",
+      "冰晶节奏感的同行者。她会用短促鼓励帮你重新起步，并提示保持舒适学习节拍，不会直接给出答案。",
     intro: "换个拍子再试一次！勇气往往藏在下一次点击里。",
     traits: [
       { icon: "♪", name: "节奏", text: "帮助维持舒适完成速度" },
@@ -45,6 +48,8 @@ export const COMPANIONS = [
       { icon: "♡", name: "轻快", text: "用活泼反馈缓解压力" },
     ],
     portrait: `${BASE}/ava.png`,
+    // 薰衣草水晶乐台：节奏与音符
+    stage: `${STAGE_BASE}/ava.png`,
   },
   {
     id: "eileen",
@@ -52,10 +57,10 @@ export const COMPANIONS = [
     nameEn: "EILEEN",
     role: "智慧分析型",
     tags: ["智慧", "分析"],
-    accent: "#7ec8ff",
+    accent: "#6ec4ff",
     summary: "提示你整理题干结构与已知条件，不代替判断。",
     description:
-      "冷静敏锐的同行者。她会提醒你先拆分问题、核对关键信息，但绝不会替你下结论或透露答案。",
+      "澄澈冰晶般的同行者。她会提醒你先拆分问题、核对关键信息，但绝不会替你下结论或透露答案。",
     intro: "先把线索排好。分析清楚了，答案自然会靠近你。",
     traits: [
       { icon: "◇", name: "智慧", text: "提示结构化思考路径" },
@@ -64,6 +69,8 @@ export const COMPANIONS = [
       { icon: "☾", name: "冷静", text: "减少干扰信息打扰" },
     ],
     portrait: `${BASE}/eileen.png`,
+    // 冰蓝学者门户：冷静分析
+    stage: `${STAGE_BASE}/eileen.png`,
   },
   {
     id: "fiona",
@@ -74,7 +81,7 @@ export const COMPANIONS = [
     accent: "#ff6eb5",
     summary: "在低落时送上温暖鼓励，帮你恢复继续学习的动力。",
     description:
-      "热情温暖的同行者。她会在你完成小目标时送上鼓励，并提醒休息与照顾状态，但不会评价答案对错。",
+      "粉心活力的同行者。她会在你完成小目标时送上鼓励，并提醒休息与照顾状态，但不会评价答案对错。",
     intro: "你已经很努力了！我们一起把下一段路走完吧。",
     traits: [
       { icon: "♡", name: "鼓舞", text: "完成节点时给予正向反馈" },
@@ -83,6 +90,8 @@ export const COMPANIONS = [
       { icon: "✚", name: "疗愈", text: "提示适时休息与放松" },
     ],
     portrait: `${BASE}/fiona.png`,
+    // 粉霞城堡心愿台：温暖鼓舞
+    stage: `${STAGE_BASE}/fiona.png`,
   },
   {
     id: "gladys",
@@ -90,10 +99,10 @@ export const COMPANIONS = [
     nameEn: "GLADYS",
     role: "逻辑精准型",
     tags: ["逻辑", "精准"],
-    accent: "#8b7cff",
+    accent: "#9b6cff",
     summary: "用逻辑清单帮你自检步骤完整性，不透露结论。",
     description:
-      "理性精确的同行者。她会提示你按清单核对步骤与遗漏项，但绝不会直接告诉你答案。",
+      "数码魔导式的同行者。她会提示你按清单核对步骤与遗漏项，但绝不会直接告诉你答案。",
     intro: "把步骤列出来。精准核对后，我们再往前推进。",
     traits: [
       { icon: "⧉", name: "逻辑", text: "提示按结构检查流程" },
@@ -102,6 +111,8 @@ export const COMPANIONS = [
       { icon: "◇", name: "克制", text: "只给方法提醒，不给答案" },
     ],
     portrait: `${BASE}/gladys.png`,
+    // 赛博紫晶数据门：逻辑精准（实心门户舞台，避免透明中心空白）
+    stage: `${STAGE_BASE}/gladys.png?v=2`,
   },
   {
     id: "diana",
@@ -112,7 +123,7 @@ export const COMPANIONS = [
     accent: "#ff7ab8",
     summary: "擅长知识整合与记忆强化提醒，陪你一起成长。",
     description:
-      "热情开朗的学术支援型伙伴。她专注于知识整合与记忆强化提醒，会用提问推动探索，但不会直接告诉你答案。",
+      "狐耳学者风的学术支援伙伴。她专注于知识整合与记忆强化提醒，会用提问推动探索，但不会直接告诉你答案。",
     intro: "一起学习一起成长！知识是最闪亮的魔法！",
     traits: [
       { icon: "📚", name: "知识整合", text: "提醒串联已学内容" },
@@ -123,6 +134,8 @@ export const COMPANIONS = [
       { icon: "♡", name: "情绪鼓励", text: "维持积极学习状态" },
     ],
     portrait: `${BASE}/diana.png`,
+    // 粉金魔法书馆：学术支援
+    stage: `${STAGE_BASE}/diana.png`,
   },
 ];
 

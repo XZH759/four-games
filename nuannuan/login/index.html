@@ -7,16 +7,22 @@
   <meta name="description" content="选择性别与职业路线，确认形象后进入。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/avatar-motion.css" />
+  <link rel="stylesheet" href="/css/terra-mosaic-bg.css" />
+  <link rel="stylesheet" href="/css/pixel-ui.css" />
   <link rel="stylesheet" href="/nuannuan/login/login.css" />
 </head>
-<body data-role="researcher" data-step="1">
-  <div class="sys-scene" aria-hidden="true">
-    <div class="sys-scene__lobby"></div>
-    <div class="sys-scene__veil"></div>
-    <div class="sys-scene__grid"></div>
-    <div class="sys-scene__particles"></div>
+<body class="pixel-page" data-role="researcher" data-step="1">
+  <div class="terra-mosaic terra-mosaic--login" aria-hidden="true">
+    <div class="terra-mosaic__sky"></div>
+    <div class="terra-mosaic__clouds"></div>
+    <div class="terra-mosaic__hills"></div>
+    <div class="terra-mosaic__trees"></div>
+    <div class="terra-mosaic__ground"></div>
+    <div class="terra-mosaic__pixels"></div>
+    <div class="terra-mosaic__noise"></div>
+    <div class="terra-mosaic__vignette"></div>
   </div>
 
   <header class="sys-top">
@@ -80,6 +86,21 @@
 
         <p class="stage-hint" id="stage-hint">选择职业后可预览形象</p>
 
+        <div class="theme-equip" id="theme-equip" aria-live="polite" hidden></div>
+
+        <div class="theme-picker" id="theme-picker" hidden>
+          <div class="theme-picker__head">
+            <strong id="theme-picker-title">主题元素</strong>
+            <small id="theme-picker-sub">按职业与性别切换</small>
+          </div>
+          <div class="theme-picker__list" id="theme-picker-list" role="listbox" aria-label="可选主题元素"></div>
+          <div class="theme-picker__meta">
+            <p id="theme-picker-desc"></p>
+            <div class="theme-picker__stats" id="theme-picker-stats"></div>
+          </div>
+          <a class="theme-picker__sheet" id="theme-picker-sheet" href="#" target="_blank" rel="noopener" hidden>查看设定图鉴</a>
+        </div>
+
         <div class="module-dock" id="module-dock" role="tablist" aria-label="档案焦点">
           <button type="button" class="module-btn is-on" data-module="role" role="tab" aria-selected="true">
             <span class="module-ico" aria-hidden="true">◇</span><small>职业</small>
@@ -138,6 +159,13 @@
             <small id="mark-desc">以观测与推理推进实验。</small>
           </div>
         </div>
+      </div>
+
+      <div class="loadout-card" id="loadout-card" data-focus="accessory">
+        <p class="section-label">已选配饰</p>
+        <ul class="loadout-list" id="loadout-list">
+          <li class="is-empty">尚未选择配饰</li>
+        </ul>
       </div>
 
       <div class="collect-card" id="collect-card">

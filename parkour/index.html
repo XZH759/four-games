@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>云城冲刺 · AI 跑酷答题</title>
-  <meta name="description" content="神庙逃亡式三车道跑酷：答对连吃 20 金币，答错扣一条生命。" />
+  <title>云城冲刺 · 神庙遗迹</title>
+  <meta name="description" content="神庙逃亡式三车道跑酷：答对连吃金币宝石，答错扣命受罚。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
@@ -15,57 +15,123 @@
 
   <section class="screen is-on" id="screen-menu">
     <a class="back" href="/">← LOBBY</a>
-    <div class="menu-card">
-      <p class="eyebrow">PIXEL RUNNER · QUIZ GATES</p>
+    <div class="menu-card stone-panel">
+      <p class="eyebrow">TEMPLE RUN · QUIZ GATES</p>
       <h1>云城冲刺</h1>
-      <p class="lead">像素风三车道跑酷。答题驱动转向：<strong>答对</strong>连吃 20 金币特效；<strong>答错</strong>桥断坠落再爬起。</p>
+      <p class="lead">丛林神庙三车道。点选答案决定转向：<strong>答对</strong>连吃金币与宝石；<strong>答错</strong>踩中错路陷阱受罚。约每 5 道知识门切换风景：丛林 → 沙漠 → 雪峰 → 熔岩。</p>
       <ul class="rules">
-        <li>点选 A/B/C：左 / 中 / 右道</li>
-        <li>答对 → 转向正道 + 金币爆发特效</li>
-        <li>答错 / 超时 → 桥断掉下去，生命 -1</li>
+        <li>A / B / C → 左 / 中 / 右道</li>
+        <li>答对 → 拐入正道 + 宝藏连吃</li>
+        <li>答错 / 超时 → 桥断坠落，生命 -1</li>
       </ul>
+      <div class="menu-loadout" id="menu-loadout"></div>
       <button type="button" class="btn-go" id="start-btn">START!</button>
     </div>
   </section>
 
   <section class="screen" id="screen-play">
-    <canvas id="game" width="960" height="640" aria-label="跑酷画面"></canvas>
+    <div class="play-frame">
+      <canvas id="game" width="960" height="640" aria-label="跑酷画面"></canvas>
 
-    <div class="hud">
-      <div class="hud-left">
-        <div class="stat"><span>SCORE</span><strong id="hud-score">0</strong></div>
-        <div class="stat"><span>DIST</span><strong id="hud-dist">0 M</strong></div>
-        <div class="lives" id="hud-lives" aria-label="生命"></div>
+      <div class="stone-rim" aria-hidden="true">
+        <span class="idol left"></span>
+        <span class="idol right"></span>
+        <span class="vine tl"></span>
+        <span class="vine tr"></span>
+        <span class="vine bl"></span>
+        <span class="vine br"></span>
       </div>
-      <div class="hud-right">
-        <div class="currency"><i class="coin"></i><strong id="hud-coins">0</strong></div>
-        <button type="button" class="pause-btn" id="pause-btn" aria-label="暂停">Ⅱ</button>
+
+      <div class="hud">
+        <div class="hud-left">
+          <div class="hearts-box">
+            <div class="lives" id="hud-lives" aria-label="生命"></div>
+            <div class="xp-bar"><i id="xp-fill"></i></div>
+          </div>
+          <div class="stat"><span>SCORE</span><strong id="hud-score">0</strong></div>
+          <div class="stat best"><span>BEST</span><strong id="hud-best">0</strong></div>
+          <div class="loadout-chip" id="loadout-chip" hidden></div>
+        </div>
+        <div class="hud-mid">
+          <div class="dist-track">
+            <strong id="hud-dist">0 M</strong>
+            <div class="dist-bar"><i id="dist-fill"></i><em class="runner-dot"></em></div>
+          </div>
+        </div>
+        <div class="hud-right">
+          <div class="currency">
+            <i class="coin" aria-hidden="true"></i>
+            <strong id="hud-coins">0</strong>
+          </div>
+          <div class="currency gem">
+            <i class="gem" aria-hidden="true"></i>
+            <strong id="hud-gems">0</strong>
+          </div>
+          <button type="button" class="pause-btn" id="pause-btn" aria-label="暂停">Ⅱ</button>
+        </div>
+      </div>
+
+      <div class="mission stone-chip" id="mission">
+        <p>MISSION</p>
+        <ul>
+          <li id="m-zone">场景 丛林神庙</li>
+          <li id="m-coins">连吃宝藏 0 / 20</li>
+          <li id="m-dist">奔跑 0 / 1000m</li>
+          <li id="m-quiz">知识门 0</li>
+        </ul>
+      </div>
+
+      <div class="zone-banner" id="zone-banner" hidden>
+        <p class="en" id="zone-en">RUIN TRAIL</p>
+        <p class="zh" id="zone-zh">丛林神庙</p>
+      </div>
+
+      <div class="turn-banner" id="turn-banner" hidden>
+        <p class="en" id="turn-en">TURN LEFT</p>
+        <p class="zh" id="turn-zh">左转</p>
+      </div>
+
+      <div class="hint tip-bar" id="swipe-hint">TIP: 点选 A/B/C 转向 · 跳过陷阱 · 连吃宝藏！</div>
+
+      <div class="quiz-banner stone-panel" id="quiz-banner" hidden>
+        <span class="q-tag" id="quiz-domain"></span>
+        <p id="quiz-stem"></p>
+        <div class="lane-keys" id="lane-keys" role="group" aria-label="题目选项"></div>
+        <p class="quiz-timer" id="quiz-timer">请选择答案</p>
+      </div>
+
+      <div class="toast" id="toast" role="status"></div>
+
+      <!-- 奖励弹层（文案/样式随场景） -->
+      <div class="fx-panel reward" id="reward-panel" hidden data-biome="jungle">
+        <div class="fx-card">
+          <div class="chest" id="reward-chest" aria-hidden="true"></div>
+          <p class="fx-en" id="reward-en">REWARD</p>
+          <p class="fx-zh" id="reward-zh">奖励</p>
+          <p class="fx-detail" id="reward-detail">完美连吃 ×20</p>
+          <button type="button" class="btn-go" id="reward-ok">继续冲刺</button>
+        </div>
+      </div>
+
+      <!-- 处罚弹层（陷阱类型 × 场景主题） -->
+      <div class="fx-panel penalty" id="penalty-panel" hidden data-kind="blade" data-biome="jungle">
+        <div class="fx-card">
+          <div class="fail-ico" id="penalty-ico" aria-hidden="true"></div>
+          <p class="fx-en danger" id="penalty-en">PENALTY</p>
+          <p class="fx-zh" id="penalty-zh">处罚</p>
+          <div class="penalty-row">
+            <div class="penalty-chip"><i class="heart-ico"></i><span>-1 HEART</span></div>
+            <div class="penalty-chip"><i class="gem"></i><span id="penalty-score">-10% SCORE</span></div>
+          </div>
+          <p class="fx-detail" id="penalty-detail">HIT WRONG PATH · 陷阱发动！</p>
+          <button type="button" class="btn-go danger" id="penalty-ok">爬起来继续</button>
+        </div>
       </div>
     </div>
-
-    <div class="mission" id="mission">
-      <p>任务</p>
-      <ul>
-        <li id="m-coins">收集金币 0 / 20</li>
-        <li id="m-dist">奔跑距离 0 / 1000m</li>
-        <li id="m-quiz">答对知识门 0</li>
-      </ul>
-    </div>
-
-    <div class="hint" id="swipe-hint">出现题目后，点击下方选项作答</div>
-
-    <div class="quiz-banner" id="quiz-banner" hidden>
-      <span class="q-tag" id="quiz-domain"></span>
-      <p id="quiz-stem"></p>
-      <div class="lane-keys" id="lane-keys" role="group" aria-label="题目选项"></div>
-      <p class="quiz-timer" id="quiz-timer">请选择答案</p>
-    </div>
-
-    <div class="toast" id="toast" role="status"></div>
   </section>
 
   <section class="screen" id="screen-over">
-    <div class="menu-card">
+    <div class="menu-card stone-panel">
       <p class="eyebrow">RUN COMPLETE</p>
       <h2 id="over-title">冲刺结束</h2>
       <div class="over-stats">
@@ -82,6 +148,6 @@
     </div>
   </section>
 
-  <script type="module" src="/parkour/parkour.js"></script>
+  <script type="module" src="/parkour/parkour.js?v=4"></script>
 </body>
 </html>

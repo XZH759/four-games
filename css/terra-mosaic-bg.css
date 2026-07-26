@@ -1,0 +1,230 @@
+/**
+ * 泰拉瑞亚 / 我的世界 · 马赛克场景背景
+ * 仅作用于页面场景层，不改面板、人物、文案
+ */
+
+.terra-mosaic {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+
+.terra-mosaic__sky {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      var(--mosaic-sky-top, #5eb0e8) 0%,
+      var(--mosaic-sky-mid, #87ceeb) 42%,
+      var(--mosaic-sky-bot, #c8e8a8) 72%,
+      var(--mosaic-sky-bot, #c8e8a8) 100%
+    );
+}
+
+/* 方块云 */
+.terra-mosaic__clouds {
+  position: absolute;
+  inset: 0 0 45% 0;
+  opacity: 0.85;
+  background-image:
+    linear-gradient(#fff 0 0),
+    linear-gradient(#fff 0 0),
+    linear-gradient(#f0f6ff 0 0),
+    linear-gradient(#fff 0 0),
+    linear-gradient(#e8f2ff 0 0);
+  background-size:
+    96px 24px,
+    64px 16px,
+    80px 20px,
+    72px 18px,
+    56px 14px;
+  background-position:
+    8% 18%,
+    12% 22%,
+    48% 12%,
+    72% 20%,
+    78% 24%;
+  background-repeat: no-repeat;
+  filter: contrast(1.05);
+  animation: mosaicCloudDrift 40s linear infinite;
+}
+
+/* 远山 / 方块丘 */
+.terra-mosaic__hills {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18%;
+  height: 38%;
+  background:
+    linear-gradient(180deg, transparent 0%, var(--mosaic-hill-far, #4a7a48) 0%) 0 40% / 100% 60% no-repeat,
+    linear-gradient(180deg, transparent 35%, var(--mosaic-hill-mid, #3d6a3c) 35%) 0 20% / 100% 80% no-repeat;
+  clip-path: polygon(
+    0% 70%, 6% 55%, 12% 62%, 18% 40%, 26% 52%, 34% 28%, 42% 45%,
+    50% 22%, 58% 48%, 66% 30%, 74% 50%, 82% 35%, 90% 55%, 100% 42%,
+    100% 100%, 0% 100%
+  );
+  opacity: 0.92;
+}
+
+/* 像素树剪影 */
+.terra-mosaic__trees {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16%;
+  height: 42%;
+  opacity: 0.9;
+  background:
+    /* 左树干 */
+    linear-gradient(#5a3a18 0 0) 7% 100% / 14px 28% no-repeat,
+    linear-gradient(#2f6a28 0 0) 4% 55% / 48px 28% no-repeat,
+    linear-gradient(#3a8a30 0 0) 5.5% 42% / 36px 22% no-repeat,
+    /* 右树 */
+    linear-gradient(#5a3a18 0 0) 90% 100% / 14px 32% no-repeat,
+    linear-gradient(#2f6a28 0 0) 87% 52% / 52px 30% no-repeat,
+    linear-gradient(#3a8a30 0 0) 88.5% 38% / 40px 24% no-repeat,
+    /* 中远小树 */
+    linear-gradient(#4a3020 0 0) 62% 100% / 10px 18% no-repeat,
+    linear-gradient(#2a5a28 0 0) 60% 68% / 32px 20% no-repeat;
+}
+
+/* 地面：草皮 + 泥土 + 石层（马赛克色带） */
+.terra-mosaic__ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22%;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--mosaic-grass-a, #3aaa48) 0 16px,
+      var(--mosaic-grass-b, #2f8f3c) 16px 32px
+    ) 0 0 / 100% 18% no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      #8a5a30 0 16px,
+      #6e4524 16px 32px,
+      #7a5030 32px 48px,
+      #5c3a1c 48px 64px
+    ) 0 18% / 100% 42% no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      #6a6a6a 0 16px,
+      #555 16px 32px,
+      #787878 32px 48px,
+      #4a4a4a 48px 64px
+    ) 0 60% / 100% 40% no-repeat;
+  box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* 像素网格叠层 —— 关键马赛克感 */
+.terra-mosaic__pixels {
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.18) 1px, transparent 1px);
+  background-size: 8px 8px;
+  mix-blend-mode: multiply;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 28%, #000 100%);
+}
+
+/* 轻微色块噪声 */
+.terra-mosaic__noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(0, 0, 0, 0.35) 0 1px, transparent 2px);
+  background-size: 24px 24px, 36px 36px;
+  background-position: 0 0, 12px 8px;
+  image-rendering: pixelated;
+}
+
+.terra-mosaic__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 40%, transparent 40%, rgba(0, 0, 0, 0.28) 100%),
+    linear-gradient(180deg, rgba(20, 40, 70, 0.12) 0%, transparent 30%, rgba(10, 20, 30, 0.22) 100%);
+}
+
+@keyframes mosaicCloudDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-3%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terra-mosaic__clouds { animation: none; }
+}
+
+/* —— 登录页：偏蓝实验室方块世界 —— */
+.terra-mosaic--login {
+  --mosaic-sky-top: #2a4a88;
+  --mosaic-sky-mid: #3a68b0;
+  --mosaic-sky-bot: #5a88c0;
+  --mosaic-hill-far: #2a4a70;
+  --mosaic-hill-mid: #1e3a58;
+  --mosaic-grass-a: #3a5a78;
+  --mosaic-grass-b: #2a4860;
+}
+.terra-mosaic--login .terra-mosaic__sky {
+  background:
+    linear-gradient(180deg, #1a3060 0%, #2a5088 35%, #3a70a8 70%, #4a80b0 100%);
+}
+.terra-mosaic--login .terra-mosaic__clouds {
+  opacity: 0.25;
+  filter: brightness(0.7) hue-rotate(190deg);
+}
+.terra-mosaic--login .terra-mosaic__trees {
+  opacity: 0.35;
+  filter: brightness(0.55) saturate(0.4) hue-rotate(180deg);
+}
+.terra-mosaic--login .terra-mosaic__ground {
+  background:
+    repeating-linear-gradient(90deg, #3a5a88 0 16px, #2a4868 16px 32px) 0 0 / 100% 18% no-repeat,
+    repeating-linear-gradient(90deg, #2a4060 0 16px, #1a2848 16px 32px, #243858 32px 48px) 0 18% / 100% 42% no-repeat,
+    repeating-linear-gradient(90deg, #1a2840 0 16px, #101828 16px 32px) 0 60% / 100% 40% no-repeat;
+}
+.terra-mosaic--login .terra-mosaic__vignette {
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 40%, rgba(80, 140, 220, 0.2), transparent 65%),
+    radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(8, 16, 40, 0.55) 100%);
+}
+.terra-mosaic--login .terra-mosaic__pixels {
+  opacity: 0.4;
+  mix-blend-mode: soft-light;
+}
+
+/* —— 伙伴页：黄昏 / 紫雾草甸（衬紫面板，仍是方块世界） —— */
+.terra-mosaic--partner {
+  --mosaic-sky-top: #2a1a58;
+  --mosaic-sky-mid: #4a3080;
+  --mosaic-sky-bot: #3a5840;
+  --mosaic-hill-far: #2a4a38;
+  --mosaic-hill-mid: #1e3a2c;
+  --mosaic-grass-a: #2a6a40;
+  --mosaic-grass-b: #1e5534;
+}
+.terra-mosaic--partner .terra-mosaic__clouds {
+  opacity: 0.35;
+  filter: brightness(0.65) saturate(0.7);
+}
+.terra-mosaic--partner .terra-mosaic__vignette {
+  background:
+    radial-gradient(ellipse 50% 40% at 70% 30%, rgba(180, 80, 200, 0.22), transparent 60%),
+    radial-gradient(ellipse 40% 35% at 20% 70%, rgba(80, 40, 160, 0.28), transparent 65%),
+    radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(8, 0, 24, 0.55) 100%);
+}
+.terra-mosaic--partner .terra-mosaic__pixels {
+  opacity: 0.35;
+  mix-blend-mode: soft-light;
+}

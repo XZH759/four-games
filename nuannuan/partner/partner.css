@@ -1,25 +1,23 @@
 :root {
   --ink: #f4efff;
-  --muted: #b7a8d8;
-  --line: rgba(180, 140, 255, 0.5);
-  --panel: rgba(24, 14, 48, 0.78);
-  --panel-2: rgba(36, 22, 68, 0.82);
+  --muted: #c8b0e8;
+  --line: #8a60d0;
+  --panel: rgba(28, 16, 56, 0.92);
+  --panel-2: rgba(40, 24, 72, 0.94);
   --accent: #ff7ab8;
   --pink: #ff5ea8;
   --violet: #9b6cff;
   --cyan: #5ec8ff;
-  --display: "Orbitron", "Noto Sans SC", sans-serif;
-  --body: "Noto Sans SC", sans-serif;
-  --raise:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -3px 0 rgba(20, 8, 45, 0.45),
-    0 5px 0 rgba(16, 6, 40, 0.55),
-    0 12px 26px rgba(8, 0, 28, 0.45);
-  --press:
-    inset 0 3px 7px rgba(10, 0, 30, 0.55),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.15),
-    0 2px 0 rgba(16, 6, 40, 0.4),
-    0 6px 14px rgba(8, 0, 28, 0.35);
+  --display: "Press Start 2P", "ZCOOL KuaiLe", monospace;
+  --body: "Noto Sans SC", "ZCOOL KuaiLe", sans-serif;
+  --raise: var(--px-raise);
+  --press: var(--px-press);
+  --px-border: #6a40b0;
+  --px-border-inner: #c8a0ff;
+  --px-panel: rgba(28, 16, 56, 0.92);
+  --px-rivet: #1a0838;
+  --px-btn-border: #1a0838;
+  --px-chip-border: #4a2880;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -28,36 +26,12 @@ body {
   min-height: 100vh;
   color: var(--ink);
   font-family: var(--body);
-  background: #100826;
+  background: #2a1a58;
   overflow-x: hidden;
 }
 
-.scene { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.scene__bg {
-  position: absolute;
-  inset: -3%;
-  background:
-    radial-gradient(ellipse 45% 40% at 72% 28%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 60%),
-    radial-gradient(ellipse 40% 35% at 18% 75%, rgba(120, 70, 220, 0.28), transparent 65%),
-    linear-gradient(160deg, #1a0f3a 0%, #100826 50%, #1c1148 100%);
-}
-.scene__hex {
-  position: absolute;
-  inset: 0;
-  opacity: 0.16;
-  background-image:
-    linear-gradient(rgba(180, 140, 255, 0.22) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(180, 140, 255, 0.22) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: radial-gradient(circle at 50% 40%, #000 18%, transparent 75%);
-}
-.scene__glow {
-  position: absolute;
-  inset: auto 8% -12% 8%;
-  height: 42%;
-  background: radial-gradient(ellipse, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%);
-  filter: blur(22px);
-}
+/* 旧场景层保留兼容；页面已改用 .terra-mosaic */
+.scene { display: none; }
 
 .topbar {
   position: relative;
@@ -288,6 +262,34 @@ body {
   display: grid;
   place-items: center;
   min-height: 420px;
+  border-radius: 16px;
+  overflow: hidden;
+  image-rendering: pixelated;
+  background-color: #1a1030;
+  background-image:
+    var(--stage-bg, none),
+    linear-gradient(180deg, #3a2870 0 42%, #2a4a40 42% 68%, #1e3a28 68% 100%);
+  background-size: cover, auto;
+  background-position: center, center;
+  background-repeat: no-repeat;
+  transition: background-image 280ms ease;
+}
+.detail-stage-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.25;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.25) 1px, transparent 1px);
+  background-size: 8px 8px;
+  pointer-events: none;
+  z-index: 0;
+}
+.detail-stage-wrap[data-has-stage="1"]::before {
+  opacity: 1;
+  background-image: linear-gradient(180deg, transparent 58%, rgba(8, 4, 24, 0.22));
+  background-size: auto;
 }
 .portrait-frame {
   position: absolute;
@@ -298,6 +300,10 @@ body {
   pointer-events: none;
   z-index: 1;
 }
+.detail-stage-wrap[data-has-stage="1"] .portrait-frame {
+  /* 舞台图自带画框，隐藏旧框避免叠框 */
+  opacity: 0;
+}
 .detail-stage {
   position: relative;
   z-index: 2;
@@ -305,6 +311,19 @@ body {
   aspect-ratio: 682 / 1024;
   display: grid;
   place-items: end center;
+}
+.detail-stage-wrap[data-has-stage="1"] .detail-stage {
+  /* 落在舞台中央台座区域 */
+  width: min(68%, 210px);
+  margin-bottom: 8%;
+}
+.detail-stage-wrap[data-has-stage="1"] .name-banner {
+  bottom: 1.5%;
+  min-width: 62%;
+  padding: 0.35rem 0.9rem;
+  background: rgba(20, 12, 40, 0.55);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, rgba(255, 255, 255, 0.35));
+  backdrop-filter: blur(4px);
 }
 .detail-stage img {
   width: 100%;
@@ -603,4 +622,209 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .candidate-card, .btn { transition: none; }
+}
+
+/* ========== 马赛克整界面覆盖（紫粉像素风） ========== */
+.pixel-page .candidates,
+.pixel-page .detail,
+.pixel-page .team,
+.pixel-page .tips,
+.pixel-page .guide-dialog {
+  border: 3px solid #8a60d0 !important;
+  border-radius: 6px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 30%),
+    linear-gradient(180deg, #2a1858 0%, #160e34 100%) !important;
+  box-shadow:
+    inset 0 0 0 2px #c8a0ff,
+    inset 0 -4px 0 rgba(0, 0, 0, 0.35),
+    4px 4px 0 rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: none !important;
+  position: relative;
+}
+.pixel-page .candidates::before,
+.pixel-page .detail::before,
+.pixel-page .team::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 8px;
+  height: 8px;
+  background: #1a0838;
+  box-shadow:
+    inset 1px 1px 0 rgba(255,255,255,0.25),
+    calc(100% - 20px) 0 0 #1a0838;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.pixel-page .topbar-title h1 {
+  font-family: var(--pixel-cn), "ZCOOL KuaiLe", sans-serif !important;
+  font-size: clamp(1.15rem, 2.8vw, 1.7rem) !important;
+  letter-spacing: 0.14em;
+  text-shadow:
+    2px 0 0 #1a0838,
+    -2px 0 0 #1a0838,
+    0 2px 0 #1a0838,
+    0 -2px 0 #1a0838,
+    3px 3px 0 rgba(0,0,0,0.45);
+}
+.pixel-page .topbar-title p,
+.pixel-page .panel-title,
+.pixel-page .detail-kicker,
+.pixel-page .trait-title,
+.pixel-page .team-title {
+  font-family: var(--pixel-cn) !important;
+  letter-spacing: 0.08em;
+}
+
+.pixel-page .icon-btn,
+.pixel-page .guide-btn,
+.pixel-page .ai-badge,
+.pixel-page .btn,
+.pixel-page .candidate-card {
+  border: 3px solid #1a0838 !important;
+  border-radius: 4px !important;
+  box-shadow: var(--px-raise) !important;
+  backdrop-filter: none !important;
+  font-family: var(--pixel-cn) !important;
+}
+.pixel-page .icon-btn,
+.pixel-page .guide-btn,
+.pixel-page .ai-badge {
+  background:
+    linear-gradient(180deg, #6a48b0 0%, #3a2068 100%) !important;
+  border-radius: 4px !important;
+}
+.pixel-page .ai-badge {
+  font-family: var(--pixel-en) !important;
+  font-size: 0.55rem !important;
+}
+
+.pixel-page .notice {
+  border: 3px solid #1a0838 !important;
+  border-radius: 4px !important;
+  background: linear-gradient(90deg, #4a2888, #6a3098) !important;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.45) !important;
+  font-family: var(--pixel-cn) !important;
+}
+.pixel-page .notice-ico {
+  border-radius: 2px !important;
+  border: 2px solid #1a0838;
+}
+
+.pixel-page .candidate-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 35%),
+    linear-gradient(180deg, #342068, #180e38) !important;
+}
+.pixel-page .candidate-card[aria-selected="true"] {
+  border-color: #ff5ea8 !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 120, 180, 0.55),
+    0 0 0 2px #ff5ea8,
+    4px 4px 0 rgba(0,0,0,0.5) !important;
+}
+.pixel-page .candidate-name {
+  font-family: var(--pixel-en), "Press Start 2P", monospace !important;
+  font-size: 0.55rem !important;
+  letter-spacing: 0.06em;
+  text-shadow: 2px 2px 0 #000;
+}
+.pixel-page .candidate-role,
+.pixel-page .candidate-tags span {
+  font-family: var(--pixel-cn) !important;
+}
+.pixel-page .candidate-tags span {
+  border: 2px solid #4a2880 !important;
+  border-radius: 2px !important;
+  background: rgba(0,0,0,0.45) !important;
+}
+.pixel-page .candidate-number,
+.pixel-page .selected-badge {
+  border: 2px solid #1a0838 !important;
+  border-radius: 2px !important;
+  font-family: var(--pixel-en) !important;
+  font-size: 0.45rem !important;
+}
+.pixel-page .selected-badge {
+  background: #ff5ea8 !important;
+  color: #fff !important;
+}
+.pixel-page .candidate-avatar img,
+.pixel-page .detail-stage img {
+  image-rendering: pixelated;
+}
+
+.pixel-page .detail-name,
+.pixel-page .name-banner span {
+  font-family: var(--pixel-en), "Press Start 2P", monospace !important;
+  letter-spacing: 0.08em;
+  text-shadow:
+    2px 0 0 #1a0838,
+    -2px 0 0 #1a0838,
+    0 2px 0 #1a0838,
+    0 -2px 0 #1a0838,
+    3px 3px 0 rgba(255, 90, 160, 0.35);
+}
+.pixel-page .detail-role,
+.pixel-page .detail-bio,
+.pixel-page .speech,
+.pixel-page .tips p,
+.pixel-page .tips strong {
+  font-family: var(--pixel-cn) !important;
+}
+.pixel-page .speech {
+  border: 3px solid #1a0838 !important;
+  border-radius: 4px !important;
+  background: rgba(12, 4, 32, 0.85) !important;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.4) !important;
+}
+.pixel-page .trait {
+  border: 2px solid #6a40b0 !important;
+  border-radius: 4px !important;
+  background: rgba(12, 4, 32, 0.65) !important;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.35) !important;
+}
+.pixel-page .trait-icon {
+  border: 2px solid #1a0838 !important;
+  border-radius: 2px !important;
+  image-rendering: pixelated;
+}
+.pixel-page .name-banner {
+  border: 3px solid #1a0838 !important;
+  border-radius: 4px !important;
+  background: linear-gradient(180deg, #ff7ab8, #d04088) !important;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.45) !important;
+}
+
+.pixel-page .btn {
+  background:
+    linear-gradient(180deg, #7a58d0 0%, #4a2898 100%) !important;
+  color: #fff !important;
+  text-shadow: 1px 1px 0 #1a0838;
+}
+.pixel-page .btn-confirm,
+.pixel-page .btn-start:not(:disabled) {
+  background:
+    linear-gradient(180deg, #ff8ac8 0%, #e04898 55%, #b02870 100%) !important;
+}
+.pixel-page .btn-detail {
+  background:
+    linear-gradient(180deg, #5ec8ff 0%, #2a88d0 100%) !important;
+}
+.pixel-page .btn:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: var(--px-press) !important;
+}
+.pixel-page .btn:disabled {
+  filter: grayscale(0.5);
+  opacity: 0.55;
+}
+
+.pixel-page .team-slots > * {
+  border: 3px solid #1a0838 !important;
+  border-radius: 50% !important;
+  box-shadow: inset 0 0 0 2px #8a60d0, 3px 3px 0 rgba(0,0,0,0.4) !important;
 }

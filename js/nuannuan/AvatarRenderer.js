@@ -67,6 +67,124 @@ function swapStacks(stage, next, reduce) {
   });
 }
 
+function buildOverlayLayer(overlays, { draggable = false, onPlace = null } = {}) {
+  if (!overlays?.length) return null;
+  const layer = document.createElement("div");
+  layer.className = "avatar-accessory-layer";
+  overlays.forEach((item, index) => {
+    const wrap = document.createElement("span");
+    wrap.className = `avatar-acc avatar-acc--${item.slot || "chest"}`;
+    if (item.slot === "neck" || item.slot === "chest" || item.placement) {
+      wrap.classList.add("avatar-acc--pendant");
+    }
+    if (draggable && item.movable !== false) {
+      wrap.classList.add("is-movable");
+      wrap.title = `${item.name || "配饰"} · 拖动调整位置`;
+      wrap.setAttribute("role", "button");
+      wrap.setAttribute("aria-label", `${item.name || "配饰"}，可拖动调整位置`);
+      wrap.tabIndex = 0;
+    }
+    wrap.dataset.accId = item.id;
+    wrap.style.zIndex = String(20 + index);
+    const place = item.placement;
+    if (place) {
+      if (place.top) wrap.style.top = place.top;
+      if (place.left) wrap.style.left = place.left;
+      if (place.width) wrap.style.width = place.width;
+    }
+    const img = document.createElement("img");
+    img.src = item.src;
+    img.alt = "";
+    img.draggable = false;
+    img.decoding = "async";
+    wrap.appendChild(img);
+    requestAnimationFrame(() => wrap.classList.add("is-on"));
+    if (draggable && item.movable !== false) {
+      enableAccessoryDrag(wrap, layer, onPlace);
+    }
+    layer.appendChild(wrap);
+  });
+  return layer;
+}
+
+function enableAccessoryDrag(wrap, layer, onPlace) {
+  let dragging = false;
+  let moved = false;
+  let pointerId = null;
+
+  const toPercent = (clientX, clientY) => {
+    const rect = layer.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    const left = ((clientX - rect.left) / rect.width) * 100;
+    const top = ((clientY - rect.top) / rect.height) * 100;
+    return {
+      left: Math.min(94, Math.max(6, left)),
+      top: Math.min(88, Math.max(4, top)),
+    };
+  };
+
+  const applyPos = (pos) => {
+    wrap.style.left = `${pos.left}%`;
+    wrap.style.top = `${pos.top}%`;
+  };
+
+  const onPointerDown = (event) => {
+    if (event.button != null && event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    dragging = true;
+    moved = false;
+    pointerId = event.pointerId;
+    wrap.classList.add("is-dragging");
+    wrap.setPointerCapture?.(pointerId);
+    const pos = toPercent(event.clientX, event.clientY);
+    if (pos) applyPos(pos);
+  };
+
+  const onPointerMove = (event) => {
+    if (!dragging || (pointerId != null && event.pointerId !== pointerId)) return;
+    event.preventDefault();
+    moved = true;
+    const pos = toPercent(event.clientX, event.clientY);
+    if (pos) applyPos(pos);
+  };
+
+  const endDrag = (event) => {
+    if (!dragging) return;
+    if (pointerId != null && event.pointerId !== pointerId) return;
+    dragging = false;
+    wrap.classList.remove("is-dragging");
+    try {
+      wrap.releasePointerCapture?.(pointerId);
+    } catch {
+      /* ignore */
+    }
+    pointerId = null;
+    if (!moved) return;
+    const pos = toPercent(event.clientX, event.clientY);
+    if (!pos) return;
+    applyPos(pos);
+    const width = parseFloat(wrap.style.width) || undefined;
+    onPlace?.({
+      id: wrap.dataset.accId,
+      left: pos.left,
+      top: pos.top,
+      ...(Number.isFinite(width) ? { width } : {}),
+    });
+  };
+
+  wrap.addEventListener("pointerdown", onPointerDown);
+  wrap.addEventListener("pointermove", onPointerMove);
+  wrap.addEventListener("pointerup", endDrag);
+  wrap.addEventListener("pointercancel", endDrag);
+}
+
+function attachOverlays(stack, overlays, dragOpts) {
+  const layer = buildOverlayLayer(overlays, dragOpts);
+  if (layer) stack.appendChild(layer);
+  return stack;
+}
+
 /**
  * @param {HTMLElement} host
  * @param {object} config
@@ -79,6 +197,11 @@ export async function renderAvatar(host, config, opts = {}) {
   const showBadge = opts.showBadge === true;
   const allowSvgFallback = opts.allowSvgFallback !== false;
   const useFixtures = Boolean(config?.useFixtures);
+  const overlays = Array.isArray(config?.accessoryOverlays) ? config.accessoryOverlays : [];
+  const dragOpts = {
+    draggable: Boolean(opts.draggableAccessories),
+    onPlace: typeof opts.onAccessoryPlace === "function" ? opts.onAccessoryPlace : null,
+  };
 
   const token = (host._avatarToken = (host._avatarToken || 0) + 1);
   const stage = ensureStage(host, alt);
@@ -99,6 +222,7 @@ export async function renderAvatar(host, config, opts = {}) {
       img.draggable = false;
       img.decoding = "async";
       next.appendChild(img);
+      attachOverlays(next, overlays, dragOpts);
       host.dataset.placeholder = "0";
       host.dataset.mode = "reference-sheet";
       stage.querySelector(".placeholder-badge")?.remove();
@@ -125,6 +249,7 @@ export async function renderAvatar(host, config, opts = {}) {
   let next;
   if (requiredOk) {
     next = buildLayerStack(layers, results, order);
+    attachOverlays(next, overlays, dragOpts);
     host.dataset.placeholder = "0";
     host.dataset.mode = useFixtures ? "fixtures" : "layered";
     stage.querySelector(".placeholder-badge")?.remove();
@@ -132,6 +257,7 @@ export async function renderAvatar(host, config, opts = {}) {
     next = document.createElement("div");
     next.className = "avatar-stack is-entering";
     next.innerHTML = buildAvatarSVG(config, uid);
+    attachOverlays(next, overlays, dragOpts);
     host.dataset.placeholder = "1";
     host.dataset.mode = "fallback";
     if (showBadge) {

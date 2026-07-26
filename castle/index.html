@@ -3,66 +3,346 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>知识城堡 · 积分兑换区</title>
+  <title>知识乐园 · 积分商城</title>
+  <meta name="description" content="知识城堡积分兑换商城：货架、盲盒、背包与乐园地图。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/castle/castle.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/castle/castle.css?v=5" />
 </head>
 <body>
   <div class="wash" aria-hidden="true"></div>
 
-  <header class="top">
-    <a class="back" href="/">← 返回导览</a>
-    <div class="title-block">
-      <p class="eyebrow">KNOWLEDGE CASTLE</p>
-      <h1>知识城堡 · 积分兑换</h1>
-    </div>
-    <div class="wallet" aria-live="polite">
-      <span>可用积分</span>
-      <strong id="points-now">0</strong>
-    </div>
-  </header>
-
-  <main class="layout">
-    <section class="intro card">
-      <p>用各游戏获得的积分解锁兑换等级。等级越高，奖池越精致，高稀有概率也越大。每次抽取消耗对应等级积分。</p>
-      <div class="demo-row">
-        <button type="button" class="btn-ghost" id="demo-add">体验：+800 积分</button>
-        <span class="hint" id="lifetime-hint">累计获得 0</span>
+  <div class="app">
+    <header class="topbar">
+      <a class="back" href="/">← 导览</a>
+      <div class="profile">
+        <div class="avatar" id="profile-avatar" aria-hidden="true">🧒</div>
+        <div>
+          <strong id="profile-name">乐园学员</strong>
+          <span class="profile-title" id="profile-title" hidden></span>
+          <span>ID <em id="profile-id">10086</em> · <b id="profile-lv">Lv.1</b> <i class="profile-pet" id="profile-pet" hidden></i></span>
+        </div>
       </div>
-    </section>
-
-    <section class="tiers" id="tiers" aria-label="兑换等级"></section>
-
-    <section class="draw-panel card" id="draw-panel">
-      <div class="draw-head">
-        <h2 id="tier-title">选择等级后抽取</h2>
-        <p id="tier-sub">点击上方 1–5 级卡片</p>
+      <div class="brand">
+        <p class="eyebrow">KNOWLEDGE PARK POINTS MALL</p>
+        <h1>知识乐园积分商城</h1>
       </div>
-      <div class="odds" id="odds"></div>
-      <div class="pool" id="pool"></div>
-      <button type="button" class="btn-draw" id="draw-btn" disabled>抽取一次</button>
-      <p class="draw-msg" id="draw-msg" role="status"></p>
-    </section>
+      <div class="stats">
+        <div class="stat star">
+          <span>可用积分</span>
+          <strong id="points-now">0</strong>
+        </div>
+        <div class="stat bar-stat">
+          <span id="unlock-label">兑换等级 1</span>
+          <div class="bar"><i id="unlock-fill"></i></div>
+        </div>
+        <div class="stat trophy">
+          <span>累计积分</span>
+          <strong id="lifetime-hint">0</strong>
+        </div>
+      </div>
+    </header>
 
-    <section class="bag card">
-      <h2>我的收藏</h2>
-      <ul id="inventory" class="inventory"></ul>
-      <p class="empty" id="inv-empty">还没有兑换到物品</p>
-    </section>
-  </main>
+    <div class="shell">
+      <aside class="side-nav" aria-label="商城导航">
+        <button type="button" class="nav-btn is-on" data-tab="home"><i>🏰</i><span>首页</span></button>
+        <button type="button" class="nav-btn" data-tab="shelf"><i>🏪</i><span>货架兑换</span></button>
+        <button type="button" class="nav-btn" data-tab="gacha"><i>🎁</i><span>等级盲盒</span></button>
+        <button type="button" class="nav-btn" data-tab="bag"><i>🎒</i><span>我的背包</span></button>
+        <button type="button" class="nav-btn" data-tab="rules"><i>📋</i><span>积分规则</span></button>
+        <button type="button" class="nav-btn" data-tab="activity" id="nav-activity"><i>🎉</i><span>活动中心</span><em class="dot" id="act-dot" hidden>1</em></button>
+        <div class="announce">
+          <p>乐园公告</p>
+          <span id="announce-text">冲刺答对可得积分，来城堡兑换装扮！</span>
+        </div>
+      </aside>
 
-  <div class="toast" id="toast" hidden></div>
-  <div class="reveal" id="reveal" hidden>
-    <div class="reveal-card">
-      <p class="rarity" id="reveal-rarity"></p>
-      <h3 id="reveal-name"></h3>
-      <p id="reveal-desc"></p>
-      <button type="button" class="btn-draw" id="reveal-close">收下</button>
+      <main class="main" id="main">
+        <!-- 首页 -->
+        <section class="panel is-on" id="panel-home">
+          <div class="park-map card">
+            <div class="map-art" aria-hidden="true">
+              <span class="m-ferris">🎡</span>
+              <span class="m-castle">🏰</span>
+              <span class="m-balloon">🎈</span>
+              <span class="m-tree">🌳</span>
+              <span class="m-stall">⛺</span>
+            </div>
+            <button type="button" class="map-pin" data-go="shelf" style="--x:18%;--y:58%"><b>🏪</b><span>货架兑换</span></button>
+            <button type="button" class="map-pin" data-go="gacha" style="--x:52%;--y:42%"><b>🎁</b><span>等级盲盒</span></button>
+            <button type="button" class="map-pin" data-go="bag" style="--x:78%;--y:62%"><b>🎒</b><span>我的背包</span></button>
+            <button type="button" class="map-pin" data-go="activity" style="--x:35%;--y:78%"><b>🗺️</b><span>活动地图</span></button>
+          </div>
+          <div class="home-actions">
+            <button type="button" class="btn-ghost" id="demo-add">体验 +800 积分</button>
+            <a class="btn-go" href="/parkour/">去乐园冲刺赚积分 →</a>
+          </div>
+          <div class="featured card">
+            <h3>精选好物</h3>
+            <div class="featured-row" id="featured-row"></div>
+          </div>
+        </section>
+
+        <!-- 货架 -->
+        <section class="panel" id="panel-shelf" hidden>
+          <div class="banner card">
+            <div>
+              <h2>积分兑换中心</h2>
+              <p>跑酷、答题、棋盘赚积分，在此兑换装扮与珍藏。累计越高，货架档位越高。</p>
+            </div>
+            <div class="banner-art" aria-hidden="true">🎡🏰🎈</div>
+          </div>
+          <div class="toolbar">
+            <div class="cats" id="cats"></div>
+            <div class="toolbar-right">
+              <label class="sort">
+                <select id="sort-by">
+                  <option value="level">默认排序</option>
+                  <option value="price">按价格</option>
+                  <option value="rarity">按稀有度</option>
+                </select>
+              </label>
+              <label class="check"><input type="checkbox" id="only-can" /> 只看可兑换</label>
+            </div>
+          </div>
+          <div class="shelf-grid" id="shelf-grid"></div>
+          <p class="empty-state" id="shelf-empty" hidden>没有符合条件的商品</p>
+          <div class="pager" id="shelf-pager"></div>
+        </section>
+
+        <!-- 盲盒 -->
+        <section class="panel" id="panel-gacha" hidden>
+          <div class="banner card">
+            <div>
+              <h2>等级盲盒</h2>
+              <p>消耗积分开启宝箱。等级越高，史诗/传说概率越大。幸运护符可提升传说权重。</p>
+            </div>
+          </div>
+          <div class="chest-row" id="chest-row"></div>
+          <div class="draw-panel card">
+            <div class="draw-head">
+              <div>
+                <p class="chip-en">BLIND BOX</p>
+                <h3 id="tier-title">选择等级</h3>
+                <p id="tier-sub"></p>
+              </div>
+              <div class="odds" id="odds"></div>
+            </div>
+            <div class="pool" id="pool"></div>
+            <button type="button" class="btn-go wide" id="draw-btn" disabled>立即抽取</button>
+            <p class="draw-msg" id="draw-msg"></p>
+          </div>
+        </section>
+
+        <!-- 背包 -->
+        <section class="panel" id="panel-bag" hidden>
+          <div class="bag-summary card">
+            <div>
+              <h2>我的背包</h2>
+              <p id="bag-stats">拥有 0 · 已装备 0 · 收集 0%</p>
+              <div class="bar tall"><i id="collect-fill"></i></div>
+            </div>
+            <div class="banner-art" aria-hidden="true">🎡🎈🏰</div>
+          </div>
+          <div class="loadout-stage terra-dress card" id="loadout-stage">
+            <div class="loadout-head">
+              <h3>装扮台 · 泰拉试装</h3>
+              <div class="verify-links">
+                <a class="btn-ghost tiny" href="/parkour/">冲刺验证</a>
+                <a class="btn-ghost tiny" href="/race/">赛车验证</a>
+              </div>
+            </div>
+            <div class="terra-frame">
+              <span class="bolt tl" aria-hidden="true"></span>
+              <span class="bolt tr" aria-hidden="true"></span>
+              <span class="bolt bl" aria-hidden="true"></span>
+              <span class="bolt br" aria-hidden="true"></span>
+              <div class="terra-scene" id="mannequin" data-trail="" data-frame="">
+                <div class="terra-sky" aria-hidden="true"></div>
+                <div class="terra-clouds" aria-hidden="true"></div>
+                <div class="terra-castle" aria-hidden="true"></div>
+                <div class="terra-tree" aria-hidden="true"></div>
+                <div class="terra-hills" aria-hidden="true"></div>
+                <div class="terra-grass" aria-hidden="true"></div>
+                <div class="terra-torch left" aria-hidden="true"><i></i></div>
+                <div class="terra-torch right" aria-hidden="true"><i></i></div>
+                <div class="terra-banner" id="mn-banner" hidden></div>
+                <div class="terra-prop" id="mn-prop" hidden data-style=""></div>
+                <div class="terra-title" id="mn-title" hidden></div>
+                <div class="mn-try-badge" id="mn-try-badge" hidden>试装</div>
+                <div class="terra-hero" id="mn-hero" data-gear="" data-wing="" data-pose="idle">
+                  <div class="ph-back" id="mn-back">
+                    <div class="px-wing wing-l" id="mn-wing-l" hidden data-style="feather">
+                      <i class="blade b1"></i><i class="blade b2"></i><i class="blade b3"></i><i class="blade b4"></i>
+                      <i class="joint"></i><i class="gem"></i>
+                    </div>
+                    <div class="px-wing wing-r" id="mn-wing-r" hidden data-style="feather">
+                      <i class="blade b1"></i><i class="blade b2"></i><i class="blade b3"></i><i class="blade b4"></i>
+                      <i class="joint"></i><i class="gem"></i>
+                    </div>
+                    <div class="px-cape" id="mn-cape" hidden>
+                      <i class="cape-body"></i><i class="cape-trim"></i><i class="cape-brooch"></i>
+                    </div>
+                    <div class="px-jet" id="mn-jet" hidden aria-hidden="true"></div>
+                    <div class="px-shadow-fx" id="mn-shadow-fx" hidden aria-hidden="true"><i></i><i></i><i></i></div>
+                    <div class="px-flight" id="mn-flight" hidden data-style="" data-motion="idle" aria-hidden="true">
+                      <i class="fl-a"></i><i class="fl-b"></i><i class="fl-c"></i><i class="fl-d"></i>
+                    </div>
+                  </div>
+                  <div class="ph-body">
+                    <i class="ph-leg l"></i>
+                    <i class="ph-leg r"></i>
+                    <i class="ph-torso"></i>
+                    <i class="ph-arm l"></i>
+                    <i class="ph-arm r"></i>
+                    <i class="ph-head"></i>
+                    <i class="ph-hair"></i>
+                    <i class="ph-eye l"></i>
+                    <i class="ph-eye r"></i>
+                    <div class="px-crown" id="mn-crown" hidden data-style="knowledge">
+                      <i class="c-base"></i><i class="c-p l"></i><i class="c-p m"></i><i class="c-p r"></i>
+                      <i class="c-gem"></i><i class="c-glint"></i>
+                      <i class="c-extra"></i>
+                    </div>
+                    <div class="px-badge" id="mn-badge" hidden></div>
+                    <div class="px-clover" id="mn-clover" hidden data-style="clover">
+                      <i></i><i></i><i></i><i></i><em></em>
+                    </div>
+                    <div class="gear-ico ph-sticker" id="mn-sticker" hidden></div>
+                    <div class="gear-ico ph-hand" id="mn-hand" hidden></div>
+                    <!-- 泰拉式：气球手持，画在身体前层 -->
+                    <div class="px-balloon" id="mn-balloon" hidden aria-hidden="true" data-motion="idle" data-attach="hand">
+                      <i class="grip"></i>
+                      <i class="bl r"></i><i class="bl b"></i><i class="bl y"></i><i class="bl g"></i><i class="bl p"></i>
+                    </div>
+                    <div class="px-stars" id="mn-stars" hidden aria-hidden="true">
+                      <i></i><i></i><i></i><i></i>
+                    </div>
+                    <div class="px-confetti" id="mn-confetti" hidden aria-hidden="true">
+                      <i></i><i></i><i></i><i></i><i></i><i></i>
+                    </div>
+                    <!-- UFO 舱罩：盖在人物躯干前 -->
+                    <div class="px-flight-front" id="mn-flight-front" hidden data-style="" data-motion="idle" aria-hidden="true">
+                      <i class="fl-dome"></i><i class="fl-rim"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="gear-ico terra-pet" id="mn-pet" hidden data-style="" data-motion="ground"></div>
+                <div class="terra-trail" id="mn-trail" hidden data-style="">
+                  <i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="pose-toggle">
+                  <button type="button" class="pose-btn is-on" data-pose="idle">静态</button>
+                  <button type="button" class="pose-btn" data-pose="fly">飞行</button>
+                </div>
+              </div>
+              <aside class="terra-slots" id="terra-slots" aria-label="装备槽位"></aside>
+            </div>
+            <p class="loadout-hint" id="loadout-hint">在背包装备道具后，会在冲刺 / 赛车中实装</p>
+          </div>
+          <div class="toolbar">
+            <div class="cats" id="bag-filters"></div>
+          </div>
+          <div class="bag-grid" id="inventory"></div>
+          <p class="empty-state" id="inv-empty">背包还是空的</p>
+          <div class="bag-foot">
+            <div class="card mini">
+              <h4>图鉴进度</h4>
+              <p id="codex-text">0 / 0</p>
+            </div>
+            <div class="card mini">
+              <h4>最近获得</h4>
+              <ul id="recent-list"></ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 规则 -->
+        <section class="panel" id="panel-rules" hidden>
+          <div class="card rules-card">
+            <h2>积分规则</h2>
+            <ul>
+              <li>云城冲刺：答对知识门 <b>+40</b>，完美连吃宝藏 <b>+80</b></li>
+              <li>累计积分决定兑换等级（解锁更高货架与盲盒）</li>
+              <li>货架直兑贵、必得；盲盒单抽便宜、看概率（直兑约为同稀有度期望抽费的约 3 倍）</li>
+              <li>幸运护符：下次盲盒传说权重 <b>+8</b>（自动消耗）</li>
+              <li>兑换物品进入背包，可装备头像框 / 称号 / 特效 / 伙伴 / 装饰</li>
+              <li><b>实装机制</b>：装备后在云城冲刺与 AI 极速赛道显示拖尾、伙伴、披风等；头像框与称号出现在 HUD</li>
+            </ul>
+            <h3>等级门槛</h3>
+            <div class="rules-tiers" id="rules-tiers"></div>
+          </div>
+        </section>
+
+        <!-- 活动 -->
+        <section class="panel" id="panel-activity" hidden>
+          <div class="card">
+            <h2>活动中心</h2>
+            <ul class="tasks" id="task-list"></ul>
+            <div class="sprint card nested">
+              <h3>冲刺奖励</h3>
+              <p>本周累计获得积分</p>
+              <div class="bar tall"><i id="week-fill"></i></div>
+              <p id="week-text">0 / 5000</p>
+              <div class="week-chests" id="week-chests"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="detail" id="detail-pane">
+        <div class="detail-card card">
+          <p class="chip-en">PREVIEW</p>
+          <div class="preview-stage" id="preview-stage">
+            <div class="preview-bg" aria-hidden="true"></div>
+            <div class="preview-ico" id="preview-ico">⭐</div>
+          </div>
+          <h3 id="preview-name">选择一件商品</h3>
+          <p id="preview-desc">点击货架或背包中的物品查看详情</p>
+          <dl class="meta-list" id="preview-meta"></dl>
+          <div class="buy-box">
+            <p class="price-line">价格 <strong id="preview-price">—</strong></p>
+            <button type="button" class="btn-go" id="preview-action" disabled>立即兑换</button>
+          </div>
+          <div class="tip-box">
+            <p>试装 / 实装</p>
+            <span>点选商品即可在背包装扮台试装；装备后生效于冲刺、赛车与大厅头像。</span>
+          </div>
+        </div>
+      </aside>
     </div>
   </div>
 
-  <script type="module" src="/castle/castle.js"></script>
+  <div class="toast" id="toast" hidden></div>
+  <div class="fx-burst" id="fx-burst" hidden aria-hidden="true"></div>
+
+  <div class="modal" id="buy-modal" hidden>
+    <div class="modal-card card">
+      <p class="chip-en">CONFIRM</p>
+      <div class="modal-ico" id="buy-ico">⭐</div>
+      <h3 id="buy-title">确认兑换</h3>
+      <p id="buy-desc"></p>
+      <p class="buy-price">消耗 <strong id="buy-cost">0</strong> 积分</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" id="buy-cancel">取消</button>
+        <button type="button" class="btn-go" id="buy-ok">确认兑换</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" id="reveal" hidden>
+    <div class="reveal-card">
+      <div class="sparkles" aria-hidden="true"></div>
+      <div class="reveal-ico" id="reveal-ico">★</div>
+      <p class="rarity" id="reveal-rarity"></p>
+      <h3 id="reveal-name"></h3>
+      <p id="reveal-desc"></p>
+      <p class="reveal-src" id="reveal-src"></p>
+      <button type="button" class="btn-go" id="reveal-close">收下</button>
+    </div>
+  </div>
+
+  <script type="module" src="/castle/castle.js?v=5"></script>
 </body>
 </html>

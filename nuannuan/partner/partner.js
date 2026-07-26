@@ -52,6 +52,16 @@ function applyTheme(companion) {
   const accent = companion?.accent || "#ff7ab8";
   document.body.style.setProperty("--accent", accent);
   document.body.dataset.companion = companion?.id || "";
+  const stageWrap = document.querySelector(".detail-stage-wrap");
+  if (stageWrap) {
+    if (companion?.stage) {
+      stageWrap.style.setProperty("--stage-bg", `url("${companion.stage}")`);
+      stageWrap.dataset.hasStage = "1";
+    } else {
+      stageWrap.style.removeProperty("--stage-bg");
+      stageWrap.dataset.hasStage = "0";
+    }
+  }
 }
 
 function portraitImg(src, alt = "") {
@@ -257,6 +267,16 @@ els.guideOpen.addEventListener("click", () => {
   }
 });
 
+function preloadStages() {
+  for (const companion of COMPANIONS) {
+    if (!companion.stage) continue;
+    const img = new Image();
+    img.decoding = "async";
+    img.src = companion.stage;
+  }
+}
+
+preloadStages();
 paintCandidates();
 paintDetail(state.selected);
 paintTeam(state.selected);

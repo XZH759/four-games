@@ -1,5 +1,5 @@
 /**
- * AI 素养挑战赛 — Kahoot-style UI matching design mockups.
+ * AI 素养挑战赛 — Terraria / 像素沙盒风格 UI
  * Solo play with bot classmates; PIN/lobby are simulated locally.
  */
 import { AI_QUESTIONS } from "/monopoly/questions.js";
@@ -11,12 +11,12 @@ const SPEED_POINTS = 500;
 const CIRC = 188.4;
 
 const AVATARS = [
-  { id: "av01", src: "/assets/kahoot/avatars/kahoot-av-01.png", label: "蓝帽少年" },
-  { id: "av02", src: "/assets/kahoot/avatars/kahoot-av-02.png", label: "学院少年" },
-  { id: "av03", src: "/assets/kahoot/avatars/kahoot-av-03.png", label: "青绿少年" },
-  { id: "av04", src: "/assets/kahoot/avatars/kahoot-av-04.png", label: "粉系少女" },
-  { id: "av05", src: "/assets/kahoot/avatars/kahoot-av-05.png", label: "短发少女" },
-  { id: "av06", src: "/assets/kahoot/avatars/kahoot-av-06.png", label: "马尾少女" },
+  { id: "av01", src: "/assets/kahoot/pixel/kahoot-av-01.png?v=3", label: "牛仔马尾" },
+  { id: "av02", src: "/assets/kahoot/pixel/kahoot-av-02.png?v=3", label: "粉结学院" },
+  { id: "av03", src: "/assets/kahoot/pixel/kahoot-av-03.png?v=3", label: "绿帽少年" },
+  { id: "av04", src: "/assets/kahoot/pixel/kahoot-av-04.png?v=3", label: "粉结少女" },
+  { id: "av05", src: "/assets/kahoot/pixel/kahoot-av-05.png?v=3", label: "学院制服" },
+  { id: "av06", src: "/assets/kahoot/pixel/kahoot-av-06.png?v=3", label: "薄荷绿发" },
 ];
 
 const BOT_POOL = [
@@ -43,11 +43,17 @@ function avatarImg(id, className = "") {
 }
 
 const SHAPES = [
-  { cls: "is-red", key: "A", svg: `<svg viewBox="0 0 24 24"><path d="M12 3 22 21H2z"/></svg>` },
-  { cls: "is-blue", key: "B", svg: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>` },
-  { cls: "is-yellow", key: "C", svg: `<svg viewBox="0 0 24 24"><path d="M12 3l2.5 7.5H22l-6 4.5 2.3 7L12 17.5 5.7 22 8 14.5 2 10h7.5z"/></svg>` },
-  { cls: "is-green", key: "D", svg: `<svg viewBox="0 0 24 24"><path d="M12 2 22 12 12 22 2 12z"/></svg>` },
+  { cls: "is-red", key: "A" },
+  { cls: "is-blue", key: "B" },
+  { cls: "is-yellow", key: "C" },
+  { cls: "is-green", key: "D" },
 ];
+
+function pressFeedback(btn) {
+  if (!btn) return;
+  btn.classList.add("is-pressed");
+  setTimeout(() => btn.classList.remove("is-pressed"), 120);
+}
 
 const els = {
   join: document.getElementById("screen-join"),
@@ -59,9 +65,17 @@ const els = {
   fillPin: document.getElementById("fill-pin"),
   nickname: document.getElementById("nickname"),
   avatarRow: document.getElementById("avatar-row"),
+  avatarPreviewImg: document.getElementById("avatar-preview-img"),
   roundSize: document.getElementById("round-size"),
   joinBtn: document.getElementById("join-btn"),
   helpBtn: document.getElementById("help-btn"),
+  stepPin: document.getElementById("step-pin"),
+  stepProfile: document.getElementById("step-profile"),
+  pinStatus: document.getElementById("pin-status"),
+  profileStatus: document.getElementById("profile-status"),
+  joinReady: document.getElementById("join-ready"),
+  nickCount: document.getElementById("nick-count"),
+  joinPanel: document.getElementById("join-panel"),
   leaveWait: document.getElementById("leave-wait"),
   roomCode: document.getElementById("room-code"),
   copyCode: document.getElementById("copy-code"),
@@ -166,27 +180,104 @@ function readPin() {
   return els.pinBoxes.map((box) => box.value).join("").toUpperCase();
 }
 
-function setPin(code) {
-  const chars = String(code).toUpperCase().slice(0, 6).split("");
+function setPin(pin, { animate = false } = {}) {
+  const chars = String(pin || "").toUpperCase().slice(0, 6).split("");
   els.pinBoxes.forEach((box, i) => {
     box.value = chars[i] || "";
+    box.classList.toggle("has-val", Boolean(box.value));
+    if (animate && chars[i]) {
+      box.classList.remove("is-flash");
+      void box.offsetWidth;
+      box.classList.add("is-flash");
+      setTimeout(() => box.classList.remove("is-flash"), 360);
+    }
   });
+  syncJoinReady();
+}
+
+function nickOk() {
+  const nick = els.nickname.value.trim();
+  return nick.length >= 2 && nick.length <= 10;
+}
+
+function pinOk() {
+  return readPin().length === 6;
+}
+
+function syncJoinReady() {
+  const pinReady = pinOk();
+  const profileReady = nickOk() && Boolean(state.avatar);
+  const ready = pinReady && profileReady;
+
+  els.pinBoxes.forEach((box) => box.classList.toggle("has-val", Boolean(box.value)));
+
+  if (els.stepPin) {
+    els.stepPin.classList.toggle("is-done", pinReady);
+    els.stepPin.classList.toggle("is-active", !pinReady);
+  }
+  if (els.stepProfile) {
+    els.stepProfile.classList.toggle("is-done", profileReady);
+    els.stepProfile.classList.toggle("is-active", pinReady && !profileReady);
+  }
+  if (els.pinStatus) {
+    els.pinStatus.textContent = pinReady ? "PIN 已就绪 ✓" : `已输入 ${readPin().length}/6 位`;
+  }
+  if (els.profileStatus) {
+    if (!nickOk()) els.profileStatus.textContent = "昵称需 2–10 个字";
+    else if (!state.avatar) els.profileStatus.textContent = "请选择头像";
+    else els.profileStatus.textContent = "昵称与头像已就绪 ✓";
+  }
+  if (els.nickCount) {
+    els.nickCount.textContent = `${els.nickname.value.length}/10`;
+  }
+  els.nickname.closest(".nick-field")?.classList.toggle("is-ok", nickOk());
+
+  if (els.joinBtn) {
+    els.joinBtn.disabled = !ready;
+    els.joinBtn.title = ready ? "进入等待房间" : "请先完成 PIN 与昵称头像";
+  }
+  if (els.joinReady) {
+    els.joinReady.classList.toggle("is-ok", ready);
+    els.joinReady.textContent = ready
+      ? "准备完成！点击加入游戏 →"
+      : "完成上方两步后即可加入";
+  }
+}
+
+function shakeJoin() {
+  if (!els.joinPanel) return;
+  els.joinPanel.classList.remove("is-shake");
+  void els.joinPanel.offsetWidth;
+  els.joinPanel.classList.add("is-shake");
+  setTimeout(() => els.joinPanel.classList.remove("is-shake"), 420);
+}
+
+function syncAvatarPreview() {
+  const a = avatarById(state.avatar);
+  if (els.avatarPreviewImg) {
+    els.avatarPreviewImg.src = a.src;
+    els.avatarPreviewImg.alt = a.label;
+  }
 }
 
 function paintAvatars() {
   els.avatarRow.innerHTML = "";
-  AVATARS.forEach((avatar) => {
+  syncAvatarPreview();
+  AVATARS.forEach((avatar, index) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = `avatar-opt${avatar.id === state.avatar ? " is-on" : ""}`;
+    btn.className = `avatar-opt ui-slot${avatar.id === state.avatar ? " is-on" : ""}`;
     btn.setAttribute("role", "option");
     btn.setAttribute("aria-selected", avatar.id === state.avatar ? "true" : "false");
     btn.setAttribute("aria-label", avatar.label);
+    btn.dataset.index = String(index);
     btn.title = avatar.label;
     btn.innerHTML = `<img src="${avatar.src}" alt="" />`;
     btn.addEventListener("click", () => {
       state.avatar = avatar.id;
       paintAvatars();
+      syncJoinReady();
+      toast(`已选择头像：${avatar.label}`);
     });
     els.avatarRow.appendChild(btn);
   });
@@ -237,7 +328,7 @@ function paintYouHud() {
   els.youStreak.textContent = state.streak > 0 ? `连续答对 ${state.streak} 题！` : "连续答对 0 题";
   els.comboText.textContent = `${state.streak} 连击`;
   const xp = Math.min(100, (me.score % 1000) / 10);
-  els.xpFill.style.width = `${Math.max(8, xp)}%`;
+  if (els.xpFill) els.xpFill.style.width = `${Math.max(8, xp)}%`;
   const lv = Math.floor(me.score / 1000) + 1;
   els.xpLabel.textContent = `Lv.${lv} ${lv < 3 ? "初学者" : lv < 5 ? "进阶者" : "挑战者"}`;
   els.itemHint.textContent = `×${state.items.hint}`;
@@ -261,10 +352,11 @@ function paintWaitGrid() {
   const max = 12;
   els.playerGrid.innerHTML = state.players
     .map((p, i) => {
-      return `<div class="player-pill${p.isYou ? " is-host" : ""}">
+      return `<div class="player-pill ui-chip${p.isYou ? " is-host" : ""}">
+        <span class="ui-gem ui-gem--tr ui-gem--${["gold","cyan","purple","green","red"][i % 5]}" aria-hidden="true"></span>
         <span class="idx">${String(i + 1).padStart(2, "0")}</span>
         <span class="av">${avatarImg(p.avatar)}</span>
-        <span>${p.name}${p.isYou ? " · 你" : ""}</span>
+        <span class="name">${p.name}${p.isYou ? " · 你" : ""}</span>
       </div>`;
     })
     .join("");
@@ -300,12 +392,22 @@ function joinRoom() {
   const nick = els.nickname.value.trim();
   if (pin.length < 6) {
     toast("请输入完整 6 位 PIN");
+    shakeJoin();
     els.pinBoxes[pin.length]?.focus();
+    syncJoinReady();
     return;
   }
-  if (nick.length < 2) {
-    toast("昵称至少 2 个字");
+  if (!nickOk()) {
+    toast("昵称需要 2–10 个字");
+    shakeJoin();
     els.nickname.focus();
+    syncJoinReady();
+    return;
+  }
+  if (!state.avatar) {
+    toast("请选择头像");
+    shakeJoin();
+    syncJoinReady();
     return;
   }
   state.pin = pin;
@@ -328,7 +430,7 @@ function joinRoom() {
   paintWaitGrid();
   show(els.wait);
   fillLobbyGradually();
-  toast("已加入房间，等待开赛");
+  toast(`欢迎加入房间 ${pin}`);
 }
 
 function startMatch() {
@@ -362,10 +464,13 @@ function beginQuestion() {
     const shape = SHAPES[displayIndex];
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = `answer ${shape.cls}`;
+    btn.className = `answer opt-banner ${shape.cls}`;
     btn.dataset.opt = String(optionIndex);
-    btn.innerHTML = `<span class="shape">${shape.svg}</span><span><span class="key">${shape.key}</span>${q.options[optionIndex]}</span>`;
-    btn.addEventListener("click", () => submitAnswer(optionIndex, btn));
+    btn.innerHTML = `<span class="opt-letter" aria-hidden="true">${shape.key}</span><span class="opt-text">${q.options[optionIndex]}</span>`;
+    btn.addEventListener("click", () => {
+      pressFeedback(btn);
+      submitAnswer(optionIndex, btn);
+    });
     els.answers.appendChild(btn);
   });
   paintYouHud();
@@ -513,53 +618,127 @@ function useItem(kind) {
 
 /* wire UI */
 paintAvatars();
-setPin(DEMO_PIN);
+setPin(DEMO_PIN, { animate: false });
+syncJoinReady();
 
 els.pinBoxes.forEach((box, i) => {
   box.addEventListener("input", () => {
     box.value = box.value.replace(/[^a-zA-Z0-9]/g, "").slice(-1).toUpperCase();
+    box.classList.toggle("has-val", Boolean(box.value));
     if (box.value && i < els.pinBoxes.length - 1) els.pinBoxes[i + 1].focus();
+    syncJoinReady();
   });
   box.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace" && !box.value && i > 0) els.pinBoxes[i - 1].focus();
+    if (e.key === "Backspace" && !box.value && i > 0) {
+      els.pinBoxes[i - 1].focus();
+      els.pinBoxes[i - 1].value = "";
+      els.pinBoxes[i - 1].classList.remove("has-val");
+      syncJoinReady();
+      e.preventDefault();
+    }
+    if (e.key === "ArrowLeft" && i > 0) els.pinBoxes[i - 1].focus();
+    if (e.key === "ArrowRight" && i < els.pinBoxes.length - 1) els.pinBoxes[i + 1].focus();
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (pinOk()) els.nickname.focus();
+      else joinRoom();
+    }
   });
+  box.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData("text") || "";
+    const clean = text.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 6);
+    if (!clean) return;
+    setPin(clean, { animate: true });
+    const next = Math.min(clean.length, 5);
+    els.pinBoxes[next]?.focus();
+  });
+  box.addEventListener("focus", () => syncJoinReady());
 });
 
 els.fillPin.addEventListener("click", () => {
-  setPin(DEMO_PIN);
+  setPin(DEMO_PIN, { animate: true });
   toast("已填入演示 PIN");
+  els.nickname.focus();
+});
+
+els.nickname.addEventListener("input", syncJoinReady);
+els.nickname.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    if (els.joinBtn && !els.joinBtn.disabled) joinRoom();
+    else if (!nickOk()) toast("昵称需要 2–10 个字");
+    else toast("请选择头像后再加入");
+  }
+});
+
+els.avatarRow.addEventListener("keydown", (e) => {
+  const focused = document.activeElement;
+  if (!focused?.classList.contains("avatar-opt")) return;
+  const idx = Number(focused.dataset.index || 0);
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+    e.preventDefault();
+    const next = els.avatarRow.querySelector(`[data-index="${(idx + 1) % AVATARS.length}"]`);
+    next?.focus();
+  }
+  if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+    e.preventDefault();
+    const prev = els.avatarRow.querySelector(`[data-index="${(idx - 1 + AVATARS.length) % AVATARS.length}"]`);
+    prev?.focus();
+  }
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    focused.click();
+  }
 });
 
 els.joinBtn.addEventListener("click", joinRoom);
 els.helpBtn.addEventListener("click", () => {
-  toast("输入 PIN → 设定昵称头像 → 加入 → 开始挑战");
+  toast("① 输入 PIN → ② 设定昵称头像 → 加入游戏");
 });
-const soundBtn = document.getElementById("sound-btn");
-if (soundBtn) {
-  let soundOn = true;
-  soundBtn.addEventListener("click", () => {
-    soundOn = !soundOn;
-    soundBtn.textContent = soundOn ? "🔊" : "🔇";
-    soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
-    toast(soundOn ? "音效已开启（演示）" : "音效已关闭（演示）");
-  });
-}
 els.leaveWait.addEventListener("click", () => {
   clearInterval(state.fillTimer);
   show(els.join);
+  syncJoinReady();
 });
 els.copyCode.addEventListener("click", async () => {
+  const code = els.roomCode.textContent;
   try {
-    await navigator.clipboard.writeText(els.roomCode.textContent);
-    toast("房间代码已复制");
+    await navigator.clipboard.writeText(code);
+    els.copyCode.classList.add("is-copied");
+    els.copyCode.innerHTML = `<span class="copy-ico" aria-hidden="true">✓</span>已复制`;
+    toast(`房间代码 ${code} 已复制`);
+    setTimeout(() => {
+      els.copyCode.classList.remove("is-copied");
+      els.copyCode.innerHTML = `<span class="copy-ico" aria-hidden="true">⧉</span>复制`;
+    }, 1600);
   } catch {
-    toast(els.roomCode.textContent);
+    toast(code);
   }
 });
 els.roomSettings.addEventListener("click", () => toast("演示模式：题量可在加入页调整"));
+
+const catStack = document.getElementById("cat-stack");
+if (catStack) {
+  catStack.addEventListener("click", (e) => {
+    const btn = e.target.closest(".cat");
+    if (!btn) return;
+    const wasOn = btn.classList.contains("is-on");
+    catStack.querySelectorAll(".cat").forEach((c) => c.classList.remove("is-on"));
+    if (!wasOn) {
+      btn.classList.add("is-on");
+      toast(`本场侧重：${btn.textContent.trim()}`);
+    } else {
+      toast("已取消题目侧重筛选（演示）");
+    }
+  });
+}
 els.startBtn.addEventListener("click", startMatch);
 els.revealNext.addEventListener("click", nextAfterReveal);
-els.again.addEventListener("click", () => show(els.join));
+els.again.addEventListener("click", () => {
+  show(els.join);
+  syncJoinReady();
+});
 els.items.addEventListener("click", (e) => {
   const btn = e.target.closest(".item-btn");
   if (!btn) return;
@@ -574,6 +753,8 @@ try {
     paintAvatars();
   }
   if (saved?.pin) setPin(saved.pin);
+  else setPin(DEMO_PIN);
+  syncJoinReady();
 } catch {
-  /* ignore */
+  syncJoinReady();
 }

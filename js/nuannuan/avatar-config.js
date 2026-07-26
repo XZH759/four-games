@@ -188,6 +188,7 @@ export const DEFAULT_AVATAR = {
   role: null,
   characterId: null,
   referenceSheet: null,
+  themePack: null,
 };
 
 export const DEFAULT_AVATAR_MALE = {
@@ -206,6 +207,7 @@ export const DEFAULT_AVATAR_MALE = {
   role: null,
   characterId: null,
   referenceSheet: null,
+  themePack: null,
 };
 
 export function hairStylesFor(gender) {
@@ -270,6 +272,31 @@ export function normalizeAvatar(partial) {
   }
   if (partial.referenceSheet === null || typeof partial.referenceSheet === "string") {
     base.referenceSheet = partial.referenceSheet;
+  }
+  if (partial.themePack && typeof partial.themePack === "object") {
+    const placements = {};
+    if (partial.themePack.placements && typeof partial.themePack.placements === "object") {
+      Object.entries(partial.themePack.placements).forEach(([id, pos]) => {
+        if (typeof id !== "string" || !pos || typeof pos !== "object") return;
+        const left = Number(pos.left);
+        const top = Number(pos.top);
+        if (!Number.isFinite(left) || !Number.isFinite(top)) return;
+        placements[id] = {
+          left,
+          top,
+          ...(Number.isFinite(Number(pos.width)) ? { width: Number(pos.width) } : {}),
+        };
+      });
+    }
+    base.themePack = {
+      accessories: Array.isArray(partial.themePack.accessories)
+        ? partial.themePack.accessories.filter((id) => typeof id === "string").slice(0, 3)
+        : [],
+      markId: typeof partial.themePack.markId === "string" ? partial.themePack.markId : null,
+      eyeId: typeof partial.themePack.eyeId === "string" ? partial.themePack.eyeId : null,
+      keywordId: typeof partial.themePack.keywordId === "string" ? partial.themePack.keywordId : null,
+      placements,
+    };
   }
 
   // 旧 nn_profile_v1 数字索引兼容
@@ -349,6 +376,17 @@ export function toSavedCharacter(cfg) {
     faceShape: avatar.faceShape,
     accessory: avatar.accessory,
     starterOutfit: avatar.starterOutfit,
+    themePack: avatar.themePack
+      ? {
+          accessories: [...(avatar.themePack.accessories || [])],
+          markId: avatar.themePack.markId || null,
+          eyeId: avatar.themePack.eyeId || null,
+          keywordId: avatar.themePack.keywordId || null,
+          placements: avatar.themePack.placements
+            ? { ...avatar.themePack.placements }
+            : {},
+        }
+      : null,
   };
 }
 

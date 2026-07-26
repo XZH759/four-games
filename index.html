@@ -6,275 +6,203 @@
   <title>AI世界游乐园 · 园区导览</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/lobby.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/lobby.css?v=8" />
 </head>
 <body>
   <div class="sky-wash" aria-hidden="true"></div>
+  <div class="cloud cloud-a" aria-hidden="true"></div>
+  <div class="cloud cloud-b" aria-hidden="true"></div>
 
   <header class="guide-top">
     <div class="brand-block">
-      <img src="/assets/bot-buddy.png" width="44" height="44" alt="" />
+      <img src="/assets/bot-buddy.png" width="48" height="48" alt="" />
       <div>
         <p class="eyebrow">PARK GUIDE · AI LITERACY</p>
         <h1>AI世界游乐园</h1>
       </div>
     </div>
-    <p class="guide-hint">点地图标记或编号列表进入游戏</p>
+
+    <a class="traveler-chip" id="traveler-chip" href="/castle/">
+      <span class="tc-avatar" id="tc-avatar">🧒</span>
+      <span class="tc-meta">
+        <strong id="tc-name">乐园学员</strong>
+        <em id="tc-title">探险新星</em>
+      </span>
+      <span class="tc-pet" id="tc-pet" hidden></span>
+    </a>
+
+    <p class="guide-hint">点击图标标记或编号列表进入游戏</p>
   </header>
 
   <main class="park-guide">
-    <!-- 鸟瞰导览图 -->
-    <section class="map-panel" aria-label="游乐园鸟瞰图">
-      <div class="map-frame">
-        <svg class="park-map" viewBox="0 0 640 520" role="img" aria-labelledby="map-title">
-          <title id="map-title">AI世界游乐园鸟瞰图</title>
-          <defs>
-            <linearGradient id="g-grass" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#7ecf6a" />
-              <stop offset="100%" stop-color="#4fad4a" />
-            </linearGradient>
-            <linearGradient id="g-water" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#7ad7ff" />
-              <stop offset="100%" stop-color="#3aa8e8" />
-            </linearGradient>
-            <linearGradient id="g-path" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stop-color="#f3e2b8" />
-              <stop offset="100%" stop-color="#e8c98a" />
-            </linearGradient>
-            <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity="0.18" />
-            </filter>
-          </defs>
+    <section class="map-panel stone-panel" aria-label="游乐园鸟瞰图">
+      <div class="panel-bevel">
+        <div class="map-stage" id="map-stage">
+          <img
+            class="map-art"
+            src="/assets/park/island-map.png?v=5"
+            alt="AI世界游乐园像素鸟瞰图：知识城堡、冒险冲刺区、知识竞技场与装扮小镇"
+            draggable="false"
+            decoding="async"
+          />
 
-          <!-- 园区外缘 -->
-          <ellipse cx="320" cy="270" rx="300" ry="230" fill="url(#g-grass)" stroke="#2f7a38" stroke-width="6" />
-          <ellipse cx="320" cy="270" rx="288" ry="218" fill="none" stroke="#9fe07a" stroke-width="3" opacity="0.55" />
-
-          <!-- 水系 -->
-          <path d="M70 290 C120 250,160 330,210 300 C250 278,280 340,340 320 C400 300,430 250,500 270 C540 284,560 310,580 300"
-                fill="none" stroke="url(#g-water)" stroke-width="22" stroke-linecap="round" opacity="0.9" />
-          <path d="M90 295 C140 260,170 325,215 302" fill="none" stroke="#c8f0ff" stroke-width="6" stroke-linecap="round" opacity="0.5" />
-
-          <!-- 主环路 -->
-          <ellipse cx="320" cy="270" rx="175" ry="125" fill="none" stroke="url(#g-path)" stroke-width="28" />
-          <ellipse cx="320" cy="270" rx="175" ry="125" fill="none" stroke="#fff6d8" stroke-width="8" opacity="0.55" />
-
-          <!-- 中央城堡枢纽（可点进积分兑换） -->
-          <a class="map-pin castle-hub" href="/castle" data-pin="0" transform="translate(320 250)" aria-label="知识城堡积分兑换">
-            <g filter="url(#soft)">
-              <ellipse cx="0" cy="42" rx="48" ry="14" fill="#2f7a38" opacity="0.25" />
-              <rect x="-38" y="0" width="76" height="40" rx="4" fill="#f4f0e6" stroke="#5b4636" stroke-width="2" />
-              <rect x="-48" y="-28" width="30" height="36" rx="3" fill="#ffe8a8" stroke="#5b4636" stroke-width="2" />
-              <rect x="18" y="-28" width="30" height="36" rx="3" fill="#ffe8a8" stroke="#5b4636" stroke-width="2" />
-              <polygon points="-48,-28 -33,-52 -18,-28" fill="#e85d4c" stroke="#5b4636" stroke-width="2" />
-              <polygon points="18,-28 33,-52 48,-28" fill="#e85d4c" stroke="#5b4636" stroke-width="2" />
-              <rect x="-14" y="-55" width="28" height="55" rx="3" fill="#fff8ea" stroke="#5b4636" stroke-width="2" />
-              <polygon points="-18,-55 0,-82 18,-55" fill="#e85d4c" stroke="#5b4636" stroke-width="2" />
-              <circle cx="0" cy="-88" r="5" fill="#ffd45a" stroke="#5b4636" stroke-width="1.5" />
-              <rect x="-6" y="18" width="12" height="22" fill="#5b4636" />
-            </g>
+          <!-- 编号与底图一致：0 城堡 · 1–2 冒险绿方 · 3 竞技场圆 · 4 橙方 · 5–7 小镇圆 -->
+          <a class="map-hotspot" href="/castle" data-pin="0" data-zone="castle" style="--x:50.7%;--y:68.5%" aria-label="0 · 积分兑换区">
+            <span class="pin-badge">0</span><span class="hot-ring"></span><span class="hot-tip">积分兑换</span>
           </a>
-          <text x="320" y="318" text-anchor="middle" class="zone-label hub">知识城堡</text>
-          <a class="map-pin" href="/castle" data-pin="11" transform="translate(320 288)">
-            <circle r="14" class="pin-bg z-arena" /><text class="pin-num" text-anchor="middle" dy="5">11</text>
+          <a class="map-hotspot" href="/parkour" data-pin="1" data-zone="adventure" style="--x:13.3%;--y:48.0%" aria-label="1 · 云城冲刺">
+            <span class="pin-badge">1</span><span class="hot-ring"></span><span class="hot-tip">云城冲刺</span>
+          </a>
+          <a class="map-hotspot" href="/race" data-pin="2" data-zone="adventure" style="--x:22.9%;--y:55.0%" aria-label="2 · AI 极速赛道">
+            <span class="pin-badge">2</span><span class="hot-ring"></span><span class="hot-tip">极速赛道</span>
+          </a>
+          <a class="map-hotspot" href="/kahoot" data-pin="3" data-zone="arena" style="--x:76.3%;--y:39.3%" aria-label="3 · AI 素养挑战赛">
+            <span class="pin-badge">3</span><span class="hot-ring"></span><span class="hot-tip">素养挑战</span>
+          </a>
+          <a class="map-hotspot" href="/monopoly" data-pin="4" data-zone="arena" style="--x:87.4%;--y:45.9%" aria-label="4 · AI 地产大亨">
+            <span class="pin-badge">4</span><span class="hot-ring"></span><span class="hot-tip">地产大亨</span>
+          </a>
+          <a class="map-hotspot" href="/nuannuan/login" data-pin="5" data-zone="town" style="--x:42.0%;--y:14.4%" aria-label="5 · AI 角色登录">
+            <span class="pin-badge">5</span><span class="hot-ring"></span><span class="hot-tip">角色登录</span>
+          </a>
+          <a class="map-hotspot" href="/nuannuan" data-pin="6" data-zone="town" style="--x:51.6%;--y:15.2%" aria-label="6 · 知识星橱">
+            <span class="pin-badge">6</span><span class="hot-ring"></span><span class="hot-tip">知识星橱</span>
+          </a>
+          <a class="map-hotspot" href="/explorer" data-pin="7" data-zone="town" style="--x:59.4%;--y:15.3%" aria-label="7 · 建立你的探索者">
+            <span class="pin-badge">7</span><span class="hot-ring"></span><span class="hot-tip">探索者</span>
           </a>
 
-          <!-- 入园广场（南） -->
-          <g class="zone-land" data-zone="plaza">
-            <path d="M250 420 Q320 455 390 420 L370 390 Q320 410 270 390 Z" fill="#8fd66f" stroke="#2f7a38" stroke-width="2" />
-            <rect x="290" y="400" width="60" height="18" rx="4" fill="#fff" stroke="#2f7a38" stroke-width="2" />
-            <text x="320" y="413" text-anchor="middle" class="gate-text">入口</text>
-            <rect x="255" y="365" width="72" height="18" rx="3" fill="#2f7a38" />
-            <text x="291" y="378" text-anchor="middle" class="zone-chip">入园广场</text>
-          </g>
+          <div class="zone-glow" data-zone="adventure" aria-hidden="true"></div>
+          <div class="zone-glow" data-zone="arena" aria-hidden="true"></div>
+          <div class="zone-glow" data-zone="town" aria-hidden="true"></div>
+          <div class="zone-glow" data-zone="castle" aria-hidden="true"></div>
 
-          <!-- 冒险冲刺区（西） -->
-          <g class="zone-land" data-zone="adventure">
-            <path d="M70 200 Q95 150 150 140 L170 200 Q120 210 95 250 Z" fill="#3db8a8" stroke="#1f7a70" stroke-width="2" opacity="0.85" />
-            <!-- 跑道 -->
-            <path d="M95 230 Q120 190 155 175" fill="none" stroke="#ffd45a" stroke-width="10" stroke-linecap="round" />
-            <path d="M95 230 Q120 190 155 175" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 4" />
-            <rect x="78" y="148" width="78" height="18" rx="3" fill="#1f7a70" />
-            <text x="117" y="161" text-anchor="middle" class="zone-chip">冒险冲刺</text>
-            <!-- 小山 -->
-            <polygon points="130,210 155,165 180,210" fill="#2a9a8c" stroke="#1f7a70" stroke-width="1.5" />
-          </g>
-
-          <!-- 知识竞技场（东） -->
-          <g class="zone-land" data-zone="arena">
-            <path d="M470 150 Q530 140 570 190 L540 240 Q500 200 470 210 Z" fill="#ff9a5c" stroke="#c45a28" stroke-width="2" opacity="0.9" />
-            <ellipse cx="520" cy="195" rx="36" ry="22" fill="#ffe0c2" stroke="#c45a28" stroke-width="2" />
-            <rect x="505" y="185" width="30" height="20" rx="2" fill="#fff" stroke="#c45a28" stroke-width="1.5" />
-            <rect x="478" y="128" width="86" height="18" rx="3" fill="#c45a28" />
-            <text x="521" y="141" text-anchor="middle" class="zone-chip">知识竞技</text>
-          </g>
-
-          <!-- 装扮小镇（北） -->
-          <g class="zone-land" data-zone="town">
-            <path d="M220 70 Q320 40 420 70 L400 120 Q320 95 240 120 Z" fill="#ff8fb0" stroke="#c44d72" stroke-width="2" opacity="0.88" />
-            <rect x="270" y="78" width="28" height="28" fill="#fff0f5" stroke="#c44d72" stroke-width="1.5" />
-            <rect x="308" y="70" width="28" height="36" fill="#ffe6ee" stroke="#c44d72" stroke-width="1.5" />
-            <rect x="346" y="82" width="28" height="24" fill="#fff0f5" stroke="#c44d72" stroke-width="1.5" />
-            <polygon points="270,78 284,58 298,78" fill="#ffd45a" />
-            <polygon points="308,70 322,48 336,70" fill="#ff6b8a" />
-            <polygon points="346,82 360,62 374,82" fill="#ffd45a" />
-            <rect x="268" y="48" width="88" height="18" rx="3" fill="#c44d72" />
-            <text x="312" y="61" text-anchor="middle" class="zone-chip">装扮小镇</text>
-          </g>
-
-          <!-- 树木点缀 -->
-          <g fill="#2f9b45" opacity="0.9">
-            <circle cx="180" cy="360" r="10" /><circle cx="200" cy="350" r="8" />
-            <circle cx="450" cy="360" r="11" /><circle cx="470" cy="348" r="7" />
-            <circle cx="140" cy="280" r="9" /><circle cx="500" cy="290" r="10" />
-            <circle cx="240" cy="160" r="8" /><circle cx="400" cy="155" r="9" />
-          </g>
-
-          <!-- 编号入口标记 -->
-          <a class="map-pin" href="/plain" data-pin="1" transform="translate(300 395)">
-            <circle r="14" class="pin-bg z-plaza" /><text class="pin-num" text-anchor="middle" dy="5">1</text>
-          </a>
-          <a class="map-pin" href="/stages" data-pin="2" transform="translate(350 385)">
-            <circle r="14" class="pin-bg z-plaza" /><text class="pin-num" text-anchor="middle" dy="5">2</text>
-          </a>
-          <a class="map-pin" href="/parkour" data-pin="3" transform="translate(125 205)">
-            <circle r="14" class="pin-bg z-adventure" /><text class="pin-num" text-anchor="middle" dy="5">3</text>
-          </a>
-          <a class="map-pin" href="/race" data-pin="4" transform="translate(165 235)">
-            <circle r="14" class="pin-bg z-adventure" /><text class="pin-num" text-anchor="middle" dy="5">4</text>
-          </a>
-          <a class="map-pin" href="/kahoot" data-pin="5" transform="translate(505 175)">
-            <circle r="14" class="pin-bg z-arena" /><text class="pin-num" text-anchor="middle" dy="5">5</text>
-          </a>
-          <a class="map-pin" href="/monopoly" data-pin="6" transform="translate(545 220)">
-            <circle r="14" class="pin-bg z-arena" /><text class="pin-num" text-anchor="middle" dy="5">6</text>
-          </a>
-          <a class="map-pin" href="/collect" data-pin="7" transform="translate(260 95)">
-            <circle r="14" class="pin-bg z-town" /><text class="pin-num" text-anchor="middle" dy="5">7</text>
-          </a>
-          <a class="map-pin" href="/nuannuan/login" data-pin="8" transform="translate(310 88)">
-            <circle r="14" class="pin-bg z-town" /><text class="pin-num" text-anchor="middle" dy="5">8</text>
-          </a>
-          <a class="map-pin" href="/nuannuan" data-pin="9" transform="translate(360 95)">
-            <circle r="14" class="pin-bg z-town" /><text class="pin-num" text-anchor="middle" dy="5">9</text>
-          </a>
-          <a class="map-pin" href="/explorer" data-pin="10" transform="translate(395 115)">
-            <circle r="14" class="pin-bg z-town" /><text class="pin-num" text-anchor="middle" dy="5">10</text>
-          </a>
-        </svg>
+          <p class="map-caption">鸟瞰导览 · 悬停编号可联动右侧列表 · 点击进入对应玩法</p>
+        </div>
       </div>
-      <p class="map-caption">鸟瞰导览 · 点击彩色编号进入对应园区游戏</p>
     </section>
 
-    <!-- 编号列表 -->
-    <aside class="legend-panel" aria-label="游戏编号导览">
+    <aside class="legend-panel stone-panel" aria-label="游戏编号导览">
       <div class="legend-head">
         <h2>园区导览一览</h2>
-        <p>按主题分区 · 与地图编号对应</p>
+        <p>编号 0–7 连续 · 与地图热区对应</p>
       </div>
 
       <div class="legend-scroll">
         <section class="legend-zone" data-zone="castle">
-          <h3><span class="dot arena"></span>知识城堡</h3>
-          <a class="legend-item" href="/castle" data-pin="11">
-            <span class="num arena">11</span>
+          <h3><span class="dot castle"></span>知识城堡</h3>
+          <a class="legend-item" href="/castle" data-pin="0" data-zone="castle">
+            <span class="num castle">0</span>
+            <span class="ico" aria-hidden="true">🏦</span>
             <span class="meta">
               <strong>积分兑换区</strong>
               <small>1–5 级奖池 · 等级越高越精致</small>
             </span>
-          </a>
-        </section>
-
-        <section class="legend-zone" data-zone="plaza">
-          <h3><span class="dot plaza"></span>入园广场</h3>
-          <a class="legend-item" href="/plain" data-pin="1">
-            <span class="num plaza">1</span>
-            <span class="meta">
-              <strong>plain 问卷基线</strong>
-              <small>臂一 · 对照问卷</small>
-            </span>
-          </a>
-          <a class="legend-item" href="/stages" data-pin="2">
-            <span class="num plaza">2</span>
-            <span class="meta">
-              <strong>stages 闯关积分</strong>
-              <small>臂二 · 基础积分闯关</small>
-            </span>
+            <span class="go">进入</span>
           </a>
         </section>
 
         <section class="legend-zone" data-zone="adventure">
           <h3><span class="dot adventure"></span>冒险冲刺区</h3>
-          <a class="legend-item" href="/parkour" data-pin="3">
-            <span class="num adventure">3</span>
+          <a class="legend-item" href="/parkour" data-pin="1" data-zone="adventure">
+            <span class="num adventure">1</span>
+            <span class="ico" aria-hidden="true">🛕</span>
             <span class="meta">
               <strong>云城冲刺</strong>
               <small>神庙逃亡 · 答对吃币</small>
             </span>
+            <span class="go">进入</span>
           </a>
-          <a class="legend-item" href="/race" data-pin="4">
-            <span class="num adventure">4</span>
+          <a class="legend-item" href="/race" data-pin="2" data-zone="adventure">
+            <span class="num adventure">2</span>
+            <span class="ico" aria-hidden="true">🏁</span>
             <span class="meta">
               <strong>AI 极速赛道</strong>
               <small>街机竞速 · 答对加速</small>
             </span>
+            <span class="go">进入</span>
           </a>
         </section>
 
         <section class="legend-zone" data-zone="arena">
           <h3><span class="dot arena"></span>知识竞技场</h3>
-          <a class="legend-item" href="/kahoot" data-pin="5">
-            <span class="num arena">5</span>
+          <a class="legend-item" href="/kahoot" data-pin="3" data-zone="arena">
+            <span class="num arena">3</span>
+            <span class="ico" aria-hidden="true">⚔️</span>
             <span class="meta">
               <strong>AI 素养挑战赛</strong>
               <small>限时抢答 · 即时排行</small>
             </span>
+            <span class="go">进入</span>
           </a>
-          <a class="legend-item" href="/monopoly" data-pin="6">
-            <span class="num arena">6</span>
+          <a class="legend-item" href="/monopoly" data-pin="4" data-zone="arena">
+            <span class="num arena">4</span>
+            <span class="ico" aria-hidden="true">🪙</span>
             <span class="meta">
               <strong>AI 地产大亨</strong>
               <small>棋盘经营 · 答对赚钱</small>
             </span>
+            <span class="go">进入</span>
           </a>
         </section>
 
         <section class="legend-zone" data-zone="town">
           <h3><span class="dot town"></span>装扮小镇</h3>
-          <a class="legend-item" href="/collect" data-pin="7">
-            <span class="num town">7</span>
-            <span class="meta">
-              <strong>collect 装扮收集</strong>
-              <small>臂三 · 养成收集</small>
-            </span>
-          </a>
-          <a class="legend-item" href="/nuannuan/login" data-pin="8">
-            <span class="num town">8</span>
+          <a class="legend-item" href="/nuannuan/login" data-pin="5" data-zone="town">
+            <span class="num town">5</span>
+            <span class="ico" aria-hidden="true">🎀</span>
             <span class="meta">
               <strong>AI 角色登录</strong>
               <small>暖暖风 · 建角登录</small>
             </span>
+            <span class="go">进入</span>
           </a>
-          <a class="legend-item" href="/nuannuan" data-pin="9">
-            <span class="num town">9</span>
+          <a class="legend-item" href="/nuannuan" data-pin="6" data-zone="town">
+            <span class="num town">6</span>
+            <span class="ico" aria-hidden="true">⭐</span>
             <span class="meta">
               <strong>知识星橱</strong>
-              <small>臂五 · 装扮商城</small>
+              <small>装扮商城 · 星币兑换</small>
             </span>
+            <span class="go">进入</span>
           </a>
-          <a class="legend-item" href="/explorer" data-pin="10">
-            <span class="num town">10</span>
+          <a class="legend-item" href="/explorer" data-pin="7" data-zone="town">
+            <span class="num town">7</span>
+            <span class="ico" aria-hidden="true">🧭</span>
             <span class="meta">
               <strong>建立你的探索者</strong>
               <small>备选 · Q 版形象</small>
             </span>
+            <span class="go">进入</span>
           </a>
         </section>
       </div>
     </aside>
   </main>
 
-  <script src="/lobby.js" defer></script>
+  <footer class="park-dock" aria-label="快捷入口">
+    <div class="update-pill" id="update-pill" hidden>
+      <span class="upd-dot"></span>
+      <span>有新更新可用</span>
+      <button type="button" class="upd-later" id="upd-later">稍后</button>
+      <button type="button" class="upd-now" id="upd-now">立即安装</button>
+    </div>
+
+    <nav class="hotbar" aria-label="玩法快捷栏">
+      <a class="hot-slot" href="/castle" data-pin="0" title="积分兑换"><span>🏦</span><em>0</em></a>
+      <a class="hot-slot" href="/parkour" data-pin="1" title="云城冲刺"><span>🛕</span><em>1</em></a>
+      <a class="hot-slot" href="/race" data-pin="2" title="极速赛道"><span>🏁</span><em>2</em></a>
+      <a class="hot-slot" href="/kahoot" data-pin="3" title="素养挑战"><span>⚔️</span><em>3</em></a>
+      <a class="hot-slot" href="/monopoly" data-pin="4" title="地产大亨"><span>🪙</span><em>4</em></a>
+      <a class="hot-slot" href="/nuannuan/login" data-pin="5" title="角色登录"><span>🎀</span><em>5</em></a>
+      <a class="hot-slot" href="/nuannuan" data-pin="6" title="知识星橱"><span>⭐</span><em>6</em></a>
+      <a class="hot-slot" href="/explorer" data-pin="7" title="探索者"><span>🧭</span><em>7</em></a>
+    </nav>
+  </footer>
+
+  <div class="page-toast" id="page-toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="/lobby.js?v=7"></script>
 </body>
 </html>

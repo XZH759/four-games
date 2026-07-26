@@ -42,6 +42,82 @@
   filter: blur(1px);
 }
 
+/* 职业配饰叠加层：增减时淡入淡出 + 轻微弹入 */
+.avatar-accessory-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.avatar-acc {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 30%;
+  opacity: 0;
+  transform: translate(-50%, 8%) scale(0.55);
+  filter: drop-shadow(0 0 10px rgba(80, 200, 255, 0.45));
+  transition:
+    opacity 220ms ease,
+    transform 260ms cubic-bezier(0.2, 0.85, 0.25, 1.15),
+    filter 220ms ease;
+}
+
+.avatar-acc.is-on {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.avatar-acc.is-movable {
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  outline: 1px dashed transparent;
+}
+
+.avatar-acc.is-movable:hover,
+.avatar-acc.is-movable:focus-visible {
+  outline-color: color-mix(in srgb, #7ec8ff 70%, white);
+  filter: drop-shadow(0 0 14px rgba(90, 210, 255, 0.65));
+}
+
+.avatar-acc.is-dragging {
+  cursor: grabbing;
+  z-index: 40 !important;
+  outline-color: #7ec8ff;
+  filter: drop-shadow(0 0 18px rgba(90, 210, 255, 0.85));
+  transition: none;
+}
+
+.avatar-acc img {
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  user-select: none;
+  pointer-events: none;
+}
+
+.avatar-acc--head { top: 12%; left: 50%; width: 36%; }
+.avatar-acc--shoulder { top: 27%; left: 70%; width: 28%; }
+.avatar-acc--back { top: 24%; left: 28%; width: 30%; }
+/* 项链/吊坠：胸口居中，与示意图 V 链 + 吊坠一致 */
+.avatar-acc--neck,
+.avatar-acc--pendant {
+  top: 26%;
+  left: 50%;
+  width: 21%;
+}
+.avatar-acc--chest {
+  top: 27%;
+  left: 50%;
+  width: 19%;
+}
+.avatar-acc--wrist { top: 46%; left: 22%; width: 30%; }
+.avatar-acc--waist { top: 50%; left: 50%; width: 32%; }
+.avatar-acc--hip { top: 52%; left: 74%; width: 28%; }
+
 .selection-badge-enter {
   animation: selection-pop 180ms cubic-bezier(.2,.8,.2,1);
 }
@@ -54,6 +130,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .avatar-stack,
+  .avatar-acc,
   .game-card,
   .game-button-primary,
   .game-button-secondary {

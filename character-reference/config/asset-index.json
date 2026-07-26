@@ -1,8 +1,8 @@
 {
   "project": "AI Character System",
-  "version": "1.1-career-cutouts",
+  "version": "1.2-pixel-career-sprites",
   "type": "career-cutout-package",
-  "note": "Runtime previews use single-figure transparent composites (1024x1536). Multi-person reference sheets remain for art direction only.",
+  "note": "Runtime previews use single-figure transparent pixel composites (1024x1536, foot_center y=1440). Multi-person reference sheets remain for art direction only.",
   "canvas": {
     "width": 1024,
     "height": 1536

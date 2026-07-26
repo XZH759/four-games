@@ -1,0 +1,112 @@
+/**
+ * 马赛克 / 像素 UI 共用规范
+ * 泰拉瑞亚式：硬边框、阶梯阴影、像素字体
+ */
+
+:root {
+  --pixel-en: "Press Start 2P", "VT323", monospace;
+  --pixel-cn: "ZCOOL KuaiLe", "Noto Sans SC", sans-serif;
+  --pixel-body: "Noto Sans SC", "Press Start 2P", sans-serif;
+  --px-raise:
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.28),
+    3px 3px 0 rgba(0, 0, 0, 0.45);
+  --px-press:
+    inset 0 3px 0 rgba(0, 0, 0, 0.35),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15),
+    1px 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.pixel-page,
+.pixel-page * {
+  image-rendering: pixelated;
+}
+
+.pixel-page {
+  font-family: var(--pixel-body);
+  letter-spacing: 0.02em;
+}
+
+.pixel-page h1,
+.pixel-page h2,
+.pixel-page h3,
+.pixel-page .pixel-title {
+  font-family: var(--pixel-cn);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.pixel-page .pixel-en,
+.pixel-page .sys-brand strong,
+.pixel-page .sys-ver,
+.pixel-page .sys-bolt,
+.pixel-page .ai-badge,
+.pixel-page .module-btn small,
+.pixel-page .section-label {
+  font-family: var(--pixel-en);
+  letter-spacing: 0.04em;
+  line-height: 1.55;
+}
+
+/* 像素面板：厚描边 + 阶梯圆角感（小 radius） */
+.pixel-panel {
+  border: 3px solid var(--px-border, #2a4a8a);
+  border-radius: 6px;
+  background: var(--px-panel, rgba(210, 225, 248, 0.92));
+  box-shadow:
+    inset 0 0 0 2px var(--px-border-inner, #fff),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.12),
+    4px 4px 0 rgba(0, 0, 0, 0.35);
+  backdrop-filter: none;
+}
+
+.pixel-panel::before,
+.pixel-panel::after {
+  /* 角钉 */
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--px-rivet, #1a3060);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.35);
+  z-index: 3;
+  pointer-events: none;
+}
+.pixel-panel::before { top: 6px; left: 6px; }
+.pixel-panel::after { top: 6px; right: 6px; }
+
+.pixel-btn {
+  border: 3px solid var(--px-btn-border, #1a3060) !important;
+  border-radius: 4px !important;
+  font-family: var(--pixel-cn) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+  box-shadow: var(--px-raise) !important;
+  backdrop-filter: none !important;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
+  transition: transform 0.06s steps(1), filter 0.06s steps(1) !important;
+}
+.pixel-btn:hover { filter: brightness(1.08); }
+.pixel-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--px-press) !important;
+}
+
+.pixel-chip {
+  border: 2px solid var(--px-chip-border, #3a2a60);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.35);
+  font-family: var(--pixel-cn);
+  font-size: 0.72rem;
+  padding: 0.15rem 0.4rem;
+}
+
+.pixel-outline {
+  text-shadow:
+    1px 0 0 #000,
+    -1px 0 0 #000,
+    0 1px 0 #000,
+    0 -1px 0 #000,
+    2px 2px 0 rgba(0, 0, 0, 0.4);
+}
