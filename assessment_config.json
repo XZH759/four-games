@@ -39,6 +39,10 @@
       "items": ["D-2-Q1", "D-4-Q1", "D-5-Q1"]
     }
   ],
+  "bankExtra": {
+    "note": "PDF 中另有题项已进入游戏池 / seed，暂未编入五关草案",
+    "items": ["D-1-Q1", "D-3-Q1", "D-4-Q1a", "M-debate-Q1"]
+  },
   "arms": {
     "plain": {
       "label": "问卷基线",

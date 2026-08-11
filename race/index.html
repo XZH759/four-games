@@ -3,114 +3,136 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="将街机卡丁车竞速与 AI literacy 知识挑战结合的原创赛车游戏。" />
-  <title>AI 极速赛道</title>
+  <meta name="description" content="自动巡航赛车，途经知识门答题决定加速或减速的 AI 素养竞速游戏。" />
+  <title data-i18n="race.title">AI 极速赛道</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/race/race.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=2" />
+  <link rel="stylesheet" href="/race/race.css?v=10" />
 </head>
-<body>
+<body class="clay-circuit is-lobby">
   <main class="race-shell">
-    <canvas id="race-canvas" width="1600" height="1000" aria-label="AI 极速赛道游戏画面"></canvas>
+    <canvas id="race-canvas" width="1600" height="1000" data-i18n-aria="race.title" aria-label="AI 极速赛道游戏画面"></canvas>
 
     <header class="race-header">
-      <a class="home-link" href="/">← 游戏大厅</a>
+      <a class="home-link" href="/" data-i18n="race.home">← 游戏大厅</a>
       <div class="race-logo">
-        <span class="logo-bolt">⚡</span>
-        <span><strong>AI 极速赛道</strong><small id="hud-track-name">云海环城 · KNOWLEDGE KART</small></span>
+        <span class="logo-bolt" aria-hidden="true">⚡</span>
+        <span>
+          <small class="logo-eyebrow">AI LITERACY GRAND PRIX</small>
+          <strong data-i18n="race.name">AI 极速赛道</strong>
+          <em id="hud-track-name">云海环城 · KNOWLEDGE KART</em>
+        </span>
+      </div>
+      <div class="race-flow-mini" aria-label="游戏流程">
+        <span>Driver & Kart</span><i></i><span class="is-current">Race</span><i></i><span>Results</span>
       </div>
       <div class="race-loadout-chip" id="race-loadout-chip" hidden></div>
-      <button type="button" class="icon-button" id="pause-button" aria-label="暂停游戏">Ⅱ</button>
+      <div id="lang-host" class="lang-host"></div>
+      <button type="button" class="icon-button" id="pause-button" data-i18n-aria="race.pause" aria-label="暂停游戏">Ⅱ</button>
     </header>
 
-    <section class="hud" aria-label="比赛信息">
-      <div class="position-panel"><strong id="position">1</strong><span>/ 6</span><small>当前排名</small></div>
-      <div class="lap-panel"><span>圈数</span><strong id="lap">1 / 3</strong></div>
-      <div class="timer-panel"><span>时间</span><strong id="timer">00:00.0</strong></div>
-      <div class="speed-panel">
-        <div class="speed-dial">
-          <i class="speed-needle" id="speed-needle"></i>
-          <div><strong id="speed">0</strong><span>km/h</span></div>
+    <section class="hud" data-i18n-aria="race.infoAria" aria-label="比赛信息">
+      <div class="hud-left-stack">
+        <div class="position-panel">
+          <strong id="position">1</strong><span>/ 6</span>
+          <small data-i18n="race.rankLabel">PLACE</small>
         </div>
-        <div class="boost-label"><span>BOOST</span><strong id="boost-state">READY</strong></div>
-        <div class="speed-bar"><i id="speed-fill"></i></div>
+        <div class="race-progress-panel">
+          <div class="lap-panel"><strong id="lap">1 / 3</strong><span data-i18n="race.laps">LAPS</span></div>
+          <div class="timer-panel"><strong id="timer">00:00.0</strong><span data-i18n="race.time">TIME</span></div>
+        </div>
       </div>
-      <div class="effect-panel item-rack" id="effect-panel">
-        <div class="item-slot is-main">
-          <span class="effect-icon" id="effect-icon">◇</span>
-          <span><small>当前道具</small><strong id="effect-name">等待知识门</strong></span>
+
+      <div class="hud-right-stack">
+        <div class="speed-panel">
+          <div class="speed-dial">
+            <i class="speed-needle" id="speed-needle"></i>
+            <div><strong id="speed">0</strong><span>km/h</span></div>
+          </div>
+          <div class="boost-label"><span>BOOST</span><strong id="boost-state">READY</strong></div>
+          <div class="speed-bar"><i id="speed-fill"></i></div>
         </div>
-        <div class="item-slot" id="shield-slot" title="事实护盾"><span>🛡️</span></div>
-        <div class="item-slot quiz-slot" title="下一座知识门"><span>?</span></div>
+        <div class="effect-panel item-rack" id="effect-panel">
+          <div class="item-slot is-main">
+            <span class="effect-icon" id="effect-icon">◇</span>
+            <span><small data-i18n="race.itemCurrent">当前道具</small><strong id="effect-name">等待知识门</strong></span>
+          </div>
+          <div class="item-slot" id="shield-slot" data-i18n-title="race.shieldTitle" title="事实护盾"><span>🛡️</span></div>
+          <div class="item-slot quiz-slot" data-i18n-title="race.nextGateTitle" title="下一座知识门"><span>?</span></div>
+        </div>
       </div>
     </section>
 
-    <section class="live-ranking" aria-label="实时排名">
-      <header><span>实时排名</span><small id="rank-lap-label">第 1 圈</small></header>
+    <section class="live-ranking" data-i18n-aria="race.liveRank" aria-label="实时排名">
+      <header><span data-i18n="race.liveRank">LIVE RANKING</span><small id="rank-lap-label">LAP 1</small></header>
       <ol id="live-ranking-list"></ol>
     </section>
-
-    <div class="race-flow-mini" aria-label="游戏流程">
-      <span>角色选择</span><i></i><span class="is-current">比赛</span><i></i><span>成绩排名</span>
-    </div>
 
     <div class="race-message" id="race-message" role="status" aria-live="polite"></div>
     <div class="countdown" id="countdown" aria-live="assertive"></div>
 
-    <section class="touch-controls" aria-label="触屏驾驶控制">
-      <div class="touch-steer">
-        <button type="button" data-control="left" aria-label="向左转向">◀</button>
-        <button type="button" data-control="right" aria-label="向右转向">▶</button>
-      </div>
-      <div class="touch-drive">
-        <button type="button" class="touch-drift" data-control="drift">漂移</button>
-        <button type="button" data-control="brake">刹车</button>
-        <button type="button" class="touch-gas" data-control="gas">加速</button>
-      </div>
+    <section class="touch-controls quiz-hint-bar" aria-label="答题反馈提示">
+      <p data-i18n="race.quizHint">赛车自动巡航 · 途经知识门答题：答对加速，答错减速</p>
     </section>
 
     <section class="start-screen overlay is-visible" id="start-screen" aria-labelledby="start-title">
+      <h1 id="start-title" class="sr-only" data-i18n="race.name">AI 极速赛道</h1>
       <div class="start-card">
-        <p class="eyebrow">AI LITERACY GRAND PRIX</p>
-        <h1 id="start-title">AI 极速赛道</h1>
-        <div class="flow-steps" aria-label="当前流程">
-          <span class="is-current"><b>1</b>角色选择</span><i></i>
-          <span><b>2</b>竞速比赛</span><i></i>
-          <span><b>3</b>成绩排名</span>
+        <div class="start-hero">
+          <span class="start-bolt" aria-hidden="true">⚡</span>
+          <div>
+            <p class="eyebrow">AI LITERACY GRAND PRIX</p>
+            <h2 data-i18n="race.name">AI 极速赛道</h2>
+          </div>
         </div>
-        <p class="select-title">选择你的车手与专属赛车</p>
+
+        <div class="flow-steps" aria-label="当前流程">
+          <span class="is-current"><b>1</b>Driver & Kart</span><i></i>
+          <span><b>2</b>Race</span><i></i>
+          <span><b>3</b>Results</span>
+        </div>
+
+        <p class="select-title" data-i18n="race.chooseDriver">Choose Your Driver & Kart</p>
         <div class="character-grid" id="character-grid" role="listbox" aria-label="车手选择"></div>
+
         <section class="selected-driver" aria-live="polite">
-          <div class="driver-portrait" id="driver-portrait">⚡</div>
+          <div class="driver-portrait" id="driver-portrait"></div>
           <div class="driver-copy">
-            <small>当前车手</small>
-            <strong id="driver-name">闪电学员</strong>
+            <small>Current Driver · <strong id="driver-name">闪电学员</strong></small>
             <span id="driver-skill">起步时获得短暂加速</span>
-            <a class="castle-link" href="/castle/">城堡装扮可实装到赛车上 →</a>
+            <a class="castle-link" href="/castle/" data-i18n="race.castleLink">城堡装扮可实装到赛车上 →</a>
           </div>
           <div class="driver-stats">
-            <label><span>速度</span><i><b id="stat-speed"></b></i></label>
-            <label><span>加速</span><i><b id="stat-accel"></b></i></label>
-            <label><span>操控</span><i><b id="stat-handling"></b></i></label>
+            <label><span>Speed</span><i><b id="stat-speed"></b></i></label>
+            <label><span>Accel</span><i><b id="stat-accel"></b></i></label>
+            <label><span>Handle</span><i><b id="stat-handling"></b></i></label>
           </div>
         </section>
-        <p class="select-title track-select-title">选择大奖赛地图</p>
+
+        <p class="select-title track-select-title" data-i18n="race.chooseTrack">Choose a Grand Prix Track</p>
         <div class="track-grid" id="track-grid" role="listbox" aria-label="地图选择"></div>
         <div class="selected-track-info" aria-live="polite">
-          <span><b id="selected-track-icon">☁️</b><strong id="selected-track-name">云海环城</strong></span>
-          <span>路线长度 <strong id="selected-track-length">4.1 km</strong></span>
-          <span>知识门 <strong id="selected-track-gates">2 座/圈</strong></span>
-          <span>难度 <strong id="selected-track-level">入门</strong></span>
+          <span class="track-pill-main"><b id="selected-track-icon">☁️</b><strong id="selected-track-name">云海环城</strong></span>
+          <span><strong id="selected-track-length">4.1 km</strong></span>
+          <span><strong id="selected-track-gates">3 / lap</strong></span>
+          <span class="track-level"><strong id="selected-track-level">入门</strong></span>
         </div>
+
         <div class="control-guide">
-          <span><kbd>W</kbd>/<kbd>↑</kbd> 加速</span>
-          <span><kbd>A</kbd><kbd>D</kbd> 转向</span>
-          <span><kbd>Space</kbd> 漂移</span>
-          <span><kbd>P</kbd> 暂停</span>
+          <span data-i18n="race.ctrlCruise">🏁 Auto cruise</span>
+          <span data-i18n="race.ctrlQuiz">❓ Knowledge Gate = only control</span>
+          <span data-i18n="race.ctrlGood">✅ Correct → Turbo / Shield / Focus</span>
+          <span data-i18n="race.ctrlBad">❌ Wrong → Fog / Stall / Spin</span>
+          <span><kbd>P</kbd> Pause</span>
         </div>
-        <button type="button" class="race-primary" id="start-button">开始比赛</button>
-        <a class="text-link" href="/">返回游戏大厅</a>
+
+        <button type="button" class="race-primary" id="start-button">
+          <span class="flag" aria-hidden="true">🏁</span>
+          <span id="start-button-label">START RACE</span>
+        </button>
+        <a class="text-link" href="/" data-i18n="race.backLobby">Back to Game Lobby</a>
       </div>
     </section>
 
@@ -118,23 +140,23 @@
       <div class="quiz-card">
         <div class="quiz-head">
           <span class="quiz-mark">?</span>
-          <div><p id="question-domain">AI 素养知识门</p><h2 id="question-title">选择正确答案</h2></div>
-          <span class="quiz-stakes">答对加速 · 答错减速</span>
+          <div><p id="question-domain">AI Literacy Gate</p><h2 id="question-title" data-i18n="race.quizTitle">选择正确答案</h2></div>
+          <span class="quiz-stakes" data-i18n="race.quizStakes">答对加速 · 答错减速</span>
         </div>
         <p class="question-stem" id="question-stem"></p>
         <div class="answer-list" id="answer-list"></div>
         <div class="answer-feedback" id="answer-feedback" hidden></div>
-        <button type="button" class="race-primary quiz-continue" id="quiz-continue" hidden>带着效果继续比赛</button>
+        <button type="button" class="race-primary quiz-continue" id="quiz-continue" hidden data-i18n="race.quizContinue">带着效果继续比赛</button>
       </div>
     </section>
 
     <section class="pause-screen overlay" id="pause-screen" aria-labelledby="pause-title">
       <div class="pause-card">
         <p class="eyebrow">PIT STOP</p>
-        <h2 id="pause-title">比赛暂停</h2>
-        <button type="button" class="race-primary" id="resume-button">继续比赛</button>
-        <button type="button" class="race-secondary" id="restart-button">重新开始</button>
-        <a class="text-link" href="/">退出到大厅</a>
+        <h2 id="pause-title" data-i18n="race.pauseTitle">比赛暂停</h2>
+        <button type="button" class="race-primary" id="resume-button" data-i18n="race.resume">继续比赛</button>
+        <button type="button" class="race-secondary" id="restart-button" data-i18n="race.restart">重新开始</button>
+        <a class="text-link" href="/" data-i18n="race.exitLobby">退出到大厅</a>
       </div>
     </section>
 
@@ -142,28 +164,28 @@
       <div class="finish-card">
         <div class="finish-trophy" id="finish-icon">🏆</div>
         <p class="eyebrow">RACE COMPLETE</p>
-        <h2 id="finish-title">比赛完成！</h2>
+        <h2 id="finish-title" data-i18n="race.finishDone">比赛完成！</h2>
         <div class="flow-steps finish-flow" aria-label="完成流程">
-          <span><b>1</b>角色选择</span><i></i>
-          <span><b>2</b>竞速比赛</span><i></i>
-          <span class="is-current"><b>3</b>成绩排名</span>
+          <span><b>1</b><span data-i18n="race.flowPick">角色选择</span></span><i></i>
+          <span><b>2</b><span data-i18n="race.flowRace">竞速比赛</span></span><i></i>
+          <span class="is-current"><b>3</b><span data-i18n="race.flowRank">成绩排名</span></span>
         </div>
         <p id="finish-summary"></p>
         <section class="final-ranking">
-          <header><strong>大奖赛最终排名</strong><span>AI SPEEDWAY CUP</span></header>
+          <header><strong data-i18n="race.finalRanking">大奖赛最终排名</strong><span>AI SPEEDWAY CUP</span></header>
           <ol id="final-ranking-list"></ol>
         </section>
         <div class="result-stats">
-          <div><small>最终排名</small><strong id="finish-position">1 / 6</strong></div>
-          <div><small>比赛用时</small><strong id="finish-time">00:00.0</strong></div>
-          <div><small>答题正确</small><strong id="finish-answers">0 / 0</strong></div>
+          <div><small data-i18n="race.statPlace">最终排名</small><strong id="finish-position">1 / 6</strong></div>
+          <div><small data-i18n="race.statTime">比赛用时</small><strong id="finish-time">00:00.0</strong></div>
+          <div><small data-i18n="race.statAnswers">答题正确</small><strong id="finish-answers">0 / 0</strong></div>
         </div>
-        <button type="button" class="race-primary" id="play-again">再赛一局</button>
-        <a class="text-link" href="/">返回游戏大厅</a>
+        <button type="button" class="race-primary" id="play-again" data-i18n="race.playAgain">再赛一局</button>
+        <a class="text-link" href="/" data-i18n="race.backLobby">返回游戏大厅</a>
       </div>
     </section>
   </main>
 
-  <script type="module" src="/race/race.js?v=4"></script>
+  <script type="module" src="/race/race.js?v=13"></script>
 </body>
 </html>

@@ -51,9 +51,8 @@ body {
 .screen.is-on { display: flex; align-items: center; justify-content: center; }
 
 .back {
-  position: absolute; top: 1rem; left: 1rem;
   color: #fff;
-  text-decoration: none; font-weight: 700; z-index: 2;
+  text-decoration: none; font-weight: 700;
   font-family: var(--display);
   font-size: 0.5rem;
   text-shadow: 2px 2px 0 #000;
@@ -63,6 +62,14 @@ body {
   border-right-color: #111;
   padding: 0.45rem 0.65rem;
 }
+.menu-topbar {
+  position: absolute; top: 1rem; left: 1rem; right: 1rem;
+  z-index: 2;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+.menu-topbar > * { pointer-events: auto; }
 .back:hover { background: var(--stone); }
 
 .stone-panel {
@@ -637,6 +644,9 @@ body {
   font-size: 1.15rem;
   color: #ffe9a0;
   text-shadow: 2px 2px 0 #000;
+}
+html[data-lang="en"] .penalty .fx-zh {
+  display: none;
 }
 .fx-detail {
   margin: 0 0 1rem;

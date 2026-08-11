@@ -475,8 +475,8 @@ export function randomAvatar(keepName = "", gender = "female") {
 
 export function validateName(name) {
   const n = (name || "").trim();
-  if (!n) return { ok: false, message: "先给角色起个名字吧" };
-  if (n.length > 8) return { ok: false, message: "名称请控制在 8 个字以内" };
+  if (!n) return { ok: false, code: "empty", message: "先给角色起个名字吧" };
+  if (n.length > 8) return { ok: false, code: "length", message: "名称请控制在 8 个字以内" };
   return { ok: true, name: n };
 }
 

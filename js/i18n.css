@@ -1,0 +1,78 @@
+/* Shared language toggle */
+.lang-host { display: inline-flex; align-items: center; }
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 2px 8px rgba(60, 40, 20, 0.12);
+  flex-shrink: 0;
+}
+.lang-toggle .lang-btn {
+  border: 0;
+  border-radius: 999px;
+  min-width: 2rem;
+  height: 1.7rem;
+  padding: 0 0.55rem;
+  font: 800 0.72rem/1 Fredoka, "Noto Sans SC", system-ui, sans-serif;
+  color: #8a6a55;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+.lang-toggle .lang-btn:hover {
+  background: rgba(255, 200, 140, 0.35);
+}
+.lang-toggle .lang-btn.is-on {
+  background: linear-gradient(180deg, #ffd8a8, #ffb878);
+  color: #5a3a28;
+  box-shadow: 0 2px 0 #e09860;
+}
+.lang-toggle.is-compact .lang-btn {
+  min-width: 1.7rem;
+  height: 1.55rem;
+  padding: 0 0.4rem;
+  font-size: 0.68rem;
+}
+
+/* Dark / pixel game headers */
+.terra .lang-toggle,
+.pixel-page .lang-toggle,
+body:has(.stone-panel) .lang-toggle {
+  background: rgba(20, 24, 40, 0.72);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+.terra .lang-toggle .lang-btn,
+.pixel-page .lang-toggle .lang-btn,
+body:has(.stone-panel) .lang-toggle .lang-btn {
+  color: #c8d0e8;
+  font-family: "Press Start 2P", "Noto Sans SC", monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.02em;
+}
+.terra .lang-toggle .lang-btn.is-on,
+.pixel-page .lang-toggle .lang-btn.is-on,
+body:has(.stone-panel) .lang-toggle .lang-btn.is-on {
+  background: #6ecf8e;
+  color: #14301c;
+  box-shadow: none;
+}
+
+/* Clay arena (AI literacy challenge) — soft peach toggle */
+.clay-arena .lang-toggle {
+  background: rgba(255, 253, 245, 0.95);
+  box-shadow: 0 4px 14px rgba(180, 120, 90, 0.14);
+}
+.clay-arena .lang-toggle .lang-btn {
+  color: #8a6a55;
+  font-family: Fredoka, Nunito, "Noto Sans SC", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.clay-arena .lang-toggle .lang-btn.is-on {
+  background: linear-gradient(180deg, #ffe0a8, #ffc070);
+  color: #5a3a28;
+  box-shadow: 0 2px 0 #e09860;
+}

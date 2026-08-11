@@ -3,12 +3,22 @@
  * 首页地图 / 货架预览兑换 / 等级盲盒 / 背包装备 / 规则 / 活动
  */
 
-import { resolveEquipFx, poseLabelsForLoad } from "/castle/equip-fx.js?v=4";
+import { resolveEquipFx, poseLabelsForLoad } from "/castle/equip-fx.js?v=5";
+import { initI18n, onLangChange, applyDom, t, getLang } from "/js/i18n.js";
+import { mountLobbyExit } from "/js/lobby-exit.js";
+import { ITEM_EN } from "/castle/item-en.js";
+
+initI18n({ toggleHost: "#lang-host" });
+onLangChange(() => {
+  applyDom();
+  if ($("points-now") && document.querySelector(".side-nav")) renderAll();
+});
+mountLobbyExit();
 
 const STORAGE_KEY = "ailit_castle_wallet_v1";
 const PAGE_SIZE = 8;
+const DEFAULT_NAMES = new Set(["乐园学员", "Park Explorer", "Park learner", "Little Explorer"]);
 
-const RARITY_LABEL = { c: "普通", r: "精良", e: "史诗", l: "传说" };
 const RARITY_COLOR = { c: "#7a8a96", r: "#3a8fd4", e: "#b45ad4", l: "#e8a020" };
 /**
  * 定价原则：盲盒单抽便宜、博概率；货架直兑买确定性，价格明显高于「盲盒摸到同稀有度」的期望花费。
@@ -16,25 +26,47 @@ const RARITY_COLOR = { c: "#7a8a96", r: "#3a8fd4", e: "#b45ad4", l: "#e8a020" };
  * 直兑取约 3× 期望，并随货架等级小幅上浮。
  */
 const PRICE_BY_RARITY = { c: 240, r: 780, e: 3000, l: 12000 };
-const CAT_LABEL = { frame: "头像框", trail: "特效", title: "称号", pet: "伙伴", decor: "装饰" };
 const EQUIP_SLOTS = ["frame", "trail", "title", "pet", "decor"];
-
-const CATS = [
-  { id: "all", name: "全部" },
-  { id: "frame", name: "头像框" },
-  { id: "trail", name: "特效" },
-  { id: "title", name: "称号" },
-  { id: "pet", name: "伙伴" },
-  { id: "decor", name: "装饰" },
-];
+const CAT_IDS = ["all", "frame", "trail", "title", "pet", "decor"];
 
 const TIERS = [
-  { level: 1, unlock: 0, cost: 40, weights: { c: 70, r: 25, e: 5, l: 0 }, blurb: "入门补给", box: "📦" },
-  { level: 2, unlock: 500, cost: 80, weights: { c: 50, r: 35, e: 14, l: 1 }, blurb: "见习藏品", box: "🗃️" },
-  { level: 3, unlock: 1500, cost: 160, weights: { c: 35, r: 40, e: 20, l: 5 }, blurb: "学者珍藏", box: "🎁" },
-  { level: 4, unlock: 4000, cost: 320, weights: { c: 20, r: 40, e: 30, l: 10 }, blurb: "城堡宝库", box: "💎" },
-  { level: 5, unlock: 8000, cost: 640, weights: { c: 10, r: 30, e: 40, l: 20 }, blurb: "至高圣物", box: "👑" },
+  { level: 1, unlock: 0, cost: 40, weights: { c: 70, r: 25, e: 5, l: 0 }, box: "📦" },
+  { level: 2, unlock: 500, cost: 80, weights: { c: 50, r: 35, e: 14, l: 1 }, box: "🗃️" },
+  { level: 3, unlock: 1500, cost: 160, weights: { c: 35, r: 40, e: 20, l: 5 }, box: "🎁" },
+  { level: 4, unlock: 4000, cost: 320, weights: { c: 20, r: 40, e: 30, l: 10 }, box: "💎" },
+  { level: 5, unlock: 8000, cost: 640, weights: { c: 10, r: 30, e: 40, l: 20 }, box: "👑" },
 ];
+
+function rarityLabel(k, short = false) {
+  return t(short ? `castle.rarityShort.${k}` : `castle.rarity.${k}`);
+}
+
+function catLabel(id) {
+  return t(`castle.cat.${id}`);
+}
+
+function tierName(level) {
+  return t(`castle.tier.${level}`);
+}
+
+function locItem(it) {
+  if (!it) return it;
+  if (getLang() !== "en") return it;
+  const en = ITEM_EN[it.id];
+  if (!en) return it;
+  return {
+    ...it,
+    name: en.name ?? it.name,
+    desc: en.desc ?? it.desc,
+    buff: en.buff ?? it.buff,
+    titleText: en.titleText ?? it.titleText,
+  };
+}
+
+function displayName(w) {
+  if (!w?.name || DEFAULT_NAMES.has(w.name)) return t("castle.defaultName");
+  return w.name;
+}
 
 const WEEK_MILESTONES = [1000, 2000, 3000, 5000];
 
@@ -213,9 +245,10 @@ function allItems() {
 
 function findItem(id) {
   const resolved = ITEM_ALIASES[id] || id;
-  return allItems().find((x) => x.id === resolved) || {
+  const raw = allItems().find((x) => x.id === resolved) || {
     id: resolved, name: resolved, rarity: "c", cat: "decor", icon: "⭐", desc: "", level: 1,
   };
+  return locItem(raw);
 }
 
 /** 迁移旧物品 id，避免背包/装备指向失效 */
@@ -309,12 +342,13 @@ function pushHistory(w, item, src) {
 }
 
 function showReveal(item, src) {
+  const it = locItem(item);
   $("reveal").hidden = false;
-  $("reveal-ico").textContent = item.icon || "★";
-  $("reveal-rarity").textContent = RARITY_LABEL[item.rarity] || "普通";
-  $("reveal-rarity").style.color = RARITY_COLOR[item.rarity] || RARITY_COLOR.c;
-  $("reveal-name").textContent = item.name;
-  $("reveal-desc").textContent = item.desc;
+  $("reveal-ico").textContent = it.icon || "★";
+  $("reveal-rarity").textContent = rarityLabel(it.rarity);
+  $("reveal-rarity").style.color = RARITY_COLOR[it.rarity] || RARITY_COLOR.c;
+  $("reveal-name").textContent = it.name;
+  $("reveal-desc").textContent = it.desc;
   $("reveal-src").textContent = src || "";
   burstFx(innerWidth / 2, innerHeight * 0.42);
 }
@@ -364,14 +398,16 @@ function renderHeader(w) {
     pts.classList.add("pulse");
   }
   $("lifetime-hint").textContent = String(w.lifetime);
-  $("profile-name").textContent = w.name;
+  $("profile-name").textContent = displayName(w);
   $("profile-id").textContent = w.uid;
   const lv = playerLevel(w.lifetime);
   $("profile-lv").textContent = `Lv.${lv}`;
   const maxLv = unlockedLevel(w.lifetime);
   const unlock = nextUnlock(w.lifetime);
   $("unlock-label").textContent =
-    maxLv >= 5 ? `兑换等级 MAX · 角色 Lv.${lv}` : `兑换 ${maxLv} 级 · 距 ${unlock.level} 级`;
+    maxLv >= 5
+      ? t("castle.unlockMax", { n: lv })
+      : t("castle.unlockProgress", { cur: maxLv, next: unlock.level });
   $("unlock-fill").style.width = `${maxLv >= 5 ? 100 : unlock.pct}%`;
 
   const load = buildLoadout(w);
@@ -400,7 +436,7 @@ function loadoutFromSlots(slots, extra = {}) {
   const headParts = ["crown", "helmet", "goggles", "hat"];
   const chestParts = ["luck", "necklace", "pendant"];
   return {
-    name: extra.name || "乐园学员",
+    name: extra.name && !DEFAULT_NAMES.has(extra.name) ? extra.name : t("castle.defaultName"),
     uid: extra.uid || "10086",
     points: extra.points || 0,
     lifetime: extra.lifetime || 0,
@@ -482,15 +518,15 @@ export function getEquippedLoadout() {
 }
 
 export { loadWallet, findItem, STORAGE_KEY };
-export { resolveEquipFx, poseLabelsForLoad } from "/castle/equip-fx.js?v=4";
+export { resolveEquipFx, poseLabelsForLoad } from "/castle/equip-fx.js?v=5";
 
 function renderPreview(w) {
   const it = state.selectedId ? findItem(state.selectedId) : null;
   const action = $("preview-action");
   if (!it) {
     $("preview-ico").textContent = "⭐";
-    $("preview-name").textContent = "选择一件商品";
-    $("preview-desc").textContent = "点击货架或背包中的物品查看详情";
+    $("preview-name").textContent = t("castle.previewPick");
+    $("preview-desc").textContent = t("castle.previewHint");
     $("preview-meta").innerHTML = "";
     $("preview-price").textContent = "—";
     const stage = $("preview-stage");
@@ -500,7 +536,7 @@ function renderPreview(w) {
       delete stage.dataset.style;
     }
     action.disabled = true;
-    action.textContent = "立即兑换";
+    action.textContent = t("castle.redeem");
     action.className = "btn-go";
     return;
   }
@@ -513,19 +549,11 @@ function renderPreview(w) {
 
   $("preview-ico").textContent = it.icon || "⭐";
   $("preview-name").textContent = it.name;
+  const wearName = it.wear ? t(`castle.wear.${it.wear}`) : "";
   $("preview-desc").textContent =
     (it.desc || "") +
     (it.buff ? ` · ${it.buff}` : "") +
-    (it.wear ? ` · 实装：${({
-      runner: "冲刺角色",
-      trail: "奔跑拖尾",
-      pet: "跟随伙伴",
-      hud: "头像/称号",
-      scene: "乐园场景",
-      coin: "金币外观",
-      settle: "结算特效",
-      gacha: "盲盒幸运",
-    })[it.wear] || it.wear}` : "");
+    (it.wear ? ` · ${t("castle.wearPrefix", { name: wearName || it.wear })}` : "");
   const stage = $("preview-stage");
   if (stage) {
     stage.dataset.rarity = it.rarity;
@@ -535,48 +563,53 @@ function renderPreview(w) {
   // 同步试装到背包装扮台（切到背包即可看全身效果）
   renderMannequin(w);
   $("preview-meta").innerHTML = `
-    <div><dt>稀有度</dt><dd style="color:${RARITY_COLOR[it.rarity]}">${RARITY_LABEL[it.rarity]}</dd></div>
-    <div><dt>类型</dt><dd>${CAT_LABEL[it.cat] || it.cat}</dd></div>
-    <div><dt>需求</dt><dd>兑换 Lv.${it.level}+</dd></div>
-    <div><dt>拥有</dt><dd>×${owned}</dd></div>`;
-  $("preview-price").textContent = unlocked ? String(price) : "未解锁";
+    <div><dt>${t("castle.meta.rarity")}</dt><dd style="color:${RARITY_COLOR[it.rarity]}">${rarityLabel(it.rarity)}</dd></div>
+    <div><dt>${t("castle.meta.type")}</dt><dd>${catLabel(it.cat) || it.cat}</dd></div>
+    <div><dt>${t("castle.meta.need")}</dt><dd>${t("castle.meta.needLv", { n: it.level })}</dd></div>
+    <div><dt>${t("castle.meta.owned")}</dt><dd>×${owned}</dd></div>`;
+  $("preview-price").textContent = unlocked ? String(price) : t("castle.locked");
 
   action.className = "btn-go";
   if (state.tab === "bag" && owned > 0 && EQUIP_SLOTS.includes(it.cat)) {
     action.disabled = false;
     if (equipped) {
-      action.textContent = "卸下";
+      action.textContent = t("castle.unequip");
       action.className = "btn-go unequip";
       action.onclick = () => unequipItem(it.id);
     } else {
-      action.textContent = "装备";
+      action.textContent = t("castle.equip");
       action.className = "btn-go equip";
       action.onclick = () => equipItem(it.id);
     }
   } else {
     action.onclick = () => openBuy(it.id);
     action.disabled = !unlocked || w.points < price;
-    action.textContent = !unlocked ? "等级未解锁" : w.points < price ? "积分不足" : "立即兑换";
+    action.textContent = !unlocked
+      ? t("castle.drawLocked")
+      : w.points < price
+        ? t("castle.toast.noPoints")
+        : t("castle.redeem");
   }
 }
 
 function renderGoodsCard(it, w, opts = {}) {
-  const price = itemPrice(it);
-  const owned = w.inventory[it.id] || 0;
+  const item = locItem(it);
+  const price = itemPrice(item);
+  const owned = w.inventory[item.id] || 0;
   const can = w.points >= price;
-  const sel = state.selectedId === it.id ? " is-sel" : "";
-  const equipped = w.equipped[it.cat] === it.id;
+  const sel = state.selectedId === item.id ? " is-sel" : "";
+  const equipped = w.equipped[item.cat] === item.id;
   return `
-    <button type="button" class="goods${sel}" data-id="${it.id}" ${opts.disableBuy && !can ? "disabled" : ""}>
-      <span class="tag ${it.rarity}">${RARITY_LABEL[it.rarity]}</span>
-      <div class="ico">${it.icon || "⭐"}</div>
-      <strong>${it.name}</strong>
-      <p class="desc">${it.desc}</p>
+    <button type="button" class="goods${sel}" data-id="${item.id}" ${opts.disableBuy && !can ? "disabled" : ""}>
+      <span class="tag ${item.rarity}">${rarityLabel(item.rarity, true)}</span>
+      <div class="ico">${item.icon || "⭐"}</div>
+      <strong>${item.name}</strong>
+      <p class="desc">${item.desc}</p>
       <div class="row">
         <span class="price">${price}</span>
-        <span class="owned">${owned > 0 ? `已有×${owned}` : `Lv.${it.level}+`}</span>
+        <span class="owned">${owned > 0 ? t("castle.ownedX", { n: owned }) : `Lv.${item.level}+`}</span>
       </div>
-      ${opts.bag ? `<div class="act${equipped ? " on" : ""}">${equipped ? "已装备" : "可使用"}</div>` : ""}
+      ${opts.bag ? `<div class="act${equipped ? " on" : ""}">${equipped ? t("castle.equipped") : t("castle.usable")}</div>` : ""}
     </button>`;
 }
 
@@ -631,7 +664,13 @@ function renderMannequin(w) {
   const tryBadge = $("mn-try-badge");
   if (tryBadge) {
     tryBadge.hidden = !load.trying;
-    tryBadge.textContent = load.trying ? `试装·${load.trying.name.replace(/^称号·/, "")}` : "";
+    if (load.trying) {
+      const trying = locItem(load.trying);
+      const short = trying.name.replace(/^称号·/, "").replace(/^Title · /, "");
+      tryBadge.textContent = `${t("castle.tryBadge")}·${short}`;
+    } else {
+      tryBadge.textContent = "";
+    }
   }
 
   const wingStyle = fx.wingStyle || "feather";
@@ -768,19 +807,21 @@ function renderMannequin(w) {
   const slots = $("terra-slots");
   if (slots) {
     const rows = [
-      { key: "frame", label: "头像框", item: load.frame },
-      { key: "title", label: "称号", item: load.title },
-      { key: "trail", label: "特效", item: load.trail },
-      { key: "pet", label: "伙伴", item: load.pet },
-      { key: "decor", label: "装饰", item: load.decor },
+      { key: "frame", label: catLabel("frame"), item: locItem(load.frame) },
+      { key: "title", label: catLabel("title"), item: locItem(load.title) },
+      { key: "trail", label: catLabel("trail"), item: locItem(load.trail) },
+      { key: "pet", label: catLabel("pet"), item: locItem(load.pet) },
+      { key: "decor", label: catLabel("decor"), item: locItem(load.decor) },
     ];
     slots.innerHTML = rows
       .map((r) => {
         const trying = load.trying?.cat === r.key;
+        const name = r.item?.name || "";
+        const short = name.replace(/^称号·/, "").replace(/^Title · /, "");
         return `<div class="slot${r.item ? " is-on" : ""}${trying ? " is-try" : ""}" title="${r.item?.name || r.label}">
         <b class="slot-ico">${r.item?.icon || "·"}</b>
         <span>${r.label}</span>
-        <em>${r.item ? r.item.name.replace(/^称号·/, "") : "空"}</em>
+        <em>${r.item ? short : t("castle.slotEmpty")}</em>
       </div>`;
       })
       .join("");
@@ -789,32 +830,33 @@ function renderMannequin(w) {
   const hint = $("loadout-hint");
   if (hint) {
     if (load.trying) {
+      const trying = locItem(load.trying);
       const tryFx = resolveEquipFx(
         loadoutFromSlots({ ...load.slots, [load.trying.cat]: load.trying }),
         { pose },
       );
       const flyHint = tryFx.canFly
-        ? ` · 可预览「${tryFx.flyLabel}」`
+        ? t("castle.hint.tryFly", { fly: tryFx.flyLabel })
         : "";
-      hint.textContent = `试装中：${load.trying.name}${flyHint}（装备后局内实装）`;
+      hint.textContent = t("castle.hint.trying", { name: trying.name, fly: flyHint });
     } else if (fx.canFly) {
-      hint.textContent = `实装飞行源：${fx.flyLabel} · 静态=${fx.idleLabel} / 动态=${fx.flyLabel}`;
+      hint.textContent = t("castle.hint.flying", { fly: fx.flyLabel, idle: fx.idleLabel });
     } else {
       const bits = [];
-      if (load.pet) bits.push(load.pet.name);
-      if (load.trail) bits.push(load.trail.name);
-      if (load.frame) bits.push(load.frame.name);
-      if (load.decor) bits.push(load.decor.name);
+      if (load.pet) bits.push(locItem(load.pet).name);
+      if (load.trail) bits.push(locItem(load.trail).name);
+      if (load.frame) bits.push(locItem(load.frame).name);
+      if (load.decor) bits.push(locItem(load.decor).name);
       hint.textContent = bits.length
-        ? `实装中：${bits.join(" · ")}（装备翅膀或气球可解锁飞行预览）`
-        : "选中物品试装；装备翅膀=振翅飞行，气球=浮空飞行";
+        ? t("castle.hint.active", { bits: bits.join(" · ") })
+        : t("castle.hint.empty");
     }
   }
 }
 
 function renderCats() {
-  $("cats").innerHTML = CATS.map(
-    (c) => `<button type="button" class="cat-btn${state.cat === c.id ? " is-on" : ""}" data-cat="${c.id}">${c.name}</button>`,
+  $("cats").innerHTML = CAT_IDS.map(
+    (id) => `<button type="button" class="cat-btn${state.cat === id ? " is-on" : ""}" data-cat="${id}">${catLabel(id)}</button>`,
   ).join("");
   $("cats").querySelectorAll(".cat-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -866,14 +908,14 @@ function renderGacha(w) {
   const level = state.selectedLevel;
   const tier = TIERS.find((t) => t.level === level);
 
-  $("chest-row").innerHTML = TIERS.map((t) => {
-    const open = w.lifetime >= t.unlock;
+  $("chest-row").innerHTML = TIERS.map((tierRow) => {
+    const open = w.lifetime >= tierRow.unlock;
     return `
-      <button type="button" class="chest${level === t.level ? " is-on" : ""}" data-lv="${t.level}" ${open ? "" : "disabled"}>
-        <span class="box">${t.box}</span>
-        <span class="lv">LV ${t.level}</span>
-        <span class="need">${open ? t.blurb : `累计 ${t.unlock}`}</span>
-        <span class="cost">抽一次 ${t.cost}</span>
+      <button type="button" class="chest${level === tierRow.level ? " is-on" : ""}" data-lv="${tierRow.level}" ${open ? "" : "disabled"}>
+        <span class="box">${tierRow.box}</span>
+        <span class="lv">LV ${tierRow.level}</span>
+        <span class="need">${open ? tierName(tierRow.level) : t("castle.tierLocked", { n: tierRow.unlock })}</span>
+        <span class="cost">${t("castle.tierDraw", { n: tierRow.cost })}</span>
       </button>`;
   }).join("");
   $("chest-row").querySelectorAll(".chest").forEach((btn) => {
@@ -884,31 +926,34 @@ function renderGacha(w) {
   });
 
   const pity = w.pityBoost || 0;
-  $("tier-title").textContent = `${tier.level} 级盲盒 · ${tier.blurb}`;
+  $("tier-title").textContent = t("castle.tierTitle", { n: tier.level, name: tierName(tier.level) });
   $("tier-sub").textContent =
     w.lifetime >= tier.unlock
-      ? `消耗 ${tier.cost} 积分${pity ? ` · 幸运加成传说 +${pity}` : ""}`
-      : `需累计 ${tier.unlock}`;
+      ? pity
+        ? t("castle.tierCostLuck", { n: tier.cost, luck: pity })
+        : t("castle.tierCost", { n: tier.cost })
+      : t("castle.tierNeed", { n: tier.unlock });
 
   const order = ["c", "r", "e", "l"];
   const total = order.reduce((s, k) => s + (tier.weights[k] || 0), 0) || 1;
   $("odds").innerHTML = order
     .map((k) => {
       const pct = (((tier.weights[k] || 0) / total) * 100).toFixed(0);
-      return `<div class="odd ${k}"><b>${pct}%</b><span>${RARITY_LABEL[k]}</span></div>`;
+      return `<div class="odd ${k}"><b>${pct}%</b><span>${rarityLabel(k)}</span></div>`;
     })
     .join("");
 
   $("pool").innerHTML = uniquePool(level)
     .sort((a, b) => ({ c: 0, r: 1, e: 2, l: 3 }[a.rarity] - { c: 0, r: 1, e: 2, l: 3 }[b.rarity]))
-    .map(
-      (it) => `
+    .map((raw) => {
+      const it = locItem(raw);
+      return `
       <button type="button" class="pool-item" data-id="${it.id}">
-        <span class="tag ${it.rarity}">${RARITY_LABEL[it.rarity]}</span>
+        <span class="tag ${it.rarity}">${rarityLabel(it.rarity, true)}</span>
         <span>${it.icon || ""}</span>
         <strong>${it.name}</strong>
-      </button>`,
-    )
+      </button>`;
+    })
     .join("");
   $("pool").querySelectorAll(".pool-item").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -921,25 +966,17 @@ function renderGacha(w) {
   const btn = $("draw-btn");
   btn.disabled = !can;
   btn.textContent = can
-    ? `立即抽取（-${tier.cost}）`
+    ? t("castle.drawCost", { n: tier.cost })
     : w.points < tier.cost
-      ? `积分不足（需 ${tier.cost}）`
-      : "等级未解锁";
+      ? t("castle.drawNeed", { n: tier.cost })
+      : t("castle.drawLocked");
   $("draw-msg").textContent = "";
 }
 
 function renderBag(w) {
-  const filters = [
-    { id: "all", name: "全部" },
-    { id: "equipped", name: "已装备" },
-    { id: "frame", name: "头像框" },
-    { id: "title", name: "称号" },
-    { id: "pet", name: "伙伴" },
-    { id: "trail", name: "特效" },
-    { id: "decor", name: "装饰" },
-  ];
+  const filters = ["all", "equipped", "frame", "title", "pet", "trail", "decor"];
   $("bag-filters").innerHTML = filters
-    .map((f) => `<button type="button" class="cat-btn${state.bagFilter === f.id ? " is-on" : ""}" data-f="${f.id}">${f.name}</button>`)
+    .map((id) => `<button type="button" class="cat-btn${state.bagFilter === id ? " is-on" : ""}" data-f="${id}">${catLabel(id)}</button>`)
     .join("");
   $("bag-filters").querySelectorAll(".cat-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -960,7 +997,7 @@ function renderBag(w) {
   const equippedCount = Object.values(w.equipped).filter(Boolean).length;
   const catalog = allItems().length;
   const pct = catalog ? Math.round((totalOwned / catalog) * 100) : 0;
-  $("bag-stats").textContent = `拥有 ${totalOwned} · 已装备 ${equippedCount} · 收集 ${pct}%`;
+  $("bag-stats").textContent = t("castle.bagStats", { owned: totalOwned, eq: equippedCount, pct });
   $("collect-fill").style.width = `${pct}%`;
   $("codex-text").textContent = `${totalOwned} / ${catalog}`;
   renderMannequin(w);
@@ -982,30 +1019,30 @@ function renderBag(w) {
         .map((h) => {
           const it = findItem(h.id);
           const mins = Math.max(0, Math.round((Date.now() - h.t) / 60000));
-          return `<li>${it.icon} ${it.name} · ${mins} 分钟前</li>`;
+          return `<li>${it.icon} ${it.name} · ${t("castle.recentMins", { n: mins })}</li>`;
         })
         .join("")
-    : "<li>暂无记录</li>";
+    : `<li>${t("castle.recentNone")}</li>`;
 }
 
 function renderRules() {
   $("rules-tiers").innerHTML = TIERS.map(
-    (t) => `<div><b>Lv.${t.level} ${t.blurb}</b><br/>累计 ${t.unlock} · 抽一次 ${t.cost}</div>`,
+    (tierRow) => `<div><b>Lv.${tierRow.level} ${tierName(tierRow.level)}</b><br/>${t("castle.rulesTierLine", { unlock: tierRow.unlock, cost: tierRow.cost })}</div>`,
   ).join("");
 }
 
 function renderActivity(w) {
   const tasks = [
-    { key: "quiz", label: "完成 3 次知识门答对", need: 3, cur: w.tasks.quiz || 0, href: "/parkour/" },
-    { key: "play", label: "参与 1 次冲刺玩法", need: 1, cur: w.tasks.play || 0, href: "/parkour/" },
-    { key: "redeem", label: "兑换 1 件商品", need: 1, cur: w.tasks.redeem || 0, href: null },
+    { key: "quiz", label: t("castle.task.quiz"), need: 3, cur: w.tasks.quiz || 0, href: "/parkour/" },
+    { key: "play", label: t("castle.task.play"), need: 1, cur: w.tasks.play || 0, href: "/parkour/" },
+    { key: "redeem", label: t("castle.task.redeem"), need: 1, cur: w.tasks.redeem || 0, href: null },
   ];
   $("task-list").innerHTML = tasks
-    .map((t) => {
-      const done = t.cur >= t.need;
+    .map((task) => {
+      const done = task.cur >= task.need;
       return `<li>
-        <div><strong>${t.label}</strong><br/><span>${Math.min(t.cur, t.need)}/${t.need}${done ? " ✓" : ""}</span></div>
-        ${done ? "<span>已完成</span>" : t.href ? `<a class="go" href="${t.href}">去完成</a>` : `<button type="button" class="go" data-tab="shelf">去兑换</button>`}
+        <div><strong>${task.label}</strong><br/><span>${Math.min(task.cur, task.need)}/${task.need}${done ? " ✓" : ""}</span></div>
+        ${done ? `<span>${t("castle.taskDone")}</span>` : task.href ? `<a class="go" href="${task.href}">${t("castle.taskGo")}</a>` : `<button type="button" class="go" data-tab="shelf">${t("castle.taskRedeem")}</button>`}
       </li>`;
     })
     .join("");
@@ -1026,19 +1063,19 @@ function openBuy(id) {
   const it = findItem(id);
   const maxLv = unlockedLevel(w.lifetime);
   if (it.level > maxLv) {
-    toast("尚未解锁该商品等级");
+    toast(t("castle.toast.unlockItem"));
     return;
   }
   const price = itemPrice(it);
   if (w.points < price) {
-    toast("积分不足");
+    toast(t("castle.toast.noPoints"));
     return;
   }
   state.pendingBuy = it;
   state.selectedId = it.id;
   $("buy-ico").textContent = it.icon || "⭐";
   $("buy-title").textContent = it.name;
-  $("buy-desc").textContent = `${it.desc} · ${RARITY_LABEL[it.rarity]}`;
+  $("buy-desc").textContent = `${it.desc} · ${rarityLabel(it.rarity)}`;
   $("buy-cost").textContent = String(price);
   $("buy-modal").hidden = false;
 }
@@ -1049,7 +1086,7 @@ function confirmBuy() {
   const w = loadWallet();
   const price = itemPrice(it);
   if (w.points < price) {
-    toast("积分不足");
+    toast(t("castle.toast.noPoints"));
     $("buy-modal").hidden = true;
     return;
   }
@@ -1057,12 +1094,12 @@ function confirmBuy() {
   w.inventory[it.id] = (w.inventory[it.id] || 0) + 1;
   w.tasks.redeem = (w.tasks.redeem || 0) + 1;
   if (it.id === "l-charm-luck") w.pityBoost = (w.pityBoost || 0) + 8;
-  pushHistory(w, it, "货架兑换");
+  pushHistory(w, it, t("castle.src.shelf"));
   saveWallet(w);
   $("buy-modal").hidden = true;
   state.pendingBuy = null;
-  showReveal(it, "来自货架兑换");
-  toast(`兑换成功 · -${price}`);
+  showReveal(it, t("castle.src.fromShelf"));
+  toast(t("castle.toast.redeemOk", { n: price }));
   renderAll();
 }
 
@@ -1071,12 +1108,12 @@ function equipItem(id) {
   const it = findItem(id);
   if (!(w.inventory[id] > 0)) return;
   if (!EQUIP_SLOTS.includes(it.cat)) {
-    toast("该物品不可装备");
+    toast(t("castle.toast.cantEquip"));
     return;
   }
   w.equipped[it.cat] = id;
   saveWallet(w);
-  toast(`已装备 · ${it.name}`);
+  toast(t("castle.toast.equipped", { name: it.name }));
   renderAll();
 }
 
@@ -1086,7 +1123,7 @@ function unequipItem(id) {
   if (w.equipped[it.cat] === id) {
     delete w.equipped[it.cat];
     saveWallet(w);
-    toast(`已卸下 · ${it.name}`);
+    toast(t("castle.toast.unequipped", { name: it.name }));
   }
   renderAll();
 }
@@ -1096,13 +1133,13 @@ function doDraw() {
   const w = loadWallet();
   const maxLv = unlockedLevel(w.lifetime);
   const level = Math.min(state.selectedLevel || maxLv, maxLv);
-  const tier = TIERS.find((t) => t.level === level);
+  const tier = TIERS.find((row) => row.level === level);
   if (!tier || w.lifetime < tier.unlock) {
-    toast("该等级尚未解锁");
+    toast(t("castle.toast.tierLocked"));
     return;
   }
   if (w.points < tier.cost) {
-    toast("积分不足");
+    toast(t("castle.toast.noPoints"));
     return;
   }
   state.drawing = true;
@@ -1112,11 +1149,16 @@ function doDraw() {
   if (pity > 0) w.pityBoost = 0;
   w.inventory[item.id] = (w.inventory[item.id] || 0) + 1;
   if (item.id === "l-charm-luck") w.pityBoost = (w.pityBoost || 0) + 8;
-  pushHistory(w, item, `${tier.level}级盲盒`);
+  pushHistory(w, item, t("castle.src.gacha", { n: tier.level }));
   saveWallet(w);
   state.selectedId = item.id;
-  showReveal(item, pity > 0 ? `来自 ${tier.level} 级盲盒 · 幸运加成已消耗` : `来自 ${tier.level} 级盲盒`);
-  toast(`盲盒开启 · -${tier.cost}`);
+  showReveal(
+    item,
+    pity > 0
+      ? t("castle.src.fromGachaLuck", { n: tier.level })
+      : t("castle.src.fromGacha", { n: tier.level }),
+  );
+  toast(t("castle.toast.gachaOk", { n: tier.cost }));
   state.drawing = false;
   renderAll();
 }
@@ -1156,7 +1198,7 @@ if ($("points-now") && document.querySelector(".side-nav")) {
 
   $("demo-add")?.addEventListener("click", () => {
     addCastlePoints(800);
-    toast("已获得 800 体验积分");
+    toast(t("castle.toast.demo"));
     burstFx();
     renderAll();
   });

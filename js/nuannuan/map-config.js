@@ -1,61 +1,81 @@
 /**
- * AI 知识之旅 · 关卡地图数据与进度
- * 5 区域 × 10 关 = 50 节点；线性解锁。
+ * AI 知识之旅 · 关卡地图
+ * 对齐 assessment_config.json：5 区 × 3 关 = 15 题（ailit_assessment 题序）
  */
 export const MAP_STORAGE = "nn_map_progress_v1";
 export const QUIZ_URL = "/collect";
+export const TOTAL_LEVELS = 15;
 
+/** @type {{ id: string, index: number, title: string, titleEn: string, levelId: string, domain: string, range: [number, number], tone: string, focus: {x:number,y:number} }[]} */
 export const REGIONS = [
   {
     id: "r1",
     index: 1,
-    title: "认识AI",
-    titleEn: "UNDERSTANDING AI",
-    range: [1, 10],
+    title: "信号塔·入口",
+    titleEn: "ENGAGING · GATE",
+    levelId: "L1",
+    domain: "Engaging",
+    range: [1, 3],
     tone: "teal",
-    /** 区域中心（地图百分比坐标），用于跳转定位 */
     focus: { x: 22, y: 68 },
   },
   {
     id: "r2",
     index: 2,
-    title: "提示与协作",
-    titleEn: "USING AI",
-    range: [11, 20],
+    title: "信号塔·塔顶",
+    titleEn: "ENGAGING · PEAK",
+    levelId: "L2",
+    domain: "Engaging",
+    range: [4, 6],
     tone: "green",
     focus: { x: 28, y: 28 },
   },
   {
     id: "r3",
     index: 3,
-    title: "评估与判断",
-    titleEn: "EVALUATING AI OUTPUTS",
-    range: [21, 30],
+    title: "创作工坊",
+    titleEn: "CREATING",
+    levelId: "L3",
+    domain: "Creating",
+    range: [7, 9],
     tone: "violet",
     focus: { x: 58, y: 22 },
   },
   {
     id: "r4",
     index: 4,
-    title: "创作与应用",
-    titleEn: "AI ETHICS & SAFETY",
-    range: [31, 40],
+    title: "指挥室",
+    titleEn: "MANAGING",
+    levelId: "L4",
+    domain: "Managing",
+    range: [10, 12],
     tone: "orange",
     focus: { x: 62, y: 55 },
   },
   {
     id: "r5",
     index: 5,
-    title: "责任与未来",
-    titleEn: "CREATING WITH AI",
-    range: [41, 50],
+    title: "核心实验室",
+    titleEn: "DESIGNING",
+    levelId: "L5",
+    domain: "Designing",
+    range: [13, 15],
     tone: "crystal",
     focus: { x: 78, y: 78 },
   },
 ];
 
+/** 与 assessment_config.levels 扁平题序一致 */
+export const LEVEL_ITEM_IDS = [
+  "E-1-Q1", "E-2-Q1", "E-3-Q1",
+  "E-4-Q1", "E-5-Q1", "E-7-Q1",
+  "C-1-Q1", "C-3-Q1", "C-4-Q1",
+  "M-1-Q1", "E-6-Q1", "E-3-Q2",
+  "D-2-Q1", "D-4-Q1", "D-5-Q1",
+];
+
 /** 奖励节点：每区终点 */
-export const CHEST_NODES = [10, 20, 30, 40, 50];
+export const CHEST_NODES = [3, 6, 9, 12, 15];
 
 const REWARD_POOL = [
   { id: "hair_aurora", label: "星辉发饰", kind: "发饰" },
@@ -67,16 +87,20 @@ const REWARD_POOL = [
 
 function buildNodes() {
   const nodes = [];
-  for (let n = 1; n <= 50; n += 1) {
+  for (let n = 1; n <= TOTAL_LEVELS; n += 1) {
     const region = REGIONS.find((r) => n >= r.range[0] && n <= r.range[1]);
     const local = n - region.range[0] + 1;
+    const itemId = LEVEL_ITEM_IDS[n - 1];
     nodes.push({
       id: n,
       regionId: region.id,
+      levelId: region.levelId,
+      domain: region.domain,
+      itemId,
       title: `${region.title} · 第 ${local} 关`,
-      summary: `完成关卡后可推进旅程进度，并有机会获得装扮奖励。`,
+      summary: `本题来自 AI 素养测评题库（${itemId}）。提交后推进旅程；养成臂按答题数解锁配件，与对错无关。`,
       reward: CHEST_NODES.includes(n)
-        ? REWARD_POOL[(CHEST_NODES.indexOf(n)) % REWARD_POOL.length]
+        ? REWARD_POOL[CHEST_NODES.indexOf(n) % REWARD_POOL.length]
         : { id: "star", label: "旅程之星 ×1", kind: "星星" },
       isChest: CHEST_NODES.includes(n),
     });
@@ -88,7 +112,7 @@ export const NODES = buildNodes();
 
 export function defaultProgress() {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     completed: [],
     current: 1,
     stars: 0,
@@ -101,13 +125,17 @@ export function loadProgress() {
     const raw = localStorage.getItem(MAP_STORAGE);
     if (!raw) return defaultProgress();
     const data = JSON.parse(raw);
+    const clampId = (n) => {
+      const v = Number(n);
+      return v >= 1 && v <= TOTAL_LEVELS ? v : 1;
+    };
     return {
       ...defaultProgress(),
       ...data,
       completed: Array.isArray(data.completed)
-        ? data.completed.map(Number).filter((n) => n >= 1 && n <= 50)
+        ? data.completed.map(Number).filter((n) => n >= 1 && n <= TOTAL_LEVELS)
         : [],
-      current: Number(data.current) >= 1 && Number(data.current) <= 50 ? Number(data.current) : 1,
+      current: clampId(data.current),
       stars: Number(data.stars) || 0,
       gems: Number(data.gems) || 0,
     };
@@ -150,47 +178,36 @@ export function getNode(id) {
   return NODES.find((n) => n.id === id) || null;
 }
 
+export function itemIdForLevel(id) {
+  return LEVEL_ITEM_IDS[id - 1] || null;
+}
+
 export function quizUrlFor(id) {
-  return `${QUIZ_URL}?level=${id}`;
+  const itemId = itemIdForLevel(id);
+  const q = new URLSearchParams({
+    level: String(id),
+    arm: "collect",
+  });
+  if (itemId) q.set("item", itemId);
+  return `${QUIZ_URL}?${q.toString()}`;
 }
 
 /**
- * 路径点：百分比坐标，贴合 world-map 五区地理（线性旅程）。
- * 区序：蓝湾 → 绿林 → 紫峰 → 金城 → 晶海
+ * 路径点：百分比坐标（5 区 × 3 关）
  */
 const REGION_PATHS = [
-  // r1 Understanding AI — 左下蓝湾
-  [
-    [14, 78], [18, 74], [22, 70], [20, 65], [24, 62],
-    [28, 66], [32, 70], [30, 75], [26, 80], [22, 72],
-  ],
-  // r2 Using AI — 左上绿林
-  [
-    [24, 48], [22, 42], [26, 36], [30, 32], [34, 28],
-    [38, 32], [36, 38], [32, 42], [28, 40], [34, 34],
-  ],
-  // r3 Evaluating — 上中紫峰
-  [
-    [42, 30], [46, 24], [52, 20], [58, 18], [64, 22],
-    [68, 26], [62, 28], [56, 26], [50, 28], [54, 22],
-  ],
-  // r4 Ethics — 中右金城
-  [
-    [58, 42], [62, 46], [66, 50], [70, 54], [68, 58],
-    [64, 62], [60, 58], [56, 54], [60, 50], [66, 56],
-  ],
-  // r5 Creating — 右下晶海
-  [
-    [70, 68], [74, 72], [78, 76], [82, 80], [86, 78],
-    [84, 84], [80, 86], [76, 82], [72, 78], [78, 74],
-  ],
+  [[14, 78], [22, 70], [28, 66]],
+  [[24, 48], [30, 32], [36, 38]],
+  [[46, 24], [58, 18], [64, 26]],
+  [[62, 46], [68, 58], [60, 54]],
+  [[74, 72], [82, 80], [78, 74]],
 ];
 
 export function pathPoints() {
   const pts = [];
   REGION_PATHS.forEach((segment, segIdx) => {
     segment.forEach(([x, y], i) => {
-      const id = segIdx * 10 + i + 1;
+      const id = segIdx * 3 + i + 1;
       pts.push({ id, x, y });
     });
   });

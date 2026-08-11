@@ -1,40 +1,43 @@
 import { getEquippedLoadout } from "/castle/castle.js";
+import { initI18n, t, onLangChange, setLang, getLang, applyDom } from "/js/i18n.js";
 
 (() => {
-  const ZONE_META = {
+  initI18n({ toggleHost: "#lang-host" });
+
+  const ZONE_META = () => ({
     castle: {
-      title: "知识城堡",
+      titleKey: "lobby.zone.castle",
       ico: "/assets/park/clay/castle.png",
       links: [
-        { href: "/castle", name: "积分兑换区", desc: "1–5 级奖池兑换装扮" },
-        { href: "/nuannuan", name: "知识星橱", desc: "答题收集 · 解锁星橱" },
+        { href: "/castle", nameKey: "lobby.link.castleExchange", descKey: "lobby.link.castleExchangeDesc" },
+        { href: "/nuannuan", nameKey: "lobby.link.starCloset", descKey: "lobby.link.starClosetDesc" },
       ],
     },
     adventure: {
-      title: "冒险冲刺区",
+      titleKey: "lobby.zone.adventure",
       ico: "/assets/park/clay/adventure.png",
       links: [
-        { href: "/parkour", name: "云城冲刺", desc: "神庙逃亡 · 答对吃币" },
-        { href: "/race", name: "AI 极速赛道", desc: "街机竞速 · 答对加速" },
+        { href: "/parkour", nameKey: "lobby.link.parkour", descKey: "lobby.link.parkourDesc" },
+        { href: "/race", nameKey: "lobby.link.race", descKey: "lobby.link.raceDesc" },
       ],
     },
     arena: {
-      title: "知识竞技场",
+      titleKey: "lobby.zone.arena",
       ico: "/assets/park/clay/arena.png",
       links: [
-        { href: "/kahoot", name: "AI 素养挑战赛", desc: "限时抢答 · 即时排行" },
-        { href: "/monopoly", name: "AI 地产大亨", desc: "棋盘经营 · 答对赚钱" },
+        { href: "/kahoot", nameKey: "lobby.link.kahoot", descKey: "lobby.link.kahootDesc" },
+        { href: "/monopoly", nameKey: "lobby.link.monopoly", descKey: "lobby.link.monopolyDesc" },
       ],
     },
     town: {
-      title: "装扮小镇",
+      titleKey: "lobby.zone.town",
       ico: "/assets/park/clay/town.png",
       links: [
-        { href: "/nuannuan/login", name: "AI 角色登录", desc: "暖暖风 · 建角登录" },
-        { href: "/explorer", name: "建立你的探索者", desc: "自定义角色 · 开启探索" },
+        { href: "/nuannuan/login", nameKey: "lobby.link.login", descKey: "lobby.link.loginDesc" },
+        { href: "/explorer", nameKey: "lobby.link.explorer", descKey: "lobby.link.explorerDesc" },
       ],
     },
-  };
+  });
 
   const zoneLabels = [...document.querySelectorAll(".zone-label[data-zone]")];
   const zoneHits = [...document.querySelectorAll(".zone-hit[data-zone]")];
@@ -90,27 +93,28 @@ import { getEquippedLoadout } from "/castle/castle.js";
   }
 
   function openPicker(zone) {
-    const meta = ZONE_META[zone];
+    const meta = ZONE_META()[zone];
     if (!meta || !picker || !pickerLinks) return;
 
     setActiveZone(zone);
     scrollGuide(zone);
 
+    const title = t(meta.titleKey);
     if (pickerIco) pickerIco.src = meta.ico;
-    if (pickerTitle) pickerTitle.textContent = meta.title;
+    if (pickerTitle) pickerTitle.textContent = title;
     pickerLinks.innerHTML = meta.links
       .map(
         (link) =>
-          `<a href="${link.href}"><span>${link.name}</span><small>${link.desc}</small></a>`
+          `<a href="${link.href}"><span>${t(link.nameKey)}</span><small>${t(link.descKey)}</small></a>`
       )
       .join("");
 
     picker.hidden = false;
-    announce(`已打开：${meta.title}`);
+    announce(t("lobby.toast.opened", { name: title }));
   }
 
   function focusZone(zone) {
-    if (!zone || !ZONE_META[zone]) return;
+    if (!zone || !ZONE_META()[zone]) return;
     openPicker(zone);
   }
 
@@ -138,8 +142,8 @@ import { getEquippedLoadout } from "/castle/castle.js";
     link.addEventListener("pointerenter", () => setZoneHot(zone, true));
     link.addEventListener("pointerleave", () => setZoneHot(zone, false));
     link.addEventListener("click", () => {
-      const name = link.querySelector("strong")?.textContent || "玩法";
-      announce(`前往：${name}`);
+      const name = link.querySelector("strong")?.textContent || t("common.lobby");
+      announce(t("lobby.toast.goto", { name }));
     });
   });
 
@@ -153,7 +157,6 @@ import { getEquippedLoadout } from "/castle/castle.js";
     closePicker();
   });
 
-  // Keyboard 1–4 → open matching zone
   window.addEventListener("keydown", (e) => {
     if (e.target.matches("input, textarea, select, [contenteditable]")) return;
     if (e.key === "Escape") {
@@ -169,7 +172,6 @@ import { getEquippedLoadout } from "/castle/castle.js";
     label?.focus({ preventScroll: true });
   });
 
-  // Soft parallax on island
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (islandStage && !reduceMotion) {
     const wrap = islandStage.parentElement;
@@ -184,33 +186,37 @@ import { getEquippedLoadout } from "/castle/castle.js";
     });
   }
 
-  // Profile from castle wallet / loadout
-  try {
-    const load = getEquippedLoadout();
-    const avatar = document.getElementById("profile-avatar");
-    const name = document.getElementById("profile-name");
-    const level = document.getElementById("profile-level");
-    const points = document.getElementById("profile-points");
-    const coins = document.getElementById("profile-coins");
-    if (avatar) avatar.textContent = load.frame?.icon || load.pet?.icon || "🧒";
-    if (name) name.textContent = load.name || "小探索者";
-    if (level) {
-      const lv = Math.max(1, Math.floor((Number(load.lifetime) || 0) / 500) + 1);
-      level.textContent = load.title
-        ? `Lv.${lv} ${load.title.titleText || load.title.name.replace(/^称号·/, "")}`
-        : `Lv.${lv} 探索者`;
+  function renderProfile() {
+    try {
+      const load = getEquippedLoadout();
+      const avatar = document.getElementById("profile-avatar");
+      const name = document.getElementById("profile-name");
+      const level = document.getElementById("profile-level");
+      const points = document.getElementById("profile-points");
+      const coins = document.getElementById("profile-coins");
+      if (avatar) avatar.textContent = load.frame?.icon || load.pet?.icon || "🧒";
+      if (name) {
+        name.removeAttribute("data-i18n");
+        name.textContent = load.name || t("lobby.explorerDefault");
+      }
+      if (level) {
+        const lv = Math.max(1, Math.floor((Number(load.lifetime) || 0) / 500) + 1);
+        level.textContent = load.title
+          ? `Lv.${lv} ${load.title.titleText || load.title.name.replace(/^称号·/, "")}`
+          : t("lobby.levelExplorer", { n: lv });
+      }
+      if (points) points.textContent = String(Number(load.points) || 0);
+      if (coins) {
+        const petBits = load.pet ? 120 : 0;
+        const trailBits = load.trail ? 80 : 0;
+        coins.textContent = String(petBits + trailBits + Math.floor((Number(load.points) || 0) / 10));
+      }
+    } catch (_) {
+      /* wallet optional */
     }
-    if (points) points.textContent = String(Number(load.points) || 0);
-    if (coins) {
-      const petBits = load.pet ? 120 : 0;
-      const trailBits = load.trail ? 80 : 0;
-      coins.textContent = String(petBits + trailBits + Math.floor((Number(load.points) || 0) / 10));
-    }
-  } catch (_) {
-    /* wallet optional */
   }
+  renderProfile();
 
-  // Week star progress
   const WEEK_KEY = "nn_park_week_star";
   let weekDays = 3;
   try {
@@ -221,54 +227,53 @@ import { getEquippedLoadout } from "/castle/castle.js";
   const weekCount = document.getElementById("week-count");
   function renderWeek() {
     if (weekFill) weekFill.style.setProperty("--p", `${(weekDays / 5) * 100}%`);
-    if (weekCount) weekCount.textContent = `${weekDays}/5 天`;
+    if (weekCount) weekCount.textContent = t("lobby.weekDays", { n: weekDays });
   }
   renderWeek();
   requestAnimationFrame(() => renderWeek());
 
   document.getElementById("week-gift")?.addEventListener("click", () => {
     if (weekDays >= 5) {
-      announce("礼物已领取，下周继续加油！");
+      announce(t("lobby.toast.giftDone"));
       return;
     }
     weekDays = Math.min(5, weekDays + 1);
     try { localStorage.setItem(WEEK_KEY, String(weekDays)); } catch (_) {}
     renderWeek();
-    announce(weekDays >= 5 ? "打卡完成！礼物已放入背包灵感盒" : `打卡成功：${weekDays}/5 天`);
+    announce(weekDays >= 5 ? t("lobby.toast.checkinDone") : t("lobby.toast.checkin", { n: weekDays }));
   });
 
-  // Soft UI actions
   document.getElementById("daily-banner")?.addEventListener("click", () => {
-    announce("今日任务：完成任意一场冲刺或挑战赛");
+    announce(t("lobby.toast.daily"));
     focusZone("adventure");
   });
   document.getElementById("btn-activity")?.addEventListener("click", () => {
-    announce("活动中心：本周双倍积分进行中");
+    announce(t("lobby.toast.activity"));
   });
   document.getElementById("btn-achieve")?.addEventListener("click", () => {
-    announce("成就勋章：继续探索可解锁新徽章");
+    announce(t("lobby.toast.achieve"));
   });
   document.getElementById("map-mini")?.addEventListener("click", () => {
     islandStage?.scrollIntoView({ behavior: "smooth", block: "center" });
-    announce("园区地图已居中");
+    announce(t("lobby.toast.mapCenter"));
   });
   document.getElementById("btn-settings")?.addEventListener("click", () => {
-    announce("设置：音效与提醒将在后续版本开放");
+    setLang(getLang() === "zh" ? "en" : "zh");
+    announce(t("lobby.toast.lang"));
   });
   document.getElementById("btn-explore")?.addEventListener("click", () => {
     islandStage?.scrollIntoView({ behavior: "smooth", block: "center" });
     focusZone("castle");
-    announce("探索模式：点击地图编号 1–4 进入分区");
+    announce(t("lobby.toast.explore"));
   });
 
-  // Newbie guide modal
   const openGuide = () => {
     if (typeof guideModal?.showModal === "function") guideModal.showModal();
-    else announce("先登录角色，再去冲刺赚积分，最后回城堡兑换装扮");
+    else announce(t("lobby.guide.step1"));
   };
   document.getElementById("newbie-guide")?.addEventListener("click", openGuide);
   document.getElementById("guide-start")?.addEventListener("click", () => {
-    announce("从装扮小镇开始创建角色吧");
+    announce(t("lobby.toast.startTown"));
     window.location.href = "/nuannuan/login";
   });
   try {
@@ -277,4 +282,11 @@ import { getEquippedLoadout } from "/castle/castle.js";
       localStorage.setItem("nn_park_guide_seen", "1");
     }
   } catch (_) {}
+
+  onLangChange(() => {
+    applyDom();
+    renderProfile();
+    renderWeek();
+    if (activeZone && picker && !picker.hidden) openPicker(activeZone);
+  });
 })();

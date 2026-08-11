@@ -1,6 +1,8 @@
 import {
   NODES,
   REGIONS,
+  TOTAL_LEVELS,
+  CHEST_NODES,
   loadProgress,
   saveProgress,
   nodeStatus,
@@ -18,6 +20,9 @@ import {
   loadConfirmedCompanion,
   loadCompanionDraft,
 } from "/js/nuannuan/companion-config.js";
+import { mountLobbyExit } from "/js/lobby-exit.js";
+
+mountLobbyExit();
 
 const KIT = "/nuannuan/map/assets/kit";
 
@@ -316,13 +321,13 @@ function hydratePlayer() {
 function absorbQueryFlags() {
   const params = new URLSearchParams(location.search);
   const complete = Number(params.get("complete"));
-  if (complete >= 1 && complete <= 50 && isUnlocked(state.progress, complete)) {
+  if (complete >= 1 && complete <= TOTAL_LEVELS && isUnlocked(state.progress, complete)) {
     if (!state.progress.completed.includes(complete)) {
       state.progress.completed.push(complete);
       state.progress.stars += 1;
-      if (complete % 10 === 0) state.progress.gems += 5;
+      if (CHEST_NODES.includes(complete)) state.progress.gems += 5;
     }
-    state.progress.current = Math.min(50, complete + 1);
+    state.progress.current = Math.min(TOTAL_LEVELS, complete + 1);
     saveProgress(state.progress);
     history.replaceState({}, "", location.pathname);
     toast(`第 ${complete} 关已记入完成`);

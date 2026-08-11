@@ -3,35 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>云城冲刺 · 神庙遗迹</title>
+  <title data-i18n="parkour.title">云城冲刺 · 神庙遗迹</title>
   <meta name="description" content="神庙逃亡式三车道跑酷：答对连吃金币宝石，答错扣命受罚。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=1" />
   <link rel="stylesheet" href="/parkour/parkour.css" />
 </head>
 <body>
   <div class="sky" aria-hidden="true"></div>
 
   <section class="screen is-on" id="screen-menu">
-    <a class="back" href="/">← LOBBY</a>
+    <div class="menu-topbar">
+      <a class="back" href="/" data-i18n="common.backLobby">← 游戏大厅</a>
+      <div id="lang-host" class="lang-host"></div>
+    </div>
     <div class="menu-card stone-panel">
       <p class="eyebrow">TEMPLE RUN · QUIZ GATES</p>
-      <h1>云城冲刺</h1>
-      <p class="lead">丛林神庙三车道。点选答案决定转向：<strong>答对</strong>连吃金币与宝石；<strong>答错</strong>踩中错路陷阱受罚。约每 5 道知识门切换风景：丛林 → 沙漠 → 雪峰 → 熔岩。</p>
+      <h1 data-i18n="parkour.h1">云城冲刺</h1>
+      <p class="lead" data-i18n="parkour.lead">丛林神庙三车道。点选答案决定转向：答对连吃金币与宝石；答错踩中错路陷阱受罚。约每 5 道知识门切换风景：丛林 → 沙漠 → 雪峰 → 熔岩。</p>
       <ul class="rules">
-        <li>A / B / C → 左 / 中 / 右道</li>
-        <li>答对 → 拐入正道 + 宝藏连吃</li>
-        <li>答错 / 超时 → 桥断坠落，生命 -1</li>
+        <li data-i18n="parkour.rule1">A / B / C → 左 / 中 / 右道</li>
+        <li data-i18n="parkour.rule2">答对 → 拐入正道 + 宝藏连吃</li>
+        <li data-i18n="parkour.rule3">答错 / 超时 → 桥断坠落，生命 -1</li>
       </ul>
       <div class="menu-loadout" id="menu-loadout"></div>
-      <button type="button" class="btn-go" id="start-btn">START!</button>
+      <button type="button" class="btn-go" id="start-btn" data-i18n="parkour.start">START!</button>
     </div>
   </section>
 
   <section class="screen" id="screen-play">
     <div class="play-frame">
-      <canvas id="game" width="960" height="640" aria-label="跑酷画面"></canvas>
+      <canvas id="game" width="960" height="640" data-i18n-aria="parkour.canvas" aria-label="跑酷画面"></canvas>
 
       <div class="stone-rim" aria-hidden="true">
         <span class="idol left"></span>
@@ -45,7 +49,7 @@
       <div class="hud">
         <div class="hud-left">
           <div class="hearts-box">
-            <div class="lives" id="hud-lives" aria-label="生命"></div>
+            <div class="lives" id="hud-lives" data-i18n-aria="parkour.lives" aria-label="生命"></div>
             <div class="xp-bar"><i id="xp-fill"></i></div>
           </div>
           <div class="stat"><span>SCORE</span><strong id="hud-score">0</strong></div>
@@ -67,7 +71,7 @@
             <i class="gem" aria-hidden="true"></i>
             <strong id="hud-gems">0</strong>
           </div>
-          <button type="button" class="pause-btn" id="pause-btn" aria-label="暂停">Ⅱ</button>
+          <button type="button" class="pause-btn" id="pause-btn" data-i18n-aria="parkour.pause" aria-label="暂停">Ⅱ</button>
         </div>
       </div>
 
@@ -96,7 +100,7 @@
       <div class="quiz-banner stone-panel" id="quiz-banner" hidden>
         <span class="q-tag" id="quiz-domain"></span>
         <p id="quiz-stem"></p>
-        <div class="lane-keys" id="lane-keys" role="group" aria-label="题目选项"></div>
+        <div class="lane-keys" id="lane-keys" role="group" data-i18n-aria="parkour.options" aria-label="题目选项"></div>
         <p class="quiz-timer" id="quiz-timer">请选择答案</p>
       </div>
 
@@ -109,7 +113,7 @@
           <p class="fx-en" id="reward-en">REWARD</p>
           <p class="fx-zh" id="reward-zh">奖励</p>
           <p class="fx-detail" id="reward-detail">完美连吃 ×20</p>
-          <button type="button" class="btn-go" id="reward-ok">继续冲刺</button>
+          <button type="button" class="btn-go" id="reward-ok" data-i18n="parkour.rewardOk">继续冲刺</button>
         </div>
       </div>
 
@@ -124,7 +128,7 @@
             <div class="penalty-chip"><i class="gem"></i><span id="penalty-score">-10% SCORE</span></div>
           </div>
           <p class="fx-detail" id="penalty-detail">HIT WRONG PATH · 陷阱发动！</p>
-          <button type="button" class="btn-go danger" id="penalty-ok">爬起来继续</button>
+          <button type="button" class="btn-go danger" id="penalty-ok" data-i18n="parkour.penaltyOk">爬起来继续</button>
         </div>
       </div>
     </div>
@@ -133,21 +137,21 @@
   <section class="screen" id="screen-over">
     <div class="menu-card stone-panel">
       <p class="eyebrow">RUN COMPLETE</p>
-      <h2 id="over-title">冲刺结束</h2>
+      <h2 id="over-title" data-i18n="parkour.overTitle">冲刺结束</h2>
       <div class="over-stats">
-        <div><span>得分</span><strong id="over-score">0</strong></div>
-        <div><span>距离</span><strong id="over-dist">0 M</strong></div>
-        <div><span>金币</span><strong id="over-coins">0</strong></div>
-        <div><span>答对</span><strong id="over-quiz">0</strong></div>
+        <div><span data-i18n="parkour.statScore">得分</span><strong id="over-score">0</strong></div>
+        <div><span data-i18n="parkour.statDist">距离</span><strong id="over-dist">0 M</strong></div>
+        <div><span data-i18n="parkour.statCoins">金币</span><strong id="over-coins">0</strong></div>
+        <div><span data-i18n="parkour.statQuiz">答对</span><strong id="over-quiz">0</strong></div>
       </div>
       <p class="over-msg" id="over-msg"></p>
       <div class="over-actions">
-        <button type="button" class="btn-go" id="retry-btn">再跑一局</button>
-        <a class="btn-ghost" href="/">返回大厅</a>
+        <button type="button" class="btn-go" id="retry-btn" data-i18n="parkour.retry">再跑一局</button>
+        <a class="btn-ghost" href="/" data-i18n="common.lobby">返回大厅</a>
       </div>
     </div>
   </section>
 
-  <script type="module" src="/parkour/parkour.js?v=4"></script>
+  <script type="module" src="/parkour/parkour.js?v=8"></script>
 </body>
 </html>

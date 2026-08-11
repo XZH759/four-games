@@ -10,6 +10,8 @@ import {
   saveFinal,
   toSavedCharacter,
 } from "/js/nuannuan/avatar-config.js";
+import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
+import { mountLobbyExit } from "/js/lobby-exit.js";
 import {
   ROLE_META,
   careerOptionsForGender,
@@ -25,8 +27,18 @@ import {
   getThemePack,
   resolveAccessoryOverlays,
   resolveThemeSelection,
-  SLOT_LABELS,
 } from "/js/nuannuan/career-theme-packs.js";
+import { localizePack } from "/js/nuannuan/login-theme-en.js";
+
+initI18n({ toggleHost: "#lang-host" });
+onLangChange(() => {
+  applyDom();
+  paintGenders();
+  paintRoles();
+  paintProfile();
+  paintModules();
+});
+mountLobbyExit();
 
 const NEXT_URL = "/nuannuan/partner";
 const STORAGE_LOGIN = "nn_login_avatar_v1";
@@ -39,14 +51,37 @@ const ROLE_BACKGROUNDS = {
 
 const SELECTABLE_MODULES = new Set(["accessory", "mark", "eyes", "theme", "outfit"]);
 
-const MODULE_HINTS = {
-  role: "查看职业与编号信息",
-  outfit: "查看当前职业服装说明",
-  accessory: "点选配饰（可多选，最多 3 件）；可拖动立绘上的配饰调位置",
-  mark: "选择专属印记",
-  eyes: "选择眼部风格",
-  theme: "选择主题关键词",
-};
+function isEn() {
+  return getLang() === "en";
+}
+
+function roleLabel(roleId) {
+  const meta = ROLE_META[roleId];
+  if (!meta) return roleId;
+  return isEn() ? meta.labelEn : meta.labelCn;
+}
+
+function genderLabel(gender = state.gender) {
+  return gender === "male" ? t("login.male") : t("login.female");
+}
+
+function slotLabel(slot) {
+  return t(`login.slot.${slot}`) || slot;
+}
+
+function nameErrorMessage(check) {
+  if (!check || check.ok) return "";
+  if (check.code === "length") return t("login.nameLen");
+  return t("login.nameNeed");
+}
+
+function currentPack() {
+  return localizePack(getThemePack(state.role, state.gender), getLang());
+}
+
+function moduleHint(module) {
+  return t(`login.hint.${module}`) || "";
+}
 
 function preloadRoleBackgrounds() {
   Object.values(ROLE_BACKGROUNDS).forEach((src) => {
@@ -115,12 +150,12 @@ const state = {
   focusItemId: null,
 };
 
-function currentPack() {
+function currentPackRaw() {
   return getThemePack(state.role, state.gender);
 }
 
 function syncThemeForCareer({ keepCompatible = false } = {}) {
-  const pack = currentPack();
+  const pack = currentPackRaw();
   if (!pack) {
     state.theme = defaultThemeSelection(null);
     return;
@@ -229,9 +264,9 @@ function paintSteps() {
     li.classList.toggle("is-done", n < state.step);
   });
   const hints = {
-    1: "步骤 1：选择性别与职业，再点底部配饰/印记定制",
-    2: "步骤 2：确认形象、主题元素与名称",
-    3: "步骤 3：核对档案后确认进入",
+    1: t("login.hint.step1"),
+    2: t("login.hint.step2"),
+    3: t("login.hint.step3"),
   };
   if (state.module === "role") els.stageHint.textContent = hints[state.step];
 }
@@ -240,7 +275,7 @@ function paintLoadout() {
   const pack = currentPack();
   if (!els.loadoutList) return;
   if (!pack || !state.theme.accessories.length) {
-    els.loadoutList.innerHTML = '<li class="is-empty">尚未选择配饰</li>';
+    els.loadoutList.innerHTML = `<li class="is-empty">${t("login.loadoutEmpty")}</li>`;
     return;
   }
   const rows = state.theme.accessories
@@ -248,7 +283,7 @@ function paintLoadout() {
       const item = findAccessory(pack, id);
       if (!item) return "";
       const stats = (item.stats || []).map((s) => `<em>${s}</em>`).join("");
-      return `<li><span class="loadout-glyph" aria-hidden="true">${item.glyph}</span><span><strong>${item.name}</strong><small>${SLOT_LABELS[item.slot] || item.slot}</small><span class="loadout-stats">${stats}</span></span></li>`;
+      return `<li><span class="loadout-glyph" aria-hidden="true">${item.glyph}</span><span><strong>${item.name}</strong><small>${slotLabel(item.slot)}</small><span class="loadout-stats">${stats}</span></span></li>`;
     })
     .join("");
   els.loadoutList.innerHTML = rows;
@@ -272,8 +307,8 @@ function paintEquipBadges() {
     .join("");
   els.themeEquip.innerHTML = `
     ${chips}
-    <button type="button" class="theme-equip__reset" id="reset-acc-pos" title="将已装备配饰位置恢复默认">重置位置</button>
-    <span class="theme-equip__hint">拖动立绘上的配饰可调整位置</span>`;
+    <button type="button" class="theme-equip__reset" id="reset-acc-pos" title="${t("login.resetPosTitle")}">${t("login.resetPos")}</button>
+    <span class="theme-equip__hint">${t("login.dragHint")}</span>`;
   els.themeEquip.querySelector("#reset-acc-pos")?.addEventListener("click", () => {
     pushHistory();
     const next = { ...(state.theme.placements || {}) };
@@ -282,7 +317,7 @@ function paintEquipBadges() {
     });
     state.theme.placements = next;
     persist();
-    toast("已重置配饰位置");
+    toast(t("login.toast.posReset"));
     void paintPreview();
   });
 }
@@ -305,13 +340,13 @@ function paintThemePicker() {
   if (!show || !pack) return;
 
   const titles = {
-    outfit: "服装说明",
-    accessory: "配饰选择",
-    mark: "印记选择",
-    eyes: "眼部风格",
-    theme: "主题关键词",
+    outfit: t("login.pick.outfit"),
+    accessory: t("login.pick.accessory"),
+    mark: t("login.pick.mark"),
+    eyes: t("login.pick.eyes"),
+    theme: t("login.pick.theme"),
   };
-  els.themePickerTitle.textContent = titles[state.module] || "主题元素";
+  els.themePickerTitle.textContent = titles[state.module] || t("login.themeTitle");
   els.themePickerSub.textContent = pack.slogan;
   els.themePickerSheet.hidden = false;
   els.themePickerSheet.href = pack.sheet;
@@ -322,7 +357,7 @@ function paintThemePicker() {
       {
         id: "outfit_base",
         glyph: "▦",
-        name: "基础职业装",
+        name: t("login.outfitBase"),
         desc: pack.outfit,
         selected: true,
         locked: true,
@@ -371,7 +406,7 @@ function paintThemePicker() {
     btn.setAttribute("role", "option");
     btn.setAttribute("aria-selected", item.selected ? "true" : "false");
     btn.dataset.id = item.id;
-    const slot = item.slot ? `<small>${SLOT_LABELS[item.slot] || item.slot}</small>` : "";
+    const slot = item.slot ? `<small>${slotLabel(item.slot)}</small>` : "";
     btn.innerHTML = `
       <span class="theme-opt__glyph" aria-hidden="true">${item.glyph || "◆"}</span>
       <span class="theme-opt__copy"><strong>${item.name}</strong>${slot}</span>
@@ -407,31 +442,30 @@ async function toggleThemeItem(module, id) {
     const set = new Set(state.theme.accessories);
     if (set.has(id)) {
       set.delete(id);
-      toast("已卸下配饰");
+      toast(t("login.toast.accOff"));
     } else if (set.size >= 3) {
-      toast("最多选择 3 件配饰");
+      toast(t("login.toast.accMax"));
     } else {
       set.add(id);
       const item = findAccessory(pack, id);
-      toast(`已装备：${item?.name || "配饰"}`);
+      toast(t("login.toast.accOn", { name: item?.name || t("login.mod.accessory") }));
     }
     state.theme.accessories = [...set];
   } else if (module === "mark") {
     state.theme.markId = id;
-    toast(`印记：${findMark(pack, id)?.title || ""}`);
+    toast(t("login.toast.mark", { name: findMark(pack, id)?.title || "" }));
   } else if (module === "eyes") {
     state.theme.eyeId = id;
-    toast(`眼部：${findEye(pack, id)?.label || ""}`);
+    toast(t("login.toast.eyes", { name: findEye(pack, id)?.label || "" }));
   } else if (module === "theme") {
     state.theme.keywordId = id;
-    toast(`主题：${findKeyword(pack, id)?.label || ""}`);
+    toast(t("login.toast.theme", { name: findKeyword(pack, id)?.label || "" }));
   }
 
   persist();
   paintThemePicker();
   paintEquipBadges();
   paintLoadout();
-  // 立绘配饰增减：重新合成叠加层
   await paintPreview();
 }
 
@@ -453,7 +487,7 @@ function paintModules() {
   }
 
   if (!pack) {
-    els.stageHint.textContent = MODULE_HINTS[state.module] || "";
+    els.stageHint.textContent = moduleHint(state.module);
     els.themePicker.hidden = true;
     return;
   }
@@ -461,23 +495,23 @@ function paintModules() {
   const extras = {
     outfit: pack.outfit,
     accessory: state.theme.accessories.length
-      ? `已选 ${state.theme.accessories.length}/3`
-      : "可多选最多 3 件",
+      ? t("login.accSelected", { n: state.theme.accessories.length })
+      : t("login.accMulti"),
     mark: findMark(pack, state.theme.markId)?.title || "",
     eyes: findEye(pack, state.theme.eyeId)?.label || "",
     theme: findKeyword(pack, state.theme.keywordId)?.label || pack.slogan,
   };
-  els.stageHint.textContent = `${MODULE_HINTS[state.module]} · ${extras[state.module] || ""}`;
+  els.stageHint.textContent = `${moduleHint(state.module)} · ${extras[state.module] || ""}`;
   paintThemePicker();
 }
 
 function paintProfile() {
   const career = currentCareer();
   const pack = currentPack();
-  const genderLabel = state.gender === "male" ? "男性" : "女性";
+  const gLabel = genderLabel();
   const mark = findMark(pack, state.theme.markId) || pack?.marks?.[0];
-  els.stageGender.textContent = genderLabel;
-  els.profileName.textContent = state.name || "未命名";
+  els.stageGender.textContent = gLabel;
+  els.profileName.textContent = state.name || t("login.unnamed");
   els.collectCount.textContent = String(state.viewed.size);
   els.markGlyph.textContent = mark?.glyph || "◆";
   els.markTitle.textContent = mark?.title || "—";
@@ -487,12 +521,15 @@ function paintProfile() {
 
   const meta = ROLE_META[career.role];
   const code = characterCode(career);
-  els.stageRole.textContent = meta?.labelCn || career.displayNameCn;
+  const rLabel = isEn() ? (meta?.labelEn || career.displayNameEn) : (meta?.labelCn || career.displayNameCn);
+  els.stageRole.textContent = rLabel;
   els.stageId.textContent = code;
-  els.detailSub.textContent = career.displayNameEn;
-  els.profileRole.textContent = `${meta?.labelCn || ""} · ${genderLabel}`;
+  els.detailSub.textContent = isEn() ? career.displayNameEn : career.displayNameCn;
+  els.profileRole.textContent = `${rLabel} · ${gLabel}`;
   els.profileCode.textContent = code;
-  els.profileAff.textContent = career.affiliation;
+  els.profileAff.textContent = isEn()
+    ? (career.affiliationEn || career.affiliation)
+    : career.affiliation;
   els.profileHeight.textContent = `${career.heightCm} cm`;
   paintLoadout();
   paintEquipBadges();
@@ -530,7 +567,7 @@ async function paintPreview() {
           },
         };
         persist();
-        toast("配饰位置已保存");
+        toast(t("login.toast.posSaved"));
       },
     },
   );
@@ -548,7 +585,7 @@ async function applySelection(next, { record = true, message, keepTheme = false 
     els.name.value = next.name;
   }
   if (next.theme) {
-    state.theme = resolveThemeSelection(currentPack(), next.theme);
+    state.theme = resolveThemeSelection(currentPackRaw(), next.theme);
   } else if (careerChanged) {
     syncThemeForCareer({ keepCompatible: keepTheme });
   }
@@ -563,8 +600,8 @@ async function applySelection(next, { record = true, message, keepTheme = false 
 function paintGenders() {
   els.genderList.innerHTML = "";
   [
-    { id: "female", label: "女性", hint: "Female", glyph: "♀" },
-    { id: "male", label: "男性", hint: "Male", glyph: "♂" },
+    { id: "female", label: t("login.female"), hint: "Female", glyph: "♀" },
+    { id: "male", label: t("login.male"), hint: "Male", glyph: "♂" },
   ].forEach((gender) => {
     const on = state.gender === gender.id;
     const button = document.createElement("button");
@@ -580,7 +617,7 @@ function paintGenders() {
       if (on) return;
       await applySelection(
         { gender: gender.id },
-        { message: gender.id === "male" ? "已切换为男性界面" : "已切换为女性界面" },
+        { message: t(gender.id === "male" ? "login.toast.male" : "login.toast.female") },
       );
     });
     els.genderList.appendChild(button);
@@ -591,6 +628,8 @@ function paintRoles() {
   els.roleList.innerHTML = "";
   careerOptionsForGender(state.gender).forEach((role) => {
     const on = state.role === role.id;
+    const label = isEn() ? role.labelEn : role.label;
+    const hint = isEn() ? (role.hintEn || role.hint) : role.hint;
     const button = document.createElement("button");
     button.type = "button";
     button.className = `choice role-card${on ? " is-on" : ""}`;
@@ -600,10 +639,13 @@ function paintRoles() {
       ${role.thumbUrl
         ? `<span class="role-thumb"><img src="${role.thumbUrl}" alt="" /></span>`
         : `<span class="role-thumb is-empty" aria-hidden="true">◇</span>`}
-      <span class="role-copy"><strong>${role.label}</strong><small>${role.hint}</small></span>
+      <span class="role-copy"><strong>${label}</strong><small>${hint}</small></span>
       ${on ? `<span class="role-check" aria-hidden="true">✓</span>` : ""}`;
     button.addEventListener("click", async () => {
-      await applySelection({ role: role.id }, { message: `已选择${role.label}` });
+      await applySelection(
+        { role: role.id },
+        { message: t("login.toast.role", { name: label }) },
+      );
     });
     els.roleList.appendChild(button);
   });
@@ -612,7 +654,10 @@ function paintRoles() {
 function cycleRole(dir) {
   const idx = CAREERS.indexOf(state.role);
   const next = CAREERS[(idx + dir + CAREERS.length) % CAREERS.length];
-  return applySelection({ role: next }, { message: `已切换为${ROLE_META[next].labelCn}` });
+  return applySelection(
+    { role: next },
+    { message: t("login.toast.roleSwitch", { name: roleLabel(next) }) },
+  );
 }
 
 els.name.addEventListener("input", () => {
@@ -630,7 +675,7 @@ els.dice.addEventListener("click", () => {
   els.nameError.hidden = true;
   paintProfile();
   persist();
-  toast("已随机名称");
+  toast(t("login.toast.nameDice"));
 });
 
 els.random.addEventListener("click", async () => {
@@ -656,7 +701,7 @@ els.random.addEventListener("click", async () => {
         gender,
         theme,
       },
-      { message: "已随机生成形象与主题元素" },
+      { message: t("login.toast.randomAll") },
     );
     state.module = "accessory";
     paintModules();
@@ -671,10 +716,10 @@ els.roleNext.addEventListener("click", () => cycleRole(1));
 els.undo.addEventListener("click", async () => {
   const prev = state.history.pop();
   if (!prev) {
-    toast("没有可回撤的操作");
+    toast(t("login.toast.undoEmpty"));
     return;
   }
-  await applySelection(prev, { record: false, message: "已回撤上一步", keepTheme: true });
+  await applySelection(prev, { record: false, message: t("login.toast.undo"), keepTheme: true });
 });
 
 els.reset.addEventListener("click", async () => {
@@ -685,7 +730,7 @@ els.reset.addEventListener("click", async () => {
       name: "",
       theme: defaultThemeSelection(getThemePack("researcher", "female")),
     },
-    { message: "已重置为默认形象" },
+    { message: t("login.toast.reset") },
   );
   els.nameError.hidden = true;
   state.step = 1;
@@ -697,23 +742,22 @@ els.reset.addEventListener("click", async () => {
 els.share.addEventListener("click", async () => {
   const career = currentCareer();
   const pack = currentPack();
-  const meta = ROLE_META[state.role];
   const mark = findMark(pack, state.theme.markId);
   const accNames = state.theme.accessories
     .map((id) => findAccessory(pack, id)?.name)
     .filter(Boolean);
   const text = [
-    `AI Character · ${state.name || "未命名"}`,
-    `${meta?.labelCn || ""} · ${state.gender === "male" ? "男" : "女"}`,
+    `AI Character · ${state.name || t("login.unnamed")}`,
+    `${roleLabel(state.role)} · ${genderLabel()}`,
     career ? characterCode(career) : "",
-    mark ? `印记:${mark.title}` : "",
-    accNames.length ? `配饰:${accNames.join("、")}` : "",
+    mark ? `${t("login.share.mark")}:${mark.title}` : "",
+    accNames.length ? `${t("login.share.acc")}:${accNames.join(isEn() ? ", " : "、")}` : "",
   ]
     .filter(Boolean)
     .join(" / ");
   try {
     await navigator.clipboard.writeText(text);
-    toast("角色信息已复制");
+    toast(t("login.toast.copied"));
   } catch {
     toast(text);
   }
@@ -740,11 +784,11 @@ els.stepNext.addEventListener("click", () => {
     const check = validateName(state.name || els.name.value);
     if (!check.ok) {
       els.nameError.hidden = false;
-      els.nameError.textContent = check.message;
+      els.nameError.textContent = nameErrorMessage(check);
       els.name.focus();
       state.step = 2;
       paintSteps();
-      toast(check.message);
+      toast(nameErrorMessage(check));
       return;
     }
     state.name = check.name;
@@ -755,9 +799,9 @@ els.stepNext.addEventListener("click", () => {
   persist();
   if (state.step === 2) {
     els.name.focus();
-    toast("请确认名称与形象");
+    toast(t("login.toast.confirmName"));
   } else if (state.step === 3) {
-    toast("请核对档案后确认进入");
+    toast(t("login.toast.confirmProfile"));
   }
 });
 
@@ -765,7 +809,7 @@ els.confirm.addEventListener("click", async () => {
   const check = validateName(state.name || els.name.value);
   if (!check.ok) {
     els.nameError.hidden = false;
-    els.nameError.textContent = check.message;
+    els.nameError.textContent = nameErrorMessage(check);
     els.name.focus();
     state.step = 2;
     paintSteps();
@@ -784,7 +828,7 @@ els.confirm.addEventListener("click", async () => {
   });
   saveFinal(avatar);
   persist();
-  toast("登录形象已保存");
+  toast(t("login.toast.saved"));
   await new Promise((resolve) => setTimeout(resolve, 420));
   location.href = NEXT_URL;
 });
@@ -803,7 +847,7 @@ async function boot() {
     if (Array.isArray(saved?.viewed)) state.viewed = new Set(saved.viewed);
 
     applyCareer();
-    state.theme = resolveThemeSelection(currentPack(), saved?.themePack);
+    state.theme = resolveThemeSelection(currentPackRaw(), saved?.themePack);
     state.ready = true;
     paintGenders();
     paintRoles();
@@ -812,7 +856,7 @@ async function boot() {
     await paintPreview();
   } catch (error) {
     console.error(error);
-    toast(error.message || "素材加载失败");
+    toast(error.message || (isEn() ? "Failed to load assets" : "素材加载失败"));
   }
 }
 

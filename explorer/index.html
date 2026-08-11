@@ -1,31 +1,33 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>建立你的探索者 · AI Literacy</title>
-  <meta name="description" content="在開始 AI Literacy 遊戲化測驗前，建立你的探索者形象。" />
+  <title data-i18n="explorer.title">建立你的探索者 · AI Literacy</title>
+  <meta name="description" content="在开始 AI Literacy 游戏化测验前，建立你的探索者形象。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=1" />
   <link rel="stylesheet" href="/explorer/explorer.css" />
 </head>
 <body>
   <div class="page">
     <header class="topbar">
-      <a class="brand-link" href="/" aria-label="返回遊戲大廳">← 返回大廳</a>
-      <nav class="steps" aria-label="建立流程">
-        <span class="pill is-current">步驟 1 / 2 · 角色建立</span>
+      <a class="brand-link" href="/" data-i18n="explorer.back" data-i18n-aria="explorer.back" aria-label="返回游戏大厅">← 返回大厅</a>
+      <nav class="steps" data-i18n-aria="explorer.flow" aria-label="建立流程">
+        <span class="pill is-current" data-i18n="explorer.step1">步骤 1 / 2 · 角色建立</span>
         <span class="sep" aria-hidden="true">→</span>
-        <span class="pill">選擇夥伴</span>
+        <span class="pill" data-i18n="explorer.step2">选择伙伴</span>
         <span class="sep" aria-hidden="true">→</span>
-        <span class="pill">開始探索</span>
+        <span class="pill" data-i18n="explorer.step3">开始探索</span>
       </nav>
+      <div id="lang-host" class="lang-host"></div>
     </header>
 
     <div class="page-head">
-      <h1>建立你的探索者</h1>
-      <p>選擇一個讓你感到舒服的形象。之後還可以透過完成章節獲得新的服裝和配件。外觀不會影響測驗內容或評分。</p>
+      <h1 data-i18n="explorer.title">建立你的探索者</h1>
+      <p data-i18n="explorer.lead">选择一个让你感到舒服的形象。之后还可以通过完成章节获得新的服装和配件。外观不会影响测验内容或评分。</p>
     </div>
 
     <div class="layout">

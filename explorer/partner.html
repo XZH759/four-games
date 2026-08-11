@@ -53,7 +53,9 @@
   <script type="module">
     import { loadFinal, DEFAULT_CONFIG, normalizeConfig } from "/js/explorer/character-config.js";
     import { buildCharacterSVG } from "/js/explorer/character-preview.js";
+    import { mountLobbyExit } from "/js/lobby-exit.js";
 
+    mountLobbyExit();
     const cfg = normalizeConfig(loadFinal() || DEFAULT_CONFIG);
     const fromDefault = new URLSearchParams(location.search).get("from") === "default";
     document.getElementById("status").textContent = fromDefault

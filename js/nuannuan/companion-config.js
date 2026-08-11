@@ -2,6 +2,8 @@
  * Route B 学习伙伴：使用独立立绘，不叠 character-assets 图层。
  * 伙伴只提供鼓励与流程提醒，不提供答案。
  */
+import { COMPANION_EN } from "/js/nuannuan/companion-en.js";
+
 export const COMPANION_STORAGE = "nn_companion_v1";
 export const COMPANION_DRAFT_STORAGE = "nn_companion_draft_v1";
 
@@ -141,6 +143,31 @@ export const COMPANIONS = [
 
 export function getCompanion(id) {
   return COMPANIONS.find((item) => item.id === id) || null;
+}
+
+/** Display-time EN overlay; does not mutate stored companion objects. */
+export function localizeCompanion(companion, lang = "zh") {
+  if (!companion) return companion;
+  if (lang !== "en") return companion;
+  const en = COMPANION_EN[companion.id];
+  if (!en) return companion;
+  return {
+    ...companion,
+    role: en.role || companion.role,
+    tags: en.tags || companion.tags,
+    summary: en.summary || companion.summary,
+    description: en.description || companion.description,
+    intro: en.intro || companion.intro,
+    traits: (companion.traits || []).map((trait, i) => {
+      const tEn = en.traits?.[i];
+      if (!tEn) return trait;
+      return {
+        ...trait,
+        name: tEn.name || trait.name,
+        text: tEn.text || trait.text,
+      };
+    }),
+  };
 }
 
 function read(key) {

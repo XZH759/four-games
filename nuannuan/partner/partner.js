@@ -1,11 +1,21 @@
 import { loadFinal } from "/js/nuannuan/avatar-config.js";
+import { mountLobbyExit } from "/js/lobby-exit.js";
+import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 import {
   COMPANIONS,
   confirmCompanion,
   loadCompanionDraft,
   loadConfirmedCompanion,
+  localizeCompanion,
   saveCompanionDraft,
 } from "/js/nuannuan/companion-config.js";
+
+initI18n({ toggleHost: "#lang-host" });
+onLangChange(() => {
+  applyDom();
+  refreshUi();
+});
+mountLobbyExit();
 
 const TEST_URL = "/nuannuan/map";
 const TEAM_SLOT_COUNT = 6;
@@ -41,6 +51,10 @@ if (!loadFinal()) {
   location.replace("/nuannuan/login");
 }
 
+function current(companion = state.selected) {
+  return localizeCompanion(companion, getLang());
+}
+
 function announce(text) {
   els.message.textContent = text;
   els.message.classList.add("is-visible");
@@ -71,13 +85,14 @@ function portraitImg(src, alt = "") {
 function paintCandidates() {
   els.list.innerHTML = "";
   if (!COMPANIONS.length) {
-    els.list.innerHTML = '<p class="empty-state">伙伴资料暂时不可用，请稍后再试。</p>';
+    els.list.innerHTML = `<p class="empty-state">${t("partner.emptyList")}</p>`;
     els.confirm.disabled = true;
     els.start.disabled = true;
     return;
   }
 
-  COMPANIONS.forEach((companion, index) => {
+  COMPANIONS.forEach((raw, index) => {
+    const companion = localizeCompanion(raw, getLang());
     const selected = state.selected?.id === companion.id;
     const button = document.createElement("button");
     button.type = "button";
@@ -86,7 +101,11 @@ function paintCandidates() {
     button.setAttribute("aria-selected", String(selected));
     button.setAttribute(
       "aria-label",
-      `${companion.nameEn || companion.name}，${companion.role}。${companion.summary}`,
+      t("partner.ariaCard", {
+        name: companion.nameEn || companion.name,
+        role: companion.role,
+        summary: companion.summary,
+      }),
     );
     button.innerHTML = `
       <span class="candidate-number" aria-hidden="true">${index + 1}</span>
@@ -100,7 +119,7 @@ function paintCandidates() {
           .join("")}</span>
       </span>`;
 
-    button.addEventListener("click", () => selectCompanion(companion, button));
+    button.addEventListener("click", () => selectCompanion(raw, button));
     button.addEventListener("keydown", (event) => {
       if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].includes(event.key)) return;
       event.preventDefault();
@@ -137,26 +156,26 @@ async function selectCompanion(companion, button) {
   paintDetail(companion);
   paintTeam(companion);
   const label = companion.nameEn || companion.name;
-  els.tipsText.textContent = `已预览「${label}」。点击「选择伙伴」锁定后再开始答题。`;
+  els.tipsText.textContent = t("partner.previewTip", { name: label });
   syncActions();
   state.busy = false;
-  announce(`已预览 ${label}`);
+  announce(t("partner.previewed", { name: label }));
 }
 
-function paintDetail(companion) {
+function paintDetail(raw) {
+  const companion = current(raw);
   if (!companion) {
     els.detailAvatar.innerHTML = "";
-    els.detailName.textContent = "请选择伙伴";
+    els.detailName.textContent = t("partner.pickFirst");
     els.detailNameEn.textContent = "PARTNER";
-    els.detailRole.textContent = "从左侧候选中选择一位同行者";
+    els.detailRole.textContent = t("partner.pickHint");
     els.detailBio.textContent = "";
-    els.detailIntro.textContent =
-      "每次测试只能选择一位伙伴。伙伴不会影响分数，也不会提供题目答案。";
-    els.traits.innerHTML = '<p class="empty-state">选择后可查看核心特质</p>';
+    els.detailIntro.textContent = t("partner.emptyIntro");
+    els.traits.innerHTML = `<p class="empty-state">${t("partner.emptyTraits")}</p>`;
     return;
   }
 
-  applyTheme(companion);
+  applyTheme(raw);
   const label = companion.nameEn || companion.name;
   els.detailAvatar.innerHTML = portraitImg(companion.portrait, `${label}`);
   els.detailName.textContent = label;
@@ -175,18 +194,20 @@ function paintDetail(companion) {
     .join("");
 }
 
-function paintTeam(companion) {
+function paintTeam(raw) {
+  const companion = current(raw);
   els.teamSlots.innerHTML = "";
   for (let i = 0; i < TEAM_SLOT_COUNT; i += 1) {
     const slot = document.createElement("div");
     slot.className = "team-slot";
     slot.dataset.slot = String(i + 1);
     if (i === 0 && companion) {
+      const label = companion.nameEn || companion.name;
       slot.classList.add("is-filled");
-      slot.setAttribute("aria-label", `已选择 ${companion.nameEn || companion.name}`);
-      slot.innerHTML = portraitImg(companion.portrait, companion.nameEn || companion.name);
+      slot.setAttribute("aria-label", t("partner.slotFilled", { name: label }));
+      slot.innerHTML = portraitImg(companion.portrait, label);
     } else {
-      slot.innerHTML = "<span>未选择</span>";
+      slot.innerHTML = `<span>${t("partner.slotEmpty")}</span>`;
     }
     els.teamSlots.appendChild(slot);
   }
@@ -197,24 +218,42 @@ function syncActions() {
   const isConfirmed = hasSelection && state.confirmed?.id === state.selected.id;
   els.confirm.disabled = !hasSelection || state.busy;
   els.confirm.innerHTML = isConfirmed
-    ? '<span aria-hidden="true">✓</span>已选择伙伴'
-    : '<span aria-hidden="true">✦</span>选择伙伴';
+    ? `<span aria-hidden="true">✓</span>${t("partner.picked")}`
+    : `<span aria-hidden="true">✦</span>${t("partner.pick")}`;
   els.confirm.classList.toggle("is-confirmed", isConfirmed);
   els.start.disabled = !isConfirmed || state.busy;
+  els.start.innerHTML = `<span aria-hidden="true">◎</span>${t("partner.start")}`;
   els.viewDetail.disabled = !hasSelection;
+  els.viewDetail.innerHTML = `<span aria-hidden="true">📄</span>${t("partner.viewDetail")}`;
+}
+
+function refreshUi() {
+  paintCandidates();
+  paintDetail(state.selected);
+  paintTeam(state.selected);
+  syncActions();
+  if (state.selected) {
+    const label = state.selected.nameEn || state.selected.name;
+    const locked = state.confirmed?.id === state.selected.id;
+    els.tipsText.textContent = locked
+      ? t("partner.lockedTip", { name: label })
+      : t("partner.currentTip", { name: label });
+  } else {
+    els.tipsText.textContent = t("partner.tipsDefault");
+  }
 }
 
 els.viewDetail.addEventListener("click", () => {
   if (!state.selected) {
-    announce("请先选择一位学习伙伴");
+    announce(t("partner.needPick"));
     return;
   }
-  const c = state.selected;
+  const c = current(state.selected);
   els.detailDialogBody.innerHTML = `
     <strong>${c.nameEn || c.name} · ${c.role}</strong><br/><br/>
     ${c.description}<br/><br/>
-    标签：${(c.tags || []).join(" / ")}<br/>
-    提示：${c.summary}`;
+    ${t("partner.tags")}：${(c.tags || []).join(" / ")}<br/>
+    ${t("partner.hint")}：${c.summary}`;
   if (typeof els.detailDialog.showModal === "function") {
     els.detailDialog.showModal();
   } else {
@@ -225,22 +264,22 @@ els.viewDetail.addEventListener("click", () => {
 els.confirm.addEventListener("click", async () => {
   if (state.busy) return;
   if (!state.selected) {
-    announce("请先选择一位学习伙伴");
+    announce(t("partner.needPick"));
     return;
   }
   state.busy = true;
   syncActions();
-  els.confirm.textContent = "保存中…";
+  els.confirm.textContent = t("partner.saving");
   try {
     if (!confirmCompanion(state.selected.id)) throw new Error("Invalid companion");
     state.confirmed = state.selected;
     paintTeam(state.selected);
     const label = state.selected.nameEn || state.selected.name;
-    els.tipsText.textContent = `「${label}」已锁定。可以开始答题了。`;
-    announce(`已选择 ${label} 作为本次学习伙伴`);
+    els.tipsText.textContent = t("partner.lockedTip", { name: label });
+    announce(t("partner.chosen", { name: label }));
   } catch (error) {
     console.error(error);
-    announce("保存失败，请稍后重试");
+    announce(t("partner.saveFail"));
   } finally {
     state.busy = false;
     syncActions();
@@ -250,12 +289,12 @@ els.confirm.addEventListener("click", async () => {
 els.start.addEventListener("click", () => {
   if (state.busy) return;
   if (!state.confirmed || state.confirmed.id !== state.selected?.id) {
-    announce("请先确认当前伙伴，再开始答题");
+    announce(t("partner.needConfirm"));
     return;
   }
   state.busy = true;
   syncActions();
-  els.start.textContent = "正在进入…";
+  els.start.textContent = t("partner.entering");
   location.href = TEST_URL;
 });
 
@@ -263,7 +302,7 @@ els.guideOpen.addEventListener("click", () => {
   if (typeof els.guideDialog.showModal === "function") {
     els.guideDialog.showModal();
   } else {
-    announce("伙伴只提供鼓励与提醒，不会直接告诉你答案。");
+    announce(t("partner.notice"));
   }
 });
 
@@ -277,10 +316,4 @@ function preloadStages() {
 }
 
 preloadStages();
-paintCandidates();
-paintDetail(state.selected);
-paintTeam(state.selected);
-syncActions();
-if (state.selected) {
-  els.tipsText.textContent = `当前预览「${state.selected.nameEn || state.selected.name}」。确认后即可开始答题。`;
-}
+refreshUi();

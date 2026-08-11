@@ -48,7 +48,7 @@ body {
 /* —— Topbar —— */
 .topbar {
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  grid-template-columns: auto auto 1fr auto auto;
   gap: 0.65rem 1rem;
   align-items: center;
   background: linear-gradient(180deg, #2a3a58, #1a2840);

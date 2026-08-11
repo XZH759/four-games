@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI世界游乐园 · 园区首页</title>
+  <title data-i18n="lobby.title">AI世界游乐园 · 园区首页</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/lobby.css?v=14" />
+  <link rel="stylesheet" href="/js/i18n.css?v=2" />
+  <link rel="stylesheet" href="/lobby.css?v=17" />
 </head>
 <body class="park-home">
   <div class="sky-layer" aria-hidden="true">
@@ -20,40 +21,43 @@
     <a class="brand" href="/">
       <img class="brand-mark" src="/assets/park/clay/explore.png" alt="" width="56" height="50" />
       <span>
-        <strong>AI世界游乐园</strong>
-        <em>探索知识 · 挑战自我 · 创造无限可能</em>
+        <strong data-i18n="lobby.brand">AI世界游乐园</strong>
+        <em data-i18n="lobby.tagline">探索知识 · 挑战自我 · 创造无限可能</em>
       </span>
     </a>
 
     <button type="button" class="daily-banner" id="daily-banner">
       <img src="/assets/park/clay/explore.png" alt="" width="28" height="24" />
-      <span>每日探索任务已更新，快去完成吧！</span>
+      <span data-i18n="lobby.daily">每日探索任务已更新，快去完成吧！</span>
     </button>
 
-    <a class="profile-card" id="profile-card" href="/castle/">
-      <span class="profile-avatar" id="profile-avatar">🧒</span>
-      <span class="profile-meta">
-        <strong id="profile-name">小探索者</strong>
-        <em id="profile-level">Lv.1 探索者</em>
-      </span>
-      <span class="profile-stats">
-        <span class="stat points" title="积分"><i>✦</i><b id="profile-points">0</b></span>
-        <span class="stat coins" title="星币"><i>◆</i><b id="profile-coins">0</b></span>
-      </span>
-      <img class="profile-bell" src="/assets/park/clay/medal.png" alt="" width="28" height="32" />
-    </a>
+    <div class="header-end">
+      <div id="lang-host" class="lang-host"></div>
+      <a class="profile-card" id="profile-card" href="/castle/">
+        <span class="profile-avatar" id="profile-avatar">🧒</span>
+        <span class="profile-meta">
+          <strong id="profile-name" data-i18n="lobby.explorerDefault">小探索者</strong>
+          <em id="profile-level">Lv.1 探索者</em>
+        </span>
+        <span class="profile-stats">
+          <span class="stat points" data-i18n-title="lobby.points" title="积分"><i>✦</i><b id="profile-points">0</b></span>
+          <span class="stat coins" data-i18n-title="lobby.coins" title="星币"><i>◆</i><b id="profile-coins">0</b></span>
+        </span>
+        <img class="profile-bell" src="/assets/park/clay/medal.png" alt="" width="28" height="32" />
+      </a>
+    </div>
   </header>
 
   <main class="park-stage">
-    <section class="island-wrap" aria-label="游乐园鸟瞰图">
-      <div class="float-tools" aria-label="快捷工具">
-        <button type="button" class="float-btn" id="btn-activity" title="活动中心">
+    <section class="island-wrap" data-i18n-aria="lobby.mapAria" aria-label="游乐园鸟瞰图">
+      <div class="float-tools" data-i18n-aria="lobby.toolsAria" aria-label="快捷工具">
+        <button type="button" class="float-btn" id="btn-activity" data-i18n-title="lobby.activity" title="活动中心">
           <img src="/assets/park/clay/gift.png" alt="" width="40" height="44" />
-          <small>活动中心</small>
+          <small data-i18n="lobby.activity">活动中心</small>
         </button>
-        <button type="button" class="float-btn" id="btn-achieve" title="成就勋章">
+        <button type="button" class="float-btn" id="btn-achieve" data-i18n-title="lobby.achieve" title="成就勋章">
           <img src="/assets/park/clay/medal.png" alt="" width="34" height="48" />
-          <small>成就勋章</small>
+          <small data-i18n="lobby.achieve">成就勋章</small>
         </button>
       </div>
 
@@ -62,22 +66,34 @@
           class="island-art"
           id="island-art"
           src="/assets/park/clay/island.png"
+          data-i18n-attr="alt"
+          data-i18n="lobby.islandAlt"
           alt="AI世界游乐园：知识城堡、冒险冲刺区、知识竞技场与装扮小镇"
           draggable="false"
           decoding="async"
         />
 
-        <!-- 点击地图自带编号 1–4：对齐图中圆形标注 + 文字气泡 -->
-        <button type="button" class="zone-label" data-zone="castle" data-num="1" style="--x:54%;--y:16%;--w:168px;--h:44px" aria-label="1 · 知识城堡"></button>
-        <button type="button" class="zone-label" data-zone="adventure" data-num="2" style="--x:24%;--y:20%;--w:178px;--h:44px" aria-label="2 · 冒险冲刺区"></button>
-        <button type="button" class="zone-label" data-zone="arena" data-num="3" style="--x:84%;--y:14%;--w:178px;--h:44px" aria-label="3 · 知识竞技场"></button>
-        <button type="button" class="zone-label" data-zone="town" data-num="4" style="--x:76%;--y:78%;--w:168px;--h:44px" aria-label="4 · 装扮小镇"></button>
+        <button type="button" class="zone-label" data-zone="castle" data-num="1" style="--x:48%;--y:26%" data-i18n-aria="lobby.zone.castleNum" aria-label="1 · 知识城堡">
+          <span class="zone-badge" aria-hidden="true">1</span>
+          <span class="zone-name" data-i18n="lobby.zone.castle">Knowledge Castle</span>
+        </button>
+        <button type="button" class="zone-label" data-zone="adventure" data-num="2" style="--x:18%;--y:30%" data-i18n-aria="lobby.zone.adventureNum" aria-label="2 · 冒险冲刺区">
+          <span class="zone-badge" aria-hidden="true">2</span>
+          <span class="zone-name" data-i18n="lobby.zone.adventure">Adventure Sprint</span>
+        </button>
+        <button type="button" class="zone-label" data-zone="arena" data-num="3" style="--x:80%;--y:16%" data-i18n-aria="lobby.zone.arenaNum" aria-label="3 · 知识竞技场">
+          <span class="zone-badge" aria-hidden="true">3</span>
+          <span class="zone-name" data-i18n="lobby.zone.arena">Knowledge Arena</span>
+        </button>
+        <button type="button" class="zone-label" data-zone="town" data-num="4" style="--x:78%;--y:66%" data-i18n-aria="lobby.zone.townNum" aria-label="4 · 装扮小镇">
+          <span class="zone-badge" aria-hidden="true">4</span>
+          <span class="zone-name" data-i18n="lobby.zone.town">Fashion Town</span>
+        </button>
 
-        <!-- 分区建筑热区（扩大可点范围） -->
-        <button type="button" class="zone-hit" data-zone="castle" style="--x:48%;--y:56%;--w:26%;--h:30%" aria-label="知识城堡"></button>
-        <button type="button" class="zone-hit" data-zone="adventure" style="--x:24%;--y:36%;--w:24%;--h:28%" aria-label="冒险冲刺区"></button>
-        <button type="button" class="zone-hit" data-zone="arena" style="--x:76%;--y:32%;--w:24%;--h:26%" aria-label="知识竞技场"></button>
-        <button type="button" class="zone-hit" data-zone="town" style="--x:74%;--y:74%;--w:24%;--h:24%" aria-label="装扮小镇"></button>
+        <button type="button" class="zone-hit" data-zone="castle" style="--x:48%;--y:48%;--w:28%;--h:34%" data-i18n-aria="lobby.zone.castle" aria-label="知识城堡"></button>
+        <button type="button" class="zone-hit" data-zone="adventure" style="--x:22%;--y:42%;--w:26%;--h:32%" data-i18n-aria="lobby.zone.adventure" aria-label="冒险冲刺区"></button>
+        <button type="button" class="zone-hit" data-zone="arena" style="--x:78%;--y:34%;--w:26%;--h:30%" data-i18n-aria="lobby.zone.arena" aria-label="知识竞技场"></button>
+        <button type="button" class="zone-hit" data-zone="town" style="--x:76%;--y:72%;--w:26%;--h:28%" data-i18n-aria="lobby.zone.town" aria-label="装扮小镇"></button>
 
         <div class="zone-glow" data-zone="castle" aria-hidden="true"></div>
         <div class="zone-glow" data-zone="adventure" aria-hidden="true"></div>
@@ -89,38 +105,38 @@
             <img id="zone-picker-ico" src="/assets/park/clay/castle.png" alt="" width="48" height="48" />
             <div>
               <strong id="zone-picker-title">知识城堡</strong>
-              <p>选择要进入的玩法</p>
+              <p data-i18n="lobby.pickerHint">选择要进入的玩法</p>
             </div>
-            <button type="button" class="zone-picker-close" id="zone-picker-close" aria-label="关闭">×</button>
+            <button type="button" class="zone-picker-close" id="zone-picker-close" data-i18n-aria="common.close" aria-label="关闭">×</button>
           </header>
           <div class="zone-picker-links" id="zone-picker-links"></div>
         </div>
       </div>
 
-      <aside class="week-star" id="week-star" aria-label="本周之星">
+      <aside class="week-star" id="week-star" data-i18n-aria="lobby.weekStar" aria-label="本周之星">
         <div class="week-head">
-          <strong>本周之星</strong>
+          <strong data-i18n="lobby.weekStar">本周之星</strong>
           <span id="week-count">3/5 天</span>
         </div>
-        <p>连续学习打卡领礼物</p>
+        <p data-i18n="lobby.weekHint">连续学习打卡领礼物</p>
         <div class="week-bar"><i id="week-fill" style="--p:60%"></i></div>
-        <button type="button" class="week-gift" id="week-gift" aria-label="领取礼物">
+        <button type="button" class="week-gift" id="week-gift" data-i18n-aria="lobby.gift" aria-label="领取礼物">
           <img src="/assets/park/clay/gift.png" alt="" width="28" height="32" />
         </button>
       </aside>
 
-      <button type="button" class="map-mini" id="map-mini" title="园区地图">
+      <button type="button" class="map-mini" id="map-mini" data-i18n-title="lobby.parkMap" title="园区地图">
         <img src="/assets/park/clay/pin.png" alt="" width="40" height="46" />
-        <small>园区地图</small>
+        <small data-i18n="lobby.parkMap">园区地图</small>
       </button>
     </section>
 
-    <aside class="guide-panel" aria-label="园区导览一览">
+    <aside class="guide-panel" data-i18n-aria="lobby.guideAria" aria-label="园区导览一览">
       <header class="guide-head">
         <img class="guide-mark" src="/assets/park/clay/pin.png" alt="" width="40" height="46" />
         <div>
-          <h2>◆ 园区导览一览 ◆</h2>
-          <p>点选分区图标或玩法入口</p>
+          <h2 data-i18n="lobby.guideTitle">◆ 园区导览一览 ◆</h2>
+          <p data-i18n="lobby.guideHint">点选分区图标或玩法入口</p>
         </div>
       </header>
 
@@ -128,104 +144,104 @@
         <section class="guide-zone theme-castle" data-zone="castle">
           <div class="zone-banner">
             <img src="/assets/park/clay/castle.png" alt="" width="64" height="64" />
-            <h3><b>1</b>知识城堡</h3>
+            <h3><b>1</b><span data-i18n="lobby.zone.castle">知识城堡</span></h3>
           </div>
           <a class="guide-link" href="/castle" data-pin="0" data-zone="castle">
             <span class="link-dot" aria-hidden="true"></span>
-            <span><strong>积分兑换区</strong><small>1–5 级奖池兑换装扮</small></span>
+            <span><strong data-i18n="lobby.link.castleExchange">积分兑换区</strong><small data-i18n="lobby.link.castleExchangeDesc">1–5 级奖池兑换装扮</small></span>
           </a>
           <a class="guide-link" href="/nuannuan" data-pin="6" data-zone="castle">
             <span class="link-dot" aria-hidden="true"></span>
-            <span><strong>知识星橱</strong><small>答题收集 · 解锁星橱</small></span>
+            <span><strong data-i18n="lobby.link.starCloset">知识星橱</strong><small data-i18n="lobby.link.starClosetDesc">答题收集 · 解锁星橱</small></span>
           </a>
         </section>
 
         <section class="guide-zone theme-adventure" data-zone="adventure">
           <div class="zone-banner">
             <img src="/assets/park/clay/adventure.png" alt="" width="64" height="48" />
-            <h3><b>2</b>冒险冲刺区</h3>
+            <h3><b>2</b><span data-i18n="lobby.zone.adventure">冒险冲刺区</span></h3>
           </div>
           <a class="guide-link" href="/parkour" data-pin="1" data-zone="adventure">
             <span class="link-dot" aria-hidden="true"></span>
-            <span><strong>云城冲刺</strong><small>神庙逃亡 · 答对吃币</small></span>
+            <span><strong data-i18n="lobby.link.parkour">云城冲刺</strong><small data-i18n="lobby.link.parkourDesc">神庙逃亡 · 答对吃币</small></span>
           </a>
           <a class="guide-link" href="/race" data-pin="2" data-zone="adventure">
             <span class="link-dot" aria-hidden="true"></span>
-            <span><strong>AI 极速赛道</strong><small>街机竞速 · 答对加速</small></span>
+            <span><strong data-i18n="lobby.link.race">AI 极速赛道</strong><small data-i18n="lobby.link.raceDesc">街机竞速 · 答对加速</small></span>
           </a>
         </section>
 
         <section class="guide-zone theme-arena" data-zone="arena">
           <div class="zone-banner">
             <img src="/assets/park/clay/arena.png" alt="" width="64" height="52" />
-            <h3><b>3</b>知识竞技场</h3>
+            <h3><b>3</b><span data-i18n="lobby.zone.arena">知识竞技场</span></h3>
           </div>
           <a class="guide-link" href="/kahoot" data-pin="3" data-zone="arena">
             <span class="link-dot" aria-hidden="true"></span>
-            <span><strong>AI 素养挑战赛</strong><small>限时抢答 · 即时排行</small></span>
+            <span><strong data-i18n="lobby.link.kahoot">AI 素养挑战赛</strong><small data-i18n="lobby.link.kahootDesc">限时抢答 · 即时排行</small></span>
           </a>
           <a class="guide-link" href="/monopoly" data-pin="4" data-zone="arena">
             <span class="link-dot" aria-hidden="true"></span>
-            <span><strong>AI 地产大亨</strong><small>棋盘经营 · 答对赚钱</small></span>
+            <span><strong data-i18n="lobby.link.monopoly">AI 地产大亨</strong><small data-i18n="lobby.link.monopolyDesc">棋盘经营 · 答对赚钱</small></span>
           </a>
         </section>
 
         <section class="guide-zone theme-town" data-zone="town">
           <div class="zone-banner">
             <img src="/assets/park/clay/town.png" alt="" width="56" height="54" />
-            <h3><b>4</b>装扮小镇</h3>
+            <h3><b>4</b><span data-i18n="lobby.zone.town">装扮小镇</span></h3>
           </div>
           <a class="guide-link" href="/nuannuan/login" data-pin="5" data-zone="town">
             <span class="link-dot" aria-hidden="true"></span>
-            <span><strong>AI 角色登录</strong><small>暖暖风 · 建角登录</small></span>
+            <span><strong data-i18n="lobby.link.login">AI 角色登录</strong><small data-i18n="lobby.link.loginDesc">暖暖风 · 建角登录</small></span>
           </a>
           <a class="guide-link" href="/explorer" data-pin="7" data-zone="town">
             <span class="link-dot" aria-hidden="true"></span>
-            <span><strong>建立你的探索者</strong><small>自定义角色 · 开启探索</small></span>
+            <span><strong data-i18n="lobby.link.explorer">建立你的探索者</strong><small data-i18n="lobby.link.explorerDesc">自定义角色 · 开启探索</small></span>
           </a>
         </section>
       </div>
 
       <button type="button" class="guide-cta" id="newbie-guide">
         <img src="/assets/park/clay/medal.png" alt="" width="22" height="28" />
-        新手引导
+        <span data-i18n="lobby.newbie">新手引导</span>
         <span class="cta-arrow" aria-hidden="true">›</span>
       </button>
     </aside>
   </main>
 
-  <nav class="bottom-nav" aria-label="主导航">
-    <a class="bn-item is-on" href="/" data-nav="home"><span>🏠</span><em>园区首页</em></a>
-    <a class="bn-item" href="/kahoot" data-nav="tasks"><span>📋</span><em>学习任务</em></a>
-    <a class="bn-item" href="/nuannuan/partner" data-nav="partner"><span>🤖</span><em>AI伙伴</em></a>
-    <button type="button" class="bn-explore" id="btn-explore" aria-label="探索模式">
+  <nav class="bottom-nav" data-i18n-aria="lobby.navAria" aria-label="主导航">
+    <a class="bn-item is-on" href="/" data-nav="home"><span>🏠</span><em data-i18n="lobby.nav.home">园区首页</em></a>
+    <a class="bn-item" href="/kahoot" data-nav="tasks"><span>📋</span><em data-i18n="lobby.nav.tasks">学习任务</em></a>
+    <a class="bn-item" href="/nuannuan/partner" data-nav="partner"><span>🤖</span><em data-i18n="lobby.nav.partner">AI伙伴</em></a>
+    <button type="button" class="bn-explore" id="btn-explore" data-i18n-aria="lobby.nav.explore" aria-label="探索模式">
       <img src="/assets/park/clay/explore.png" alt="" width="52" height="46" />
-      <em>探索模式</em>
+      <em data-i18n="lobby.nav.explore">探索模式</em>
     </button>
-    <a class="bn-item" href="/nuannuan" data-nav="workshop"><span>🎨</span><em>创造工坊</em></a>
-    <a class="bn-item" href="/kahoot" data-nav="rank"><span>🏆</span><em>排行榜</em></a>
-    <button type="button" class="bn-item" id="btn-settings" data-nav="settings"><span>⚙️</span><em>设置</em></button>
+    <a class="bn-item" href="/nuannuan" data-nav="workshop"><span>🎨</span><em data-i18n="lobby.nav.workshop">创造工坊</em></a>
+    <a class="bn-item" href="/kahoot" data-nav="rank"><span>🏆</span><em data-i18n="lobby.nav.rank">排行榜</em></a>
+    <button type="button" class="bn-item" id="btn-settings" data-nav="settings"><span>⚙️</span><em data-i18n="lobby.nav.settings">设置</em></button>
   </nav>
 
   <dialog class="soft-modal" id="guide-modal" aria-labelledby="guide-modal-title">
     <form method="dialog" class="soft-modal-card">
       <img class="modal-hero" src="/assets/park/clay/castle.png" alt="" width="120" height="118" />
-      <h2 id="guide-modal-title">新手引导</h2>
+      <h2 id="guide-modal-title" data-i18n="lobby.guide.modalTitle">新手引导</h2>
       <ol>
-        <li>先到<strong>装扮小镇</strong>创建或登录角色</li>
-        <li>去<strong>冒险冲刺 / 竞技场</strong>答题赚积分</li>
-        <li>回<strong>知识城堡</strong>兑换装扮与特效</li>
-        <li>装扮会自动带入冲刺与赛车实装</li>
+        <li data-i18n="lobby.guide.step1">先到装扮小镇创建或登录角色</li>
+        <li data-i18n="lobby.guide.step2">去冒险冲刺 / 竞技场答题赚积分</li>
+        <li data-i18n="lobby.guide.step3">回知识城堡兑换装扮与特效</li>
+        <li data-i18n="lobby.guide.step4">装扮会自动带入冲刺与赛车实装</li>
       </ol>
       <div class="soft-modal-actions">
-        <button value="cancel" class="btn-ghost">稍后再看</button>
-        <button value="ok" class="btn-solid" id="guide-start">开始探索</button>
+        <button value="cancel" class="btn-ghost" data-i18n="lobby.guide.later">稍后再看</button>
+        <button value="ok" class="btn-solid" id="guide-start" data-i18n="lobby.guide.start">开始探索</button>
       </div>
     </form>
   </dialog>
 
   <div class="page-toast" id="page-toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="/lobby.js?v=12"></script>
+  <script type="module" src="/lobby.js?v=14"></script>
 </body>
 </html>

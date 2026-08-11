@@ -2,8 +2,10 @@
  * 云城冲刺 — 神庙遗迹风 · 长路径 · 弯道 · 金币/宝石
  * 答对：连吃宝藏；答错：桥断坠落受罚
  */
-import { AI_QUESTIONS } from "/monopoly/questions.js";
+import { AI_QUESTIONS, isCorrectOption, localizeQuestion } from "/monopoly/questions.js";
 import { addCastlePoints, getEquippedLoadout } from "/castle/castle.js";
+import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
+import { mountLobbyExit } from "/js/lobby-exit.js";
 import {
   drawFlightGear,
   drawOrbitAura,
@@ -20,6 +22,9 @@ import {
   DEFAULT_FACING,
 } from "/castle/cosmetics-draw.js?v=4";
 import { resolveEquipFx, isOrbitTrail, isBloomTrail } from "/castle/equip-fx.js?v=4";
+
+initI18n({ toggleHost: "#lang-host" });
+mountLobbyExit();
 
 const MAX_LIVES = 3;
 const COIN_BURST = 20;
@@ -254,6 +259,7 @@ const BIOME_FX = {
         popup: "藤刺陷阱！",
         timer: "藤蔓陷阱…",
         detail: "JUNGLE A · 藤蔓 + 地刺！",
+        detailEn: "JUNGLE A · Vines + spikes!",
         life: "被藤刺缠中！-1 生命",
         end: "倒在丛林陷阱里…",
         recover: "挣脱藤蔓，继续奔跑！",
@@ -266,6 +272,7 @@ const BIOME_FX = {
         popup: "神庙碾压！",
         timer: "滚石逼近…",
         detail: "JUNGLE B · 神庙巨石！",
+        detailEn: "JUNGLE B · Temple boulder!",
         life: "被神庙石碾中！-1 生命",
         end: "被神庙滚石压倒…",
         recover: "从苔石里爬出！",
@@ -278,6 +285,7 @@ const BIOME_FX = {
         popup: "石口吞噬！",
         timer: "石怪陷阱…",
         detail: "JUNGLE C · 石口陷阱！",
+        detailEn: "JUNGLE C · Stone mouth trap!",
         life: "被石口咬中！-1 生命",
         end: "被丛林石怪吞没…",
         recover: "从石口逃出！",
@@ -318,6 +326,7 @@ const BIOME_FX = {
         popup: "沙刺陷阱！",
         timer: "沙刺陷阱…",
         detail: "DESERT A · 沙地尖刺！",
+        detailEn: "DESERT A · Sand spikes!",
         life: "踩中沙刺！-1 生命",
         end: "倒在沙刺陷阱上…",
         recover: "跳出沙板，继续冲刺！",
@@ -330,6 +339,7 @@ const BIOME_FX = {
         popup: "流沙碾压！",
         timer: "流沙逼近…",
         detail: "DESERT B · 流沙 + 石柱！",
+        detailEn: "DESERT B · Quicksand + pillars!",
         life: "陷入流沙！-1 生命",
         end: "被流沙淹没…",
         recover: "从流沙里爬出！",
@@ -342,6 +352,7 @@ const BIOME_FX = {
         popup: "沙口吞噬！",
         timer: "沙口陷阱…",
         detail: "DESERT C · 沙口 + 熔沙！",
+        detailEn: "DESERT C · Sand mouth + molten sand!",
         life: "掉进沙口！-1 生命",
         end: "被沙漠沙口吞没…",
         recover: "抓住岩壁爬上来！",
@@ -382,6 +393,7 @@ const BIOME_FX = {
         popup: "冰锥斩击！",
         timer: "冰锥陷阱…",
         detail: "SNOW A · 冰锥 + 寒刃！",
+        detailEn: "SNOW A · Ice spikes + frost blades!",
         life: "被冰锥刺中！-1 生命",
         end: "倒在冰锥陷阱上…",
         recover: "抖落霜雪，继续冲刺！",
@@ -394,6 +406,7 @@ const BIOME_FX = {
         popup: "雪球碾压！",
         timer: "雪球逼近…",
         detail: "SNOW B · 巨型雪球！",
+        detailEn: "SNOW B · Giant snowball!",
         life: "被雪球砸中！-1 生命",
         end: "被雪球压倒…",
         recover: "从雪堆里爬出！",
@@ -406,6 +419,7 @@ const BIOME_FX = {
         popup: "冰窟坠落！",
         timer: "冰窟陷阱…",
         detail: "SNOW C · 冰窟 + 霜怪！",
+        detailEn: "SNOW C · Frost pit + ice beast!",
         life: "掉进冰窟！-1 生命",
         end: "坠入冰窟深渊…",
         recover: "抓住冰棱爬上来！",
@@ -446,6 +460,7 @@ const BIOME_FX = {
         popup: "熔刃斩击！",
         timer: "熔刃陷阱…",
         detail: "LAVA A · 熔刃 + 地火！",
+        detailEn: "LAVA A · Ember blades + ground fire!",
         life: "被熔刃灼伤！-1 生命",
         end: "倒在熔刃陷阱上…",
         recover: "躲开火舌，继续冲刺！",
@@ -458,6 +473,7 @@ const BIOME_FX = {
         popup: "岩浆碾压！",
         timer: "岩浆石逼近…",
         detail: "LAVA B · 岩浆滚石！",
+        detailEn: "LAVA B · Magma boulder!",
         life: "被岩浆石砸中！-1 生命",
         end: "被岩浆滚石压倒…",
         recover: "从焦石里爬出！",
@@ -470,6 +486,7 @@ const BIOME_FX = {
         popup: "熔岩吞噬！",
         timer: "熔岩陷阱…",
         detail: "LAVA C · 熔岩 + 石怪！",
+        detailEn: "LAVA C · Lava + rock beast!",
         life: "掉进熔岩！-1 生命",
         end: "被熔岩与石怪吞没…",
         recover: "抓住岩壁爬上来！",
@@ -754,21 +771,21 @@ function paintLoadoutHud() {
   const menu = els.menuLoadout;
   if (menu) {
     if (!load) {
-      menu.innerHTML = `<p>尚未读取装扮 · <a href="/castle/">去知识城堡装备</a></p>`;
+      menu.innerHTML = `<p>${t("parkour.loadoutUnread")} <a href="/castle/">${t("parkour.loadoutUnreadLink")}</a></p>`;
     } else {
       const rows = [
-        ["头像框", load.frame],
-        ["称号", load.title],
-        ["特效", load.trail],
-        ["伙伴", load.pet],
-        ["装饰", load.decor],
+        ["frame", load.frame],
+        ["title", load.title],
+        ["trail", load.trail],
+        ["pet", load.pet],
+        ["decor", load.decor],
       ]
         .filter(([, it]) => it)
         .map(([, it]) => `<li>${it.icon} ${it.name}</li>`)
         .join("");
       menu.innerHTML = rows
-        ? `<p>当前实装装扮</p><ul>${rows}</ul><a href="/castle/">调整装扮</a>`
-        : `<p>背包还没装备道具</p><a href="/castle/">去知识城堡兑换装备 →</a>`;
+        ? `<p>${t("parkour.loadoutActive")}</p><ul>${rows}</ul><a href="/castle/">${t("parkour.loadoutAdjust")}</a>`
+        : `<p>${t("parkour.loadoutEmpty")}</p><a href="/castle/">${t("parkour.loadoutGoCastle")}</a>`;
     }
   }
 }
@@ -836,8 +853,9 @@ function nextQuestion() {
 
 function makeQuizGate(z) {
   const q = nextQuestion();
-  const correct = q.answer;
-  const others = q.options.map((_, i) => i).filter((i) => i !== correct);
+  const correctPool = Array.isArray(q.answers) && q.answers.length ? q.answers : [q.answer];
+  const correct = correctPool[Math.floor(Math.random() * correctPool.length)] ?? q.answer;
+  const others = q.options.map((_, i) => i).filter((i) => !isCorrectOption(q, i));
   const picks = shuffle([correct, ...shuffle(others).slice(0, 2)]);
   while (picks.length < 3) picks.push(others[picks.length % others.length] ?? 0);
   return {
@@ -913,13 +931,21 @@ function showPenalty(scoreCut, kind = "blade") {
   if (!els.penaltyPanel) return;
   const copy = failCopy(kind);
   const biome = activeScene().biome || "jungle";
+  const en = getLang() === "en";
   els.penaltyPanel.dataset.kind = kind;
   els.penaltyPanel.dataset.biome = biome;
   if (els.penaltyScore) els.penaltyScore.textContent = `-${scoreCut}% SCORE`;
   if (els.penaltyEn) els.penaltyEn.textContent = copy.en;
-  if (els.penaltyZh) els.penaltyZh.textContent = copy.zh;
-  if (els.penaltyDetail) els.penaltyDetail.textContent = copy.detail;
-  if (els.penaltyOk) els.penaltyOk.textContent = copy.btn;
+  if (els.penaltyZh) {
+    els.penaltyZh.textContent = copy.zh;
+    els.penaltyZh.hidden = en;
+  }
+  if (els.penaltyDetail) {
+    els.penaltyDetail.textContent = en ? (copy.detailEn || copy.en) : copy.detail;
+  }
+  if (els.penaltyOk) {
+    els.penaltyOk.textContent = en ? t("parkour.penaltyOk") : copy.btn;
+  }
   els.penaltyPanel.hidden = false;
   clearTimeout(showPenalty._t);
   showPenalty._t = setTimeout(hidePenalty, 2400);
@@ -1024,16 +1050,28 @@ function updateHud() {
     const dot = els.distFill.parentElement?.querySelector(".runner-dot");
     if (dot) dot.style.left = `${distPct}%`;
   }
-  els.missionCoins.textContent = state.burstActive
-    ? `连吃宝藏 ${state.burstCollected} / ${COIN_BURST}`
-    : `连吃宝藏 ${state.burstCollected} / ${COIN_BURST}`;
-  els.missionDist.textContent = `奔跑 ${Math.min(Math.floor(state.distance), 1000)} / 1000m`;
-  els.missionQuiz.textContent = `知识门 ${state.quizCorrect} · 已遇 ${state.quizSeen}`;
+  els.missionCoins.textContent = t("parkour.missionCoins", {
+    n: state.burstCollected,
+    max: COIN_BURST,
+  });
+  els.missionDist.textContent = t("parkour.missionDist", {
+    n: Math.min(Math.floor(state.distance), 1000),
+  });
+  els.missionQuiz.textContent = t("parkour.missionQuiz", {
+    ok: state.quizCorrect,
+    seen: state.quizSeen,
+  });
   if (els.missionZone) {
     const sc = activeScene();
     const into = state.quizSeen % QUESTIONS_PER_SCENE;
     const left = QUESTIONS_PER_SCENE - into;
-    els.missionZone.textContent = `场景 ${sc.name} · 再 ${left} 题换景（${into}/${QUESTIONS_PER_SCENE}）`;
+    const name = getLang() === "en" ? sc.nameEn : sc.name;
+    els.missionZone.textContent = t("parkour.missionZone", {
+      name,
+      left,
+      into,
+      per: QUESTIONS_PER_SCENE,
+    });
   }
 }
 
@@ -1043,14 +1081,18 @@ function setQuizBanner(quiz) {
     els.laneKeys.innerHTML = "";
     return;
   }
+  const q = localizeQuestion(quiz.question, getLang());
   els.quizBanner.hidden = false;
-  els.quizDomain.textContent = quiz.question.domain;
-  els.quizStem.textContent = quiz.question.stem;
-  els.quizTimer.textContent = `请点选答案 · 剩余 ${Math.ceil(state.quizTimeLeft)}s`;
+  els.quizDomain.textContent = q.domain;
+  els.quizStem.textContent = q.stem;
+  els.quizTimer.textContent = t("parkour.quizPick", {
+    s: Math.ceil(state.quizTimeLeft),
+  });
   els.laneKeys.innerHTML = "";
+  const laneLabels = [t("parkour.laneLeft"), t("parkour.laneMid"), t("parkour.laneRight")];
   quiz.laneOptions.forEach((optIdx, lane) => {
-    const label = ["A · 左", "B · 中", "C · 右"][lane];
-    const text = quiz.question.options[optIdx];
+    const label = laneLabels[lane];
+    const text = q.options[optIdx];
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = `l${lane}`;
@@ -1059,6 +1101,16 @@ function setQuizBanner(quiz) {
     els.laneKeys.appendChild(btn);
   });
 }
+
+onLangChange(() => {
+  applyDom();
+  paintLoadoutHud();
+  if (els.swipeHint) els.swipeHint.textContent = t("parkour.tipSwipe");
+  updateHud();
+  if (state.activeQuiz && !state.activeQuiz.resolved) {
+    setQuizBanner(state.activeQuiz);
+  }
+});
 
 function answerQuiz(chosenLane) {
   const quiz = state.activeQuiz;
@@ -1124,8 +1176,11 @@ function resetGame() {
   refreshLoadout();
   setQuizBanner(null);
   updateHud();
-  els.swipeHint.classList.remove("is-hide");
-  setTimeout(() => els.swipeHint.classList.add("is-hide"), 4000);
+  if (els.swipeHint) {
+    els.swipeHint.textContent = t("parkour.tipSwipe");
+    els.swipeHint.classList.remove("is-hide");
+    setTimeout(() => els.swipeHint.classList.add("is-hide"), 4000);
+  }
   show(els.play);
   requestAnimationFrame(loop);
 }
@@ -1209,9 +1264,16 @@ function resolveQuiz(quiz, chosenLane, timedOut) {
     spawnCoinBurst(quiz.correctLane);
     state.returnHomeAt = state.t + 6.2;
     showTurnBanner(quiz.correctLane);
-    const loot = biomeFx().reward.zh;
-    toast(`答对！拐进${quiz.correctLane === 0 ? "左" : quiz.correctLane === 2 ? "右" : "中"}道，冲向${loot}`);
-    els.quizTimer.textContent = `答对！${loot}冲刺中…`;
+    const reward = biomeFx().reward;
+    const loot = getLang() === "en" ? reward.en : reward.zh;
+    const laneKey =
+      quiz.correctLane === 0
+        ? "parkour.laneNameL"
+        : quiz.correctLane === 2
+          ? "parkour.laneNameR"
+          : "parkour.laneNameM";
+    toast(t("parkour.correctLane", { lane: t(laneKey), loot }));
+    els.quizTimer.textContent = t("parkour.correctTimer", { loot });
     addPopup(quiz.correctLane === 0 ? "← 拐入左道" : quiz.correctLane === 2 ? "拐入右道 →" : "直行正道", biomeFx().gem);
   } else {
     // 超时：随机踩一条错路陷阱，让淘汰表现也多样化
@@ -1403,7 +1465,9 @@ function update(dt) {
   if (state.awaitingAnswer) {
     state.quizTimeLeft -= dt;
     if (els.quizTimer) {
-      els.quizTimer.textContent = `请点选答案 · 剩余 ${Math.max(0, Math.ceil(state.quizTimeLeft))}s`;
+      els.quizTimer.textContent = t("parkour.quizPick", {
+        s: Math.max(0, Math.ceil(state.quizTimeLeft)),
+      });
     }
     if (state.quizTimeLeft <= 0 && state.activeQuiz) {
       resolveQuiz(state.activeQuiz, null, true);

@@ -1,0 +1,42 @@
+/* Shared discreet “back to lobby” control for all games */
+.exit-quiet {
+  position: fixed;
+  left: 0.55rem;
+  bottom: 0.55rem;
+  z-index: 80;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font: 600 0.68rem/1 Fredoka, Nunito, "Noto Sans SC", "Noto Sans TC", system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  color: rgba(90, 64, 48, 0.4);
+  background: rgba(255, 253, 245, 0.4);
+  border: 1px solid rgba(180, 140, 100, 0.14);
+  box-shadow: none;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.exit-quiet:hover,
+.exit-quiet:focus-visible {
+  opacity: 1;
+  color: #5a4030;
+  background: rgba(255, 253, 245, 0.95);
+  box-shadow: 0 4px 14px rgba(180, 120, 90, 0.16);
+  outline: none;
+}
+
+/* Darker game shells (parkour / kahoot pixel remnants) */
+body:has(.stone-panel) .exit-quiet,
+body.clay-arena .exit-quiet {
+  color: rgba(90, 64, 48, 0.45);
+}
+
+@media (max-width: 640px) {
+  .exit-quiet {
+    left: 0.4rem;
+    bottom: 0.4rem;
+    font-size: 0.64rem;
+    padding: 0.26rem 0.5rem;
+  }
+}

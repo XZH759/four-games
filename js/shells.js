@@ -51,7 +51,7 @@ window.Shells = {
       if (!ctx.justClearedLevel) return Promise.resolve();
       const toast = document.createElement("div");
       toast.className = "between-toast";
-      toast.innerHTML = `<div><img src="assets/bot-buddy.png" alt=""/><p>区域接通 · ${ctx.zone}</p><button type="button">继续</button></div>`;
+      toast.innerHTML = `<div><img src="/assets/bot-buddy.png" alt=""/><p>区域接通 · ${ctx.zone}</p><button type="button">继续</button></div>`;
       host.appendChild(toast);
       return new Promise((resolve) => {
         const t = setTimeout(() => { toast.remove(); resolve(); }, 2000);
@@ -108,7 +108,7 @@ window.Shells = {
         <div class="shell-collect">
           <div class="pet-row">
             <div class="pet-stage growth-${growth}" data-log="accessory-view">
-              <img src="assets/bot-buddy.png" alt="机伴"/>
+              <img src="/assets/bot-buddy.png" alt="机伴"/>
               <div class="wear">${s.unlocked.map((id) => {
                 const p = this.parts.find((x) => x.id === id);
                 return p ? `<span title="${p.label}">${p.icon}</span>` : "";
@@ -199,7 +199,7 @@ window.Shells = {
         <div class="shell-race">
           <p class="rank-note">榜单按答题数 · 与对错无关 · 无淘汰</p>
           <div class="track">
-            <div class="racer you" style="left:${youPct}%"><img src="assets/bot-buddy.png" alt="你"/></div>
+            <div class="racer you" style="left:${youPct}%"><img src="/assets/bot-buddy.png" alt="你"/></div>
             <div class="racer peer" style="left:${peerPct}%"><span>07</span></div>
           </div>
           <ol class="mini-board">

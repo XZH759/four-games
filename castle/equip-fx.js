@@ -8,6 +8,8 @@
  * - balloon 手持气球浮空
  */
 
+import { t } from "/js/i18n.js";
+
 /** @typedef {"wing"|"balloon"|null} FlightMode */
 /** @typedef {"wings"|"jetpack"|"mount"|"balloon"|null} FlightKind */
 
@@ -19,17 +21,17 @@ export const ORBIT_TRAIL_STYLES = new Set(["leaf", "bubble"]);
 /** 绽放型特效：在角色周围炸开（烟花） */
 export const BLOOM_TRAIL_STYLES = new Set(["fireworks"]);
 
-const FLY_LABELS = {
-  feather: "羽翼飞行",
-  angel: "天使飞行",
-  mech: "机械振翅",
-  demon: "魔翼滑翔",
-  butterfly: "蝶翼飞舞",
-  cloud: "云朵巡航",
-  jetpack: "喷气推进",
-  rocket: "火箭推进",
-  carpet: "飞毯巡航",
-  ufo: "飞碟巡航",
+const FLY_KEYS = {
+  feather: "castle.fly.feather",
+  angel: "castle.fly.angel",
+  mech: "castle.fly.mech",
+  demon: "castle.fly.demon",
+  butterfly: "castle.fly.butterfly",
+  cloud: "castle.fly.cloud",
+  jetpack: "castle.fly.jetpack",
+  rocket: "castle.fly.rocket",
+  carpet: "castle.fly.carpet",
+  ufo: "castle.fly.ufo",
 };
 
 export function resolveFlightKind(wingStyle, balloon = false) {
@@ -146,18 +148,18 @@ export function resolveEquipFx(load, rt = {}) {
   const flyLabel = !cap.canFly
     ? null
     : cap.flightKind === "balloon"
-      ? "气球浮空"
-      : (FLY_LABELS[cap.wingStyle] || "飞行");
+      ? t("castle.fly.balloon")
+      : t(FLY_KEYS[cap.wingStyle] || "castle.fly.generic");
 
   const idleLabel = !cap.canFly
-    ? "静态"
+    ? t("castle.idle.static")
     : cap.flightKind === "balloon"
-      ? "气球待机"
+      ? t("castle.idle.balloon")
       : cap.isMount
-        ? "坐骑待机"
+        ? t("castle.idle.mount")
         : cap.isJetpack
-          ? "喷气待机"
-          : "振翅待机";
+          ? t("castle.idle.jet")
+          : t("castle.idle.wing");
 
   let flightFx = null;
   if (flying) {
@@ -190,8 +192,8 @@ export function poseLabelsForLoad(load) {
   const fx = resolveEquipFx(load, { pose: "idle" });
   return {
     canFly: fx.canFly,
-    idle: fx.idleLabel || "静态",
-    fly: fx.flyLabel || "飞行",
+    idle: fx.idleLabel || t("castle.idle.static"),
+    fly: fx.flyLabel || t("castle.fly.generic"),
     flightMode: fx.flightMode,
     flightKind: fx.flightKind,
   };

@@ -2,7 +2,29 @@
  * AI 素养挑战赛 — Terraria / 像素沙盒风格 UI
  * Solo play with bot classmates; PIN/lobby are simulated locally.
  */
-import { AI_QUESTIONS } from "/monopoly/questions.js";
+import { AI_QUESTIONS, isCorrectOption, localizeQuestion } from "/monopoly/questions.js";
+import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
+import { mountLobbyExit } from "/js/lobby-exit.js";
+
+initI18n({ toggleHost: "#lang-host" });
+onLangChange(() => {
+  applyDom();
+  syncJoinReady();
+  paintAvatars();
+  paintWaitRoom();
+  if (els.play?.classList.contains("is-on")) {
+    paintQuestionText();
+    paintYouHud();
+    paintBoard(els.liveBoard);
+  }
+  if (els.reveal?.classList.contains("is-on") && state.lastReveal) {
+    showReveal(state.lastReveal);
+  }
+  if (els.podium?.classList.contains("is-on")) {
+    paintPodium();
+  }
+});
+mountLobbyExit();
 
 const DEMO_PIN = "AI2025";
 const TIME_LIMIT_MS = 20000;
@@ -11,27 +33,41 @@ const SPEED_POINTS = 500;
 const CIRC = 188.4;
 
 const AVATARS = [
-  { id: "av01", src: "/assets/kahoot/pixel/kahoot-av-01.png?v=3", label: "牛仔马尾" },
-  { id: "av02", src: "/assets/kahoot/pixel/kahoot-av-02.png?v=3", label: "粉结学院" },
-  { id: "av03", src: "/assets/kahoot/pixel/kahoot-av-03.png?v=3", label: "绿帽少年" },
-  { id: "av04", src: "/assets/kahoot/pixel/kahoot-av-04.png?v=3", label: "粉结少女" },
-  { id: "av05", src: "/assets/kahoot/pixel/kahoot-av-05.png?v=3", label: "学院制服" },
-  { id: "av06", src: "/assets/kahoot/pixel/kahoot-av-06.png?v=3", label: "薄荷绿发" },
+  { id: "av01", src: "/assets/kahoot/pixel/kahoot-av-01.png?v=3", label: "牛仔马尾", labelEn: "Cowboy ponytail" },
+  { id: "av02", src: "/assets/kahoot/pixel/kahoot-av-02.png?v=3", label: "粉结学院", labelEn: "Pink-bow academy" },
+  { id: "av03", src: "/assets/kahoot/pixel/kahoot-av-03.png?v=3", label: "绿帽少年", labelEn: "Green-hat teen" },
+  { id: "av04", src: "/assets/kahoot/pixel/kahoot-av-04.png?v=3", label: "粉结少女", labelEn: "Pink-bow girl" },
+  { id: "av05", src: "/assets/kahoot/pixel/kahoot-av-05.png?v=3", label: "学院制服", labelEn: "School uniform" },
+  { id: "av06", src: "/assets/kahoot/pixel/kahoot-av-06.png?v=3", label: "薄荷绿发", labelEn: "Mint hair" },
 ];
 
 const BOT_POOL = [
-  { name: "学霸国王", avatarId: "av02" },
-  { name: "电路兔", avatarId: "av03" },
-  { name: "信号喵", avatarId: "av05" },
-  { name: "星火仔", avatarId: "av01" },
-  { name: "数据狐", avatarId: "av06" },
-  { name: "机伴07", avatarId: "av04" },
-  { name: "闪电选手", avatarId: "av01" },
-  { name: "好奇星", avatarId: "av04" },
-  { name: "冷静派", avatarId: "av02" },
-  { name: "冲鸭鸭", avatarId: "av03" },
-  { name: "代码熊", avatarId: "av05" },
+  { name: "学霸国王", nameEn: "Quiz King", avatarId: "av02" },
+  { name: "电路兔", nameEn: "Circuit Bunny", avatarId: "av03" },
+  { name: "信号喵", nameEn: "Signal Cat", avatarId: "av05" },
+  { name: "星火仔", nameEn: "Spark Kid", avatarId: "av01" },
+  { name: "数据狐", nameEn: "Data Fox", avatarId: "av06" },
+  { name: "机伴07", nameEn: "Bot-07", avatarId: "av04" },
+  { name: "闪电选手", nameEn: "Lightning", avatarId: "av01" },
+  { name: "好奇星", nameEn: "Curious Star", avatarId: "av04" },
+  { name: "冷静派", nameEn: "Cool Head", avatarId: "av02" },
+  { name: "冲鸭鸭", nameEn: "Go Duck", avatarId: "av03" },
+  { name: "代码熊", nameEn: "Code Bear", avatarId: "av05" },
 ];
+
+function isEn() {
+  return getLang() === "en";
+}
+
+function avatarLabel(avatar) {
+  return isEn() ? (avatar.labelEn || avatar.label) : avatar.label;
+}
+
+function playerName(p) {
+  if (!p) return "";
+  if (p.isYou) return p.name;
+  return isEn() ? (p.nameEn || p.name) : p.name;
+}
 
 function avatarById(id) {
   return AVATARS.find((a) => a.id === id) || AVATARS[0];
@@ -43,10 +79,10 @@ function avatarImg(id, className = "") {
 }
 
 const SHAPES = [
-  { cls: "is-red", key: "A" },
-  { cls: "is-blue", key: "B" },
-  { cls: "is-yellow", key: "C" },
-  { cls: "is-green", key: "D" },
+  { cls: "is-red", key: "A", tone: "pink" },
+  { cls: "is-blue", key: "B", tone: "sky" },
+  { cls: "is-yellow", key: "C", tone: "mint" },
+  { cls: "is-green", key: "D", tone: "lavender" },
 ];
 
 function pressFeedback(btn) {
@@ -147,6 +183,7 @@ const state = {
   locked: false,
   rafId: null,
   fillTimer: null,
+  lastReveal: null,
 };
 
 function toast(msg) {
@@ -220,12 +257,14 @@ function syncJoinReady() {
     els.stepProfile.classList.toggle("is-active", pinReady && !profileReady);
   }
   if (els.pinStatus) {
-    els.pinStatus.textContent = pinReady ? "PIN 已就绪 ✓" : `已输入 ${readPin().length}/6 位`;
+    els.pinStatus.textContent = pinReady
+      ? t("kahoot.pinReady")
+      : t("kahoot.pinProgress", { n: readPin().length });
   }
   if (els.profileStatus) {
-    if (!nickOk()) els.profileStatus.textContent = "昵称需 2–10 个字";
-    else if (!state.avatar) els.profileStatus.textContent = "请选择头像";
-    else els.profileStatus.textContent = "昵称与头像已就绪 ✓";
+    if (!nickOk()) els.profileStatus.textContent = t("kahoot.nickNeed");
+    else if (!state.avatar) els.profileStatus.textContent = t("kahoot.avatarNeed");
+    else els.profileStatus.textContent = t("kahoot.profileReady");
   }
   if (els.nickCount) {
     els.nickCount.textContent = `${els.nickname.value.length}/10`;
@@ -234,13 +273,11 @@ function syncJoinReady() {
 
   if (els.joinBtn) {
     els.joinBtn.disabled = !ready;
-    els.joinBtn.title = ready ? "进入等待房间" : "请先完成 PIN 与昵称头像";
+    els.joinBtn.title = ready ? t("kahoot.joinTitleReady") : t("kahoot.joinTitleNeed");
   }
   if (els.joinReady) {
     els.joinReady.classList.toggle("is-ok", ready);
-    els.joinReady.textContent = ready
-      ? "准备完成！点击加入游戏 →"
-      : "完成上方两步后即可加入";
+    els.joinReady.textContent = ready ? t("kahoot.joinGo") : t("kahoot.joinNeed");
   }
 }
 
@@ -256,7 +293,7 @@ function syncAvatarPreview() {
   const a = avatarById(state.avatar);
   if (els.avatarPreviewImg) {
     els.avatarPreviewImg.src = a.src;
-    els.avatarPreviewImg.alt = a.label;
+    els.avatarPreviewImg.alt = avatarLabel(a);
   }
 }
 
@@ -264,20 +301,21 @@ function paintAvatars() {
   els.avatarRow.innerHTML = "";
   syncAvatarPreview();
   AVATARS.forEach((avatar, index) => {
+    const label = avatarLabel(avatar);
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = `avatar-opt ui-slot${avatar.id === state.avatar ? " is-on" : ""}`;
     btn.setAttribute("role", "option");
     btn.setAttribute("aria-selected", avatar.id === state.avatar ? "true" : "false");
-    btn.setAttribute("aria-label", avatar.label);
+    btn.setAttribute("aria-label", label);
     btn.dataset.index = String(index);
-    btn.title = avatar.label;
+    btn.title = label;
     btn.innerHTML = `<img src="${avatar.src}" alt="" />`;
     btn.addEventListener("click", () => {
       state.avatar = avatar.id;
       paintAvatars();
       syncJoinReady();
-      toast(`已选择头像：${avatar.label}`);
+      toast(t("kahoot.toast.avatarPick", { name: label }));
     });
     els.avatarRow.appendChild(btn);
   });
@@ -308,12 +346,12 @@ function paintBoard(listEl) {
   listEl.innerHTML = ranked()
     .slice(0, 8)
     .map((p, i) => {
-      const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : String(i + 1);
+      const medal = i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : String(i + 1);
       return `<li class="${p.isYou ? "is-you" : ""}">
         <span class="rank">${medal}</span>
         <span class="av">${avatarImg(p.avatar)}</span>
-        <span>${p.name}${p.isYou ? " (你)" : ""}</span>
-        <span class="pts">${p.score}</span>
+        <span class="nm">${playerName(p)}${p.isYou ? t("kahoot.you") : ""}</span>
+        <span class="pts">${p.score.toLocaleString()}</span>
       </li>`;
     })
     .join("");
@@ -325,16 +363,19 @@ function paintYouHud() {
   els.youAvatar.innerHTML = avatarImg(me.avatar);
   els.youName.textContent = me.name;
   els.youScore.textContent = me.score.toLocaleString();
-  els.youStreak.textContent = state.streak > 0 ? `连续答对 ${state.streak} 题！` : "连续答对 0 题";
-  els.comboText.textContent = `${state.streak} 连击`;
+  els.youStreak.textContent =
+    state.streak > 0 ? t("kahoot.streakN", { n: state.streak }) : t("kahoot.streak0");
+  els.comboText.textContent = t("kahoot.combo", { n: state.streak });
   const xp = Math.min(100, (me.score % 1000) / 10);
   if (els.xpFill) els.xpFill.style.width = `${Math.max(8, xp)}%`;
   const lv = Math.floor(me.score / 1000) + 1;
-  els.xpLabel.textContent = `Lv.${lv} ${lv < 3 ? "初学者" : lv < 5 ? "进阶者" : "挑战者"}`;
+  const role =
+    lv < 3 ? t("kahoot.lvBeginner") : lv < 5 ? t("kahoot.lvAdvanced") : t("kahoot.lvChallenger");
+  els.xpLabel.textContent = t("kahoot.lv", { n: lv, role });
   els.itemHint.textContent = `×${state.items.hint}`;
   els.itemFifty.textContent = `×${state.items.fifty}`;
   els.itemTime.textContent = `×${state.items.time}`;
-  els.buffShield.textContent = state.shield ? "可抵一次" : "未启用";
+  els.buffShield.textContent = state.shield ? t("kahoot.shieldOn") : t("kahoot.shieldOff");
   els.buffTime.textContent = state.extraMs ? `+${state.extraMs / 1000}s` : "—";
   [...els.items.querySelectorAll(".item-btn")].forEach((btn) => {
     const key = btn.dataset.item;
@@ -345,18 +386,18 @@ function paintYouHud() {
   const pct = ((state.index + (state.locked ? 1 : 0)) / total) * 100;
   els.timelineTrack.innerHTML = `<i style="width:${Math.min(100, pct)}%"></i>`;
   els.timelineTip.textContent =
-    state.streak >= 3 ? "太厉害了！保持这个节奏！" : "保持节奏，冲向满分！";
+    state.streak >= 3 ? t("kahoot.tipHot") : t("kahoot.tipRhythm");
 }
 
 function paintWaitGrid() {
   const max = 12;
   els.playerGrid.innerHTML = state.players
     .map((p, i) => {
-      return `<div class="player-pill ui-chip${p.isYou ? " is-host" : ""}">
-        <span class="ui-gem ui-gem--tr ui-gem--${["gold","cyan","purple","green","red"][i % 5]}" aria-hidden="true"></span>
+      return `<div class="player-pill${p.isYou ? " is-host" : ""}">
         <span class="idx">${String(i + 1).padStart(2, "0")}</span>
         <span class="av">${avatarImg(p.avatar)}</span>
-        <span class="name">${p.name}${p.isYou ? " · 你" : ""}</span>
+        <span class="name">${playerName(p)}${p.isYou ? t("kahoot.youDot") : ""}</span>
+        <span class="dot" aria-hidden="true"></span>
       </div>`;
     })
     .join("");
@@ -377,6 +418,7 @@ function fillLobbyGradually() {
     state.players.push({
       id: `bot-${i}`,
       name: bot.name,
+      nameEn: bot.nameEn,
       avatar: bot.avatarId,
       score: 0,
       isYou: false,
@@ -391,21 +433,21 @@ function joinRoom() {
   const pin = readPin();
   const nick = els.nickname.value.trim();
   if (pin.length < 6) {
-    toast("请输入完整 6 位 PIN");
+    toast(t("kahoot.toast.pinNeed"));
     shakeJoin();
     els.pinBoxes[pin.length]?.focus();
     syncJoinReady();
     return;
   }
   if (!nickOk()) {
-    toast("昵称需要 2–10 个字");
+    toast(t("kahoot.toast.nickNeed"));
     shakeJoin();
     els.nickname.focus();
     syncJoinReady();
     return;
   }
   if (!state.avatar) {
-    toast("请选择头像");
+    toast(t("kahoot.toast.avatarNeed"));
     shakeJoin();
     syncJoinReady();
     return;
@@ -430,7 +472,12 @@ function joinRoom() {
   paintWaitGrid();
   show(els.wait);
   fillLobbyGradually();
-  toast(`欢迎加入房间 ${pin}`);
+  toast(t("kahoot.toast.welcome", { pin }));
+}
+
+function paintWaitRoom() {
+  if (!els.wait?.classList.contains("is-on")) return;
+  paintWaitGrid();
 }
 
 function startMatch() {
@@ -453,31 +500,40 @@ function beginQuestion() {
   state.locked = false;
   state.extraMs = 0;
   els.buffTime.textContent = "—";
-  const q = state.questions[state.index];
   const total = state.questions.length;
-  els.qIndex.textContent = `第 ${state.index + 1} / ${total} 题`;
+  state.order = shuffle(state.questions[state.index].options.map((_, i) => i));
+  paintQuestionText();
+  paintYouHud();
+  show(els.play);
+  state.startedAt = performance.now();
+  state.endsAt = state.startedAt + TIME_LIMIT_MS;
+  tickTimer();
+}
+
+function paintQuestionText() {
+  const raw = state.questions[state.index];
+  if (!raw) return;
+  const q = localizeQuestion(raw, getLang());
+  const total = state.questions.length;
+  els.qIndex.textContent = t("kahoot.qIndex", { n: state.index + 1, total });
   els.qDomain.textContent = q.domain;
   els.qStem.textContent = q.stem;
-  state.order = shuffle(q.options.map((_, i) => i));
+  const order = state.order?.length ? state.order : q.options.map((_, i) => i);
   els.answers.innerHTML = "";
-  state.order.forEach((optionIndex, displayIndex) => {
+  order.forEach((optionIndex, displayIndex) => {
     const shape = SHAPES[displayIndex];
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = `answer opt-banner ${shape.cls}`;
+    btn.className = `answer opt-banner clay-opt ${shape.cls}`;
     btn.dataset.opt = String(optionIndex);
-    btn.innerHTML = `<span class="opt-letter" aria-hidden="true">${shape.key}</span><span class="opt-text">${q.options[optionIndex]}</span>`;
+    btn.disabled = state.locked;
+    btn.innerHTML = `<span class="opt-letter" aria-hidden="true"><em>${shape.key}</em></span><span class="opt-text">${q.options[optionIndex]}</span><span class="opt-deco" aria-hidden="true"></span>`;
     btn.addEventListener("click", () => {
       pressFeedback(btn);
       submitAnswer(optionIndex, btn);
     });
     els.answers.appendChild(btn);
   });
-  paintYouHud();
-  show(els.play);
-  state.startedAt = performance.now();
-  state.endsAt = state.startedAt + TIME_LIMIT_MS;
-  tickTimer();
 }
 
 function tickTimer() {
@@ -502,7 +558,7 @@ function submitAnswer(optionIndex, button) {
   const q = state.questions[state.index];
   const elapsed = performance.now() - state.startedAt;
   const timedOut = optionIndex == null;
-  let correct = !timedOut && optionIndex === q.answer;
+  let correct = !timedOut && isCorrectOption(q, optionIndex);
   let shielded = false;
   if (!correct && !timedOut && state.shield) {
     state.shield = false;
@@ -518,13 +574,13 @@ function submitAnswer(optionIndex, button) {
   state.streak = correct ? state.streak + 1 : 0;
   if (state.streak > 0 && state.streak % 5 === 0) {
     state.shield = true;
-    toast("获得护盾：可抵挡一次失误");
+    toast(t("kahoot.toast.shield"));
   }
 
   [...els.answers.children].forEach((node) => {
     const opt = Number(node.dataset.opt);
     node.disabled = true;
-    if (opt === q.answer) node.classList.add("is-correct");
+    if (isCorrectOption(q, opt)) node.classList.add("is-correct");
     else if (button && node === button) node.classList.add("is-wrong");
     else node.classList.add("is-miss");
   });
@@ -534,29 +590,41 @@ function submitAnswer(optionIndex, button) {
 }
 
 function showReveal({ correct, timedOut, shielded, points, question }) {
+  state.lastReveal = { correct, timedOut, shielded, points, question };
   const me = you();
   const total = state.questions.length;
-  els.revealIndex.textContent = `第 ${state.index + 1} / ${total} 题`;
-  els.revealGain.textContent = `本题获得 ★+${points} 分`;
+  els.revealIndex.textContent = t("kahoot.qIndex", { n: state.index + 1, total });
+  els.revealGain.textContent = t("kahoot.revealGain", { n: points });
   els.revealAvatar.innerHTML = avatarImg(me.avatar);
   els.revealName.textContent = me.name;
   els.revealTotal.textContent = me.score.toLocaleString();
-  els.revealStreak.textContent = state.streak > 0 ? `连续 ${state.streak}` : "连续 0";
+  els.revealStreak.textContent = t("kahoot.streakShort", { n: state.streak });
   els.revealCenter.classList.toggle("is-bad", !correct);
   els.confetti.classList.toggle("is-off", !correct);
-  els.revealTitle.textContent = timedOut ? "时间到" : shielded ? "护盾抵挡！" : correct ? "答对了！" : "答错了";
-  els.revealSub.textContent = correct
-    ? "太棒了！你展现了超强的学习力！"
-    : "别灰心，下一题再冲！";
-  els.revealAnswer.textContent = `${["A", "B", "C", "D"][question.answer] || ""} ${question.options[question.answer]}`;
-  els.revealPoints.textContent = `+${points} 分`;
-  els.revealExplain.textContent = question.explain || "";
+  els.revealTitle.textContent = timedOut
+    ? t("kahoot.timeout")
+    : shielded
+      ? t("kahoot.shielded")
+      : correct
+        ? t("kahoot.correct")
+        : t("kahoot.wrong");
+  els.revealSub.textContent = correct ? t("kahoot.subGood") : t("kahoot.subBad");
+  const keys = ["A", "B", "C", "D"];
+  const displayQ = localizeQuestion(question, getLang());
+  const correctIdx = Array.isArray(question.answers) && question.answers.length
+    ? question.answers
+    : [question.answer];
+  els.revealAnswer.textContent = correctIdx
+    .map((i) => `${keys[i] || ""} ${displayQ.options[i] || ""}`)
+    .join(" · ");
+  els.revealPoints.textContent = t("kahoot.plusPts", { n: points });
+  els.revealExplain.textContent = displayQ.explain || "";
   els.revealCombo.textContent = `${state.streak} COMBO!`;
   els.revealComboFill.style.width = `${Math.min(100, state.streak * 12.5)}%`;
   els.revealComboTip.textContent =
-    state.streak >= 3 ? "太厉害了！连续答对中，气势如虹！" : "继续保持气势！";
+    state.streak >= 3 ? t("kahoot.comboTipHot") : t("kahoot.comboTip");
   els.revealNext.textContent =
-    state.index + 1 >= total ? "查看颁奖 →" : "下一题 →";
+    state.index + 1 >= total ? t("kahoot.seePodium") : t("kahoot.nextQ");
   paintBoard(els.revealBoard);
   show(els.reveal);
 }
@@ -578,7 +646,7 @@ function paintPodium() {
     .map(
       (p, i) => `<div class="podium-slot is-${i + 1}">
       <div>${medals[i]}</div>
-      <strong>${avatarImg(p.avatar, "av-img")} ${p.name}${p.isYou ? " (你)" : ""}</strong>
+      <strong>${avatarImg(p.avatar, "av-img")} ${playerName(p)}${p.isYou ? t("kahoot.you") : ""}</strong>
       <span>${p.score}</span>
     </div>`,
     )
@@ -591,11 +659,15 @@ function useItem(kind) {
   if (kind === "hint") {
     state.items.hint -= 1;
     const q = state.questions[state.index];
-    toast(q.explain ? `提示：${q.explain.slice(0, 42)}…` : `领域：${q.domain}`);
+    toast(
+      q.explain
+        ? t("kahoot.toast.hint", { text: `${localizeQuestion(q, getLang()).explain.slice(0, 42)}…` })
+        : t("kahoot.toast.domain", { text: q.domain }),
+    );
   } else if (kind === "fifty") {
     state.items.fifty -= 1;
     const q = state.questions[state.index];
-    const wrong = state.order.filter((i) => i !== q.answer);
+    const wrong = state.order.filter((i) => !isCorrectOption(q, i));
     shuffle(wrong)
       .slice(0, 2)
       .forEach((opt) => {
@@ -605,13 +677,13 @@ function useItem(kind) {
           node.disabled = true;
         }
       });
-    toast("已去掉两个错误选项");
+    toast(t("kahoot.toast.fifty"));
   } else if (kind === "time") {
     state.items.time -= 1;
     state.extraMs += 5000;
     state.endsAt += 5000;
     els.buffTime.textContent = `+${state.extraMs / 1000}s`;
-    toast("作答时间 +5 秒");
+    toast(t("kahoot.toast.time"));
   }
   paintYouHud();
 }
@@ -658,7 +730,7 @@ els.pinBoxes.forEach((box, i) => {
 
 els.fillPin.addEventListener("click", () => {
   setPin(DEMO_PIN, { animate: true });
-  toast("已填入演示 PIN");
+  toast(t("kahoot.toast.pinFilled"));
   els.nickname.focus();
 });
 
@@ -667,8 +739,8 @@ els.nickname.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     if (els.joinBtn && !els.joinBtn.disabled) joinRoom();
-    else if (!nickOk()) toast("昵称需要 2–10 个字");
-    else toast("请选择头像后再加入");
+    else if (!nickOk()) toast(t("kahoot.toast.nickNeed"));
+    else toast(t("kahoot.toast.avatarThen"));
   }
 });
 
@@ -694,7 +766,7 @@ els.avatarRow.addEventListener("keydown", (e) => {
 
 els.joinBtn.addEventListener("click", joinRoom);
 els.helpBtn.addEventListener("click", () => {
-  toast("① 输入 PIN → ② 设定昵称头像 → 加入游戏");
+  toast(t("kahoot.toast.help"));
 });
 els.leaveWait.addEventListener("click", () => {
   clearInterval(state.fillTimer);
@@ -706,17 +778,17 @@ els.copyCode.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(code);
     els.copyCode.classList.add("is-copied");
-    els.copyCode.innerHTML = `<span class="copy-ico" aria-hidden="true">✓</span>已复制`;
-    toast(`房间代码 ${code} 已复制`);
+    els.copyCode.innerHTML = `<span class="copy-ico" aria-hidden="true">✓</span>${t("kahoot.copied")}`;
+    toast(t("kahoot.toast.copied", { code }));
     setTimeout(() => {
       els.copyCode.classList.remove("is-copied");
-      els.copyCode.innerHTML = `<span class="copy-ico" aria-hidden="true">⧉</span>复制`;
+      els.copyCode.innerHTML = `<span class="copy-ico" aria-hidden="true">⧉</span>${t("kahoot.copy")}`;
     }, 1600);
   } catch {
     toast(code);
   }
 });
-els.roomSettings.addEventListener("click", () => toast("演示模式：题量可在加入页调整"));
+els.roomSettings.addEventListener("click", () => toast(t("kahoot.toast.settings")));
 
 const catStack = document.getElementById("cat-stack");
 if (catStack) {
@@ -727,9 +799,9 @@ if (catStack) {
     catStack.querySelectorAll(".cat").forEach((c) => c.classList.remove("is-on"));
     if (!wasOn) {
       btn.classList.add("is-on");
-      toast(`本场侧重：${btn.textContent.trim()}`);
+      toast(t("kahoot.toast.catOn", { name: btn.textContent.trim() }));
     } else {
-      toast("已取消题目侧重筛选（演示）");
+      toast(t("kahoot.toast.catOff"));
     }
   });
 }

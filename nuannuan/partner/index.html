@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>学习伙伴选择 · AI Literacy</title>
+  <title data-i18n="partner.title">学习伙伴选择 · AI Literacy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=2" />
   <link rel="stylesheet" href="/css/terra-mosaic-bg.css" />
   <link rel="stylesheet" href="/css/pixel-ui.css" />
   <link rel="stylesheet" href="/nuannuan/partner/partner.css" />
@@ -24,26 +25,27 @@
   </div>
 
   <header class="topbar">
-    <a class="icon-btn" href="/nuannuan/login" aria-label="返回登录建角">←</a>
+    <a class="icon-btn" href="/nuannuan/login" data-i18n-aria="partner.back" aria-label="返回登录建角">←</a>
     <div class="topbar-title">
-      <h1>学习伙伴选择</h1>
-      <p>选择 1 位 AI 助手陪伴你完成本次测试</p>
+      <h1 data-i18n="partner.h1">学习伙伴选择</h1>
+      <p data-i18n="partner.sub">选择 1 位 AI 助手陪伴你完成本次测试</p>
     </div>
     <div class="topbar-actions">
-      <button type="button" class="guide-btn" id="guide-open">? 伙伴指南</button>
+      <div id="lang-host" class="lang-host"></div>
+      <button type="button" class="guide-btn" id="guide-open" data-i18n="partner.guide">? 伙伴指南</button>
       <span class="ai-badge" aria-hidden="true">AI</span>
     </div>
   </header>
 
   <p class="notice" id="partner-note">
     <span class="notice-ico" aria-hidden="true">!</span>
-    重要说明：伙伴只提供鼓励与提醒，不会直接告诉你答案。
+    <span data-i18n="partner.notice">重要说明：伙伴只提供鼓励与提醒，不会直接告诉你答案。</span>
   </p>
 
   <main class="layout">
     <section class="candidates" aria-labelledby="candidate-title">
-      <h2 id="candidate-title" class="panel-title">候选伙伴</h2>
-      <div class="candidate-grid" id="candidate-list" role="listbox" aria-label="学习伙伴候选列表"></div>
+      <h2 id="candidate-title" class="panel-title" data-i18n="partner.candidates">候选伙伴</h2>
+      <div class="candidate-grid" id="candidate-list" role="listbox" data-i18n-aria="partner.candidatesAria" aria-label="学习伙伴候选列表"></div>
     </section>
 
     <section class="detail" id="detail-panel" aria-labelledby="detail-name" aria-live="polite">
@@ -57,14 +59,14 @@
 
       <div class="detail-side">
         <div class="detail-head">
-          <span class="detail-kicker">当前伙伴</span>
+          <span class="detail-kicker" data-i18n="partner.kicker">当前伙伴</span>
           <h2 class="detail-name" id="detail-name">DIANA</h2>
           <p class="detail-role" id="detail-role">学术支援型</p>
         </div>
         <p class="detail-bio" id="detail-bio"></p>
         <blockquote class="speech" id="detail-intro"></blockquote>
         <div class="trait-area">
-          <h3 class="trait-title">核心特质</h3>
+          <h3 class="trait-title" data-i18n="partner.traits">核心特质</h3>
           <div class="trait-list" id="trait-list"></div>
         </div>
       </div>
@@ -73,53 +75,56 @@
 
   <footer class="foot">
     <section class="team" aria-labelledby="team-title">
-      <h2 class="team-title" id="team-title">我的学习小队 <small>（本次仅可选 1 位）</small></h2>
+      <h2 class="team-title" id="team-title">
+        <span data-i18n="partner.team">我的学习小队</span>
+        <small data-i18n="partner.teamLimit">（本次仅可选 1 位）</small>
+      </h2>
       <div class="team-slots" id="team-slots"></div>
     </section>
 
-    <aside class="tips" aria-label="操作提示">
+    <aside class="tips" data-i18n-aria="partner.tipsAria" aria-label="操作提示">
       <span class="tips-ico" aria-hidden="true">📘</span>
       <div>
         <strong>TIPS</strong>
-        <p id="tips-text">点击左侧卡片预览伙伴，确认后再开始答题。</p>
+        <p id="tips-text" data-i18n="partner.tipsDefault">点击左侧卡片预览伙伴，确认后再开始答题。</p>
       </div>
     </aside>
 
     <div class="actions">
       <button type="button" class="btn btn-detail" id="view-detail">
-        <span aria-hidden="true">📄</span>查看详情
+        <span aria-hidden="true">📄</span><span data-i18n="partner.viewDetail">查看详情</span>
       </button>
       <button type="button" class="btn btn-confirm" id="confirm-partner">
-        <span aria-hidden="true">✦</span>选择伙伴
+        <span aria-hidden="true">✦</span><span data-i18n="partner.pick">选择伙伴</span>
       </button>
       <button type="button" class="btn btn-start" id="start-test" disabled>
-        <span aria-hidden="true">◎</span>开始答题
+        <span aria-hidden="true">◎</span><span data-i18n="partner.start">开始答题</span>
       </button>
     </div>
   </footer>
 
   <dialog class="guide-dialog" id="guide-dialog" aria-labelledby="guide-title">
     <form method="dialog" class="guide-card">
-      <h2 id="guide-title">伙伴指南</h2>
+      <h2 id="guide-title" data-i18n="partner.guideTitle">伙伴指南</h2>
       <ul>
-        <li>每次测试只能选择 <strong>1</strong> 位学习伙伴。</li>
-        <li>伙伴只提供鼓励、流程提醒与进度反馈。</li>
-        <li>伙伴<strong>不会</strong>直接告诉你答案，也不影响评分。</li>
-        <li>先点选卡片预览，再点「选择伙伴」，最后「开始答题」。</li>
+        <li data-i18n="partner.guide1" data-i18n-html>每次测试只能选择 <strong>1</strong> 位学习伙伴。</li>
+        <li data-i18n="partner.guide2">伙伴只提供鼓励、流程提醒与进度反馈。</li>
+        <li data-i18n="partner.guide3" data-i18n-html>伙伴<strong>不会</strong>直接告诉你答案，也不影响评分。</li>
+        <li data-i18n="partner.guide4">先点选卡片预览，再点「选择伙伴」，最后「开始答题」。</li>
       </ul>
-      <button type="submit" class="btn btn-confirm">知道了</button>
+      <button type="submit" class="btn btn-confirm" data-i18n="partner.gotIt">知道了</button>
     </form>
   </dialog>
 
   <dialog class="guide-dialog" id="detail-dialog" aria-labelledby="detail-dialog-title">
     <form method="dialog" class="guide-card">
-      <h2 id="detail-dialog-title">伙伴详情</h2>
+      <h2 id="detail-dialog-title" data-i18n="partner.detailTitle">伙伴详情</h2>
       <p id="detail-dialog-body"></p>
-      <button type="submit" class="btn btn-confirm">关闭</button>
+      <button type="submit" class="btn btn-confirm" data-i18n="partner.close">关闭</button>
     </form>
   </dialog>
 
   <div class="toast" id="page-message" role="status" aria-live="polite"></div>
-  <script type="module" src="/nuannuan/partner/partner.js"></script>
+  <script type="module" src="/nuannuan/partner/partner.js?v=2"></script>
 </body>
 </html>

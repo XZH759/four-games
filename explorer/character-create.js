@@ -14,6 +14,12 @@ import {
   normalizeConfig,
 } from "../js/explorer/character-config.js";
 import { buildCharacterSVG, buildOptionThumb } from "../js/explorer/character-preview.js";
+import { initI18n, onLangChange, applyDom } from "/js/i18n.js";
+import { mountLobbyExit } from "/js/lobby-exit.js";
+
+initI18n({ toggleHost: "#lang-host" });
+onLangChange(() => applyDom());
+mountLobbyExit();
 
 const NEXT_URL = "/explorer/partner";
 const REDUCE_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

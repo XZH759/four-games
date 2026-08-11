@@ -4,99 +4,173 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="将经典地产棋盘玩法与 AI literacy 答题结合的教育游戏。" />
-  <title>AI 地产大亨</title>
+  <title data-i18n="monopoly.title">AI Property Tycoon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/monopoly/monopoly.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=2" />
+  <link rel="stylesheet" href="/monopoly/monopoly.css?v=13" />
 </head>
-<body>
+<body class="clay-tycoon">
+  <div class="tycoon-shell">
   <header class="game-header">
-    <a class="home-link" href="/">← 返回游戏大厅</a>
+    <a class="home-link" href="/" data-i18n="monopoly.home">← Back to Lobby</a>
     <div class="game-title">
-      <span class="title-mark" aria-hidden="true">🎩</span>
-      <span><strong>AI 地产大亨</strong><small>经典地产棋盘 · 知识决定财富</small></span>
+      <span class="title-mark" aria-hidden="true">
+        <img class="title-icon" src="/assets/monopoly/clay/icons/verification-ave.png" alt="" />
+      </span>
+      <span class="game-title-copy">
+        <strong data-i18n="monopoly.name">AI PROPERTY TYCOON</strong>
+        <small data-i18n="monopoly.sub">Classic board · knowledge builds wealth.</small>
+      </span>
     </div>
     <div class="header-actions">
-      <button type="button" class="header-button" id="mode-button">对战模式</button>
-      <button type="button" class="header-button" id="rules-button">游戏规则</button>
+      <div id="lang-host" class="lang-host"></div>
+      <button type="button" class="header-button match-mode" id="mode-button" data-i18n="monopoly.mode">Match Mode</button>
+      <button type="button" class="header-button rules-btn" id="rules-button" data-i18n="monopoly.rules">Rules</button>
     </div>
   </header>
 
   <main class="game-layout">
-    <aside class="status-panel" aria-label="玩家状态">
-      <section class="player-card is-active" id="player-card">
-        <div class="player-head">
-          <span class="token token-player" aria-hidden="true">🤖</span>
-          <span><strong id="player-name">你</strong><small id="player-status">等待掷骰</small></span>
+    <aside class="status-panel" data-i18n-aria="monopoly.statusAria" aria-label="玩家状态">
+      <section class="player-card player-you is-active" id="player-card">
+        <div class="player-card-inner">
+          <span class="avatar avatar-you" aria-hidden="true">🤖</span>
+          <div class="player-meta">
+            <div class="player-label-row">
+              <strong id="player-name">YOU</strong>
+              <small class="status-chip" id="player-status" data-i18n="monopoly.waitDice">Ready</small>
+            </div>
+            <div class="money" id="player-money">$1,500</div>
+            <div class="asset-line">
+              <span id="player-properties">0</span>
+              <span data-i18n="monopoly.props">Properties</span>
+            </div>
+          </div>
         </div>
-        <div class="money" id="player-money">$1,500</div>
-        <div class="asset-line"><span>地产</span><strong id="player-properties">0</strong></div>
       </section>
 
-      <section class="player-card" id="bot-card">
-        <div class="player-head">
-          <span class="token token-bot" aria-hidden="true">🧠</span>
-          <span><strong id="opponent-name">AI 对手</strong><small id="bot-status">等待回合</small></span>
+      <section class="player-card player-bot" id="bot-card">
+        <div class="player-card-inner">
+          <span class="avatar avatar-bot" aria-hidden="true">🧠</span>
+          <div class="player-meta">
+            <div class="player-label-row">
+              <strong id="opponent-name">AI OPPONENT</strong>
+              <small class="status-chip" id="bot-status" data-i18n="monopoly.waitTurn">Wait</small>
+            </div>
+            <div class="money" id="bot-money">$1,500</div>
+            <div class="asset-line">
+              <span id="bot-properties">0</span>
+              <span data-i18n="monopoly.props">Properties</span>
+            </div>
+          </div>
         </div>
-        <div class="money" id="bot-money">$1,500</div>
-        <div class="asset-line"><span>地产</span><strong id="bot-properties">0</strong></div>
       </section>
 
       <section class="turn-card">
-        <p>第 <strong id="round-number">1</strong> 回合</p>
-        <p id="turn-label">轮到你行动</p>
+        <p class="round-line">
+          <span data-i18n="monopoly.roundPrefix">Round</span>
+          <strong id="round-number">1</strong>
+          <span data-i18n="monopoly.roundSuffix"></span>
+        </p>
+        <p id="turn-label">Roll the dice</p>
         <div class="dice-pair" aria-live="polite">
-          <span class="die" id="die-one">–</span>
-          <span class="die" id="die-two">–</span>
+          <span class="die" id="die-one" data-face="0">–</span>
+          <span class="die" id="die-two" data-face="0">–</span>
         </div>
-        <button type="button" class="primary-action" id="roll-button">掷骰子</button>
-        <button type="button" class="secondary-action" id="buy-button" hidden>购买地产</button>
-        <button type="button" class="secondary-action" id="end-button" hidden>结束回合</button>
+        <button type="button" class="primary-action" id="roll-button" data-i18n="monopoly.roll">ROLL DICE</button>
+        <button type="button" class="secondary-action" id="buy-button" hidden>Buy property</button>
+        <button type="button" class="secondary-action" id="end-button" hidden data-i18n="monopoly.endTurn">End turn</button>
       </section>
 
       <section class="legend-card">
-        <h2>棋盘图例</h2>
-        <p><span class="legend-dot property"></span> 可购买地产</p>
-        <p><span class="legend-dot question">?</span> AI literacy 题目</p>
-        <p><span class="legend-dot station"></span> 数据枢纽</p>
-        <p><span class="legend-dot tax"></span> 费用格</p>
+        <h2 data-i18n="monopoly.legend">BOARD LEGEND</h2>
+        <ul class="legend-list">
+          <li><span class="legend-dot property" aria-hidden="true"></span><span data-i18n="monopoly.legendProp">Buyable property</span></li>
+          <li><span class="legend-dot question" aria-hidden="true"></span><span data-i18n="monopoly.legendQ">AI literacy question</span></li>
+          <li><span class="legend-dot station" aria-hidden="true"></span><span data-i18n="monopoly.legendStation">Data hub</span></li>
+          <li><span class="legend-dot tax" aria-hidden="true"></span><span data-i18n="monopoly.legendTax">Fee tile</span></li>
+        </ul>
       </section>
     </aside>
 
-    <section class="board-section" aria-label="AI 地产大亨棋盘">
+    <section class="board-section" aria-label="AI Property Tycoon board">
       <div class="board" id="board">
         <div class="board-center">
-          <p class="center-eyebrow">AI LITERACY</p>
-          <h1>地产大亨</h1>
-          <p>走到 <strong>?</strong> 格回答 AI 素养题</p>
-          <div class="reward-rule">
-            <span>答对 <strong>+$300</strong></span>
-            <span>答错 <strong>−$150</strong></span>
+          <div class="center-texture" aria-hidden="true"></div>
+          <div class="center-pebbles" aria-hidden="true">
+            <span class="pebble p1"></span>
+            <span class="pebble p2"></span>
+            <span class="pebble p3"></span>
+            <span class="pebble p4"></span>
+            <span class="pebble p5"></span>
           </div>
+
           <div class="center-message" id="center-message" role="status" aria-live="polite">
-            点击“掷骰子”开始游戏
+            Tap ROLL DICE to start
+          </div>
+
+          <div class="center-brand">
+            <p class="center-eyebrow">AI LITERACY</p>
+            <h1 class="tycoon-title" aria-label="Property Tycoon">
+              <span class="title-word property">
+                <span style="--d:0s">P</span><span style="--d:.04s">R</span><span style="--d:.08s">O</span><span style="--d:.12s">P</span><span style="--d:.16s">E</span><span style="--d:.2s">R</span><span style="--d:.24s">T</span><span style="--d:.28s">Y</span>
+              </span>
+              <span class="title-word tycoon">
+                <span style="--d:.32s">T</span><span style="--d:.36s">Y</span><span style="--d:.4s">C</span><span style="--d:.44s">O</span><span style="--d:.48s">O</span><span style="--d:.52s">N</span>
+              </span>
+            </h1>
+            <p class="board-hint" data-i18n="monopoly.boardHint">Land on ? tiles to answer AI literacy questions</p>
+          </div>
+
+          <div class="clay-deck data" aria-hidden="true">
+            <img class="deck-art" src="/assets/monopoly/clay/icons/ai-data.png" alt="" />
+            <span>AI DATA CARD</span>
+          </div>
+          <div class="clay-deck quiz" aria-hidden="true">
+            <img class="deck-art" src="/assets/monopoly/clay/icons/ai-question.png" alt="" />
+            <span>AI QUESTION</span>
+          </div>
+
+          <div class="reward-rule" aria-label="Question rewards">
+            <div class="ok">
+              <span data-i18n="monopoly.correctLabel">Correct</span>
+              <strong id="reward-correct">+$300</strong>
+            </div>
+            <div class="bad">
+              <span data-i18n="monopoly.wrongLabel">Wrong</span>
+              <strong id="reward-wrong">−$150</strong>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <aside class="log-panel">
+    <aside class="log-panel" aria-label="Game information">
       <div class="goal-card">
-        <span aria-hidden="true">🏆</span>
-        <div><strong>胜利目标</strong><small>让对手破产，或率先达到 $4,000</small></div>
+        <span class="goal-trophy" aria-hidden="true">🏆</span>
+        <div class="goal-copy">
+          <strong data-i18n="monopoly.goalTitle">Win Condition</strong>
+          <small data-i18n="monopoly.goalText">Bankrupt your opponent, or reach $4,000 first</small>
+        </div>
       </div>
+
       <section class="property-summary">
-        <h2 id="asset-title">我的资产</h2>
-        <div class="owned-list" id="owned-list"><p>尚未购买地产</p></div>
+        <h2 id="asset-title">My Assets</h2>
+        <div class="owned-list" id="owned-list">
+          <p class="owned-empty" data-i18n="monopoly.noAssets">No properties owned</p>
+        </div>
       </section>
+
       <section class="game-log">
-        <h2>事件记录</h2>
+        <h2 data-i18n="monopoly.log">Event Log</h2>
         <ol id="game-log"></ol>
       </section>
-      <button type="button" class="restart-button" id="restart-button">重新开始</button>
+
+      <button type="button" class="restart-button" id="restart-button" data-i18n="monopoly.restart">RESTART</button>
     </aside>
   </main>
+  </div>
 
   <div class="modal" id="question-modal" hidden>
     <section class="modal-card question-card" role="dialog" aria-modal="true" aria-labelledby="question-title">
@@ -104,14 +178,14 @@
         <span class="question-symbol" aria-hidden="true">?</span>
         <div>
           <p id="question-domain">AI 素养挑战</p>
-          <h2 id="question-title">知识卡</h2>
+          <h2 id="question-title" data-i18n="monopoly.qTitle">知识卡</h2>
         </div>
         <span class="question-stakes">答对 +$300 · 答错 −$150</span>
       </div>
       <p class="question-stem" id="question-stem"></p>
       <div class="answer-list" id="answer-list"></div>
       <div class="answer-feedback" id="answer-feedback" hidden></div>
-      <button type="button" class="primary-action modal-continue" id="question-continue" hidden>继续游戏</button>
+      <button type="button" class="primary-action modal-continue" id="question-continue" hidden data-i18n="monopoly.qContinue">继续游戏</button>
     </section>
   </div>
 
@@ -133,25 +207,25 @@
 
   <div class="modal" id="lobby-modal" hidden>
     <section class="modal-card lobby-card" role="dialog" aria-modal="true" aria-labelledby="lobby-title">
-      <h2 id="lobby-title">选择对战模式</h2>
-      <p class="lobby-intro">保留 AI 对手，也可以让第二位玩家输入用户名加入本机对战。</p>
-      <div class="mode-tabs" role="tablist" aria-label="对战模式">
-        <button type="button" class="mode-tab is-active" data-mode="ai" role="tab" aria-selected="true">🤖 AI 对战</button>
-        <button type="button" class="mode-tab" data-mode="pvp" role="tab" aria-selected="false">👥 玩家对战</button>
+      <h2 id="lobby-title" data-i18n="monopoly.lobbyTitle">选择对战模式</h2>
+      <p class="lobby-intro" data-i18n="monopoly.lobbyIntro">保留 AI 对手，也可以让第二位玩家输入用户名加入本机对战。</p>
+      <div class="mode-tabs" role="tablist" data-i18n-aria="monopoly.lobbyTabs" aria-label="对战模式">
+        <button type="button" class="mode-tab is-active" data-mode="ai" role="tab" aria-selected="true" data-i18n="monopoly.lobbyAi">🤖 AI 对战</button>
+        <button type="button" class="mode-tab" data-mode="pvp" role="tab" aria-selected="false" data-i18n="monopoly.lobbyPvp">👥 玩家对战</button>
       </div>
       <div class="join-fields">
         <label>
-          <span>玩家 1 用户名</span>
-          <input id="player-one-input" maxlength="12" autocomplete="off" placeholder="输入用户名" value="玩家一" />
+          <span data-i18n="monopoly.lobbyP1">玩家 1 用户名</span>
+          <input id="player-one-input" maxlength="12" autocomplete="off" data-i18n-placeholder="monopoly.lobbyPh1" placeholder="输入用户名" value="玩家一" />
         </label>
         <label id="player-two-field" hidden>
-          <span>玩家 2 用户名</span>
-          <input id="player-two-input" maxlength="12" autocomplete="off" placeholder="输入用户名即可加入" value="玩家二" />
+          <span data-i18n="monopoly.lobbyP2">玩家 2 用户名</span>
+          <input id="player-two-input" maxlength="12" autocomplete="off" data-i18n-placeholder="monopoly.lobbyPh2" placeholder="输入用户名即可加入" value="玩家二" />
         </label>
       </div>
       <p class="join-error" id="join-error" role="alert" hidden></p>
-      <button type="button" class="primary-action" id="join-game">加入游戏</button>
-      <p class="local-note">本模式为同一设备轮流操作，不会将用户名上传到服务器。</p>
+      <button type="button" class="primary-action" id="join-game" data-i18n="monopoly.lobbyJoin">加入游戏</button>
+      <p class="local-note" data-i18n="monopoly.lobbyNote">本模式为同一设备轮流操作，不会将用户名上传到服务器。</p>
     </section>
   </div>
 
@@ -165,6 +239,6 @@
     </section>
   </div>
 
-  <script type="module" src="/monopoly/monopoly.js"></script>
+  <script type="module" src="/monopoly/monopoly.js?v=18"></script>
 </body>
 </html>

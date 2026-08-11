@@ -3,40 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI 素养挑战赛</title>
-  <meta name="description" content="泰拉瑞亚风格 AI 素养限时答题：加入房间、抢答计分、实时排行。" />
+  <title data-i18n="kahoot.title">AI 素养挑战赛</title>
+  <meta name="description" content="粘土乐园风 AI 素养限时答题：加入房间、抢答计分、实时排行。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/kahoot/kahoot.css?v=6" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=2" />
+  <link rel="stylesheet" href="/kahoot/kahoot.css?v=10" />
 </head>
-<body class="terra">
-  <div class="world-bg" aria-hidden="true">
-    <div class="sky"></div>
-    <div class="stars"></div>
-    <div class="moon"></div>
-    <div class="mountains"></div>
-    <div class="trees"></div>
-  </div>
-  <div class="ground-strip" aria-hidden="true">
-    <span class="torch t-left"></span>
-    <span class="torch t-right"></span>
-    <span class="slime"></span>
-    <span class="crystal c1"></span>
-    <span class="crystal c2"></span>
-    <span class="mushroom"></span>
-  </div>
+<body class="clay-arena">
+  <div class="world-bg" aria-hidden="true"></div>
+  <div class="ground-strip" aria-hidden="true"></div>
 
   <!-- JOIN -->
   <section class="screen is-on screen-join" id="screen-join" aria-labelledby="join-title">
     <header class="topbar join-top">
       <div class="brand join-brand">
-        <h1 id="join-title" class="join-title">JOIN GAME</h1>
-        <img class="brand-bot pixel-sprite" src="/assets/kahoot/pixel/bot-buddy.png?v=2" alt="" width="48" height="48" />
+        <h1 id="join-title" class="join-title" data-i18n="kahoot.joinTitle">JOIN GAME</h1>
+        <img class="brand-bot" src="/assets/kahoot/pixel/bot-buddy.png?v=2" alt="" width="48" height="48" />
       </div>
       <div class="top-actions">
-        <a class="icon-btn stone" href="/" title="返回大厅" aria-label="返回大厅">←</a>
-        <button type="button" class="icon-btn stone" id="help-btn" title="如何加入？">?</button>
+        <div id="lang-host" class="lang-host"></div>
+        <a class="icon-btn stone" href="/" data-i18n-title="kahoot.back" data-i18n-aria="kahoot.back" title="返回大厅" aria-label="返回大厅">←</a>
+        <button type="button" class="icon-btn stone" id="help-btn" data-i18n-title="kahoot.help" title="如何加入？">?</button>
       </div>
     </header>
 
@@ -58,21 +47,21 @@
           <div class="corner-moss tr" aria-hidden="true"></div>
 
           <div class="step" data-step="pin" id="step-pin">
-            <h2><span class="step-num">①</span> 输入 6 位数游戏 PIN 码</h2>
+            <h2><span class="step-num">①</span> <span data-i18n="kahoot.pinStep">输入 6 位数游戏 PIN 码</span></h2>
             <div class="pin-row" id="pin-row" aria-label="游戏 PIN">
-              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 第1位" />
-              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 第2位" />
-              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 第3位" />
-              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 第4位" />
-              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 第5位" />
-              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 第6位" />
+              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 1" />
+              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 2" />
+              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 3" />
+              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 4" />
+              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 5" />
+              <input class="pin-box" maxlength="1" inputmode="text" autocomplete="off" placeholder="—" aria-label="PIN 6" />
             </div>
-            <p class="hint-line">演示房可用默认 PIN：<button type="button" class="linkish" id="fill-pin">AI2025</button></p>
-            <p class="step-status" id="pin-status" aria-live="polite">请填写完整 PIN</p>
+            <p class="hint-line"><span data-i18n="kahoot.pinHint">演示房可用默认 PIN：</span><button type="button" class="linkish" id="fill-pin">AI2025</button></p>
+            <p class="step-status" id="pin-status" aria-live="polite" data-i18n="kahoot.pinNeed">请填写完整 PIN</p>
           </div>
 
           <div class="step" data-step="profile" id="step-profile">
-            <h2><span class="step-num">②</span> 设定你的昵称与头像</h2>
+            <h2><span class="step-num">②</span> <span data-i18n="kahoot.profileStep">设定你的昵称与头像</span></h2>
             <div class="identity-stage">
               <div class="avatar-preview ui-frame ui-frame--avatar" id="avatar-preview" aria-hidden="true">
                 <span class="ui-gem ui-gem--tl ui-gem--green" aria-hidden="true"></span>
@@ -80,48 +69,48 @@
               </div>
               <label class="nick-field nick-plate ui-frame ui-frame--banner-wood">
                 <span class="ui-gem ui-gem--left ui-gem--red" aria-hidden="true"></span>
-                <span class="sr-only">昵称</span>
-                <span class="nick-tag" aria-hidden="true">昵称</span>
-                <input id="nickname" maxlength="10" minlength="2" placeholder="输入昵称（2-10 字）" autocomplete="nickname" required />
+                <span class="sr-only" data-i18n="kahoot.nick">昵称</span>
+                <span class="nick-tag" aria-hidden="true" data-i18n="kahoot.nick">昵称</span>
+                <input id="nickname" maxlength="10" minlength="2" data-i18n-placeholder="kahoot.nickPh" placeholder="输入昵称（2-10 字）" autocomplete="nickname" required />
                 <span class="nick-count" id="nick-count">0/10</span>
               </label>
             </div>
-            <p class="avatar-pick-label">选择冒险者立绘</p>
-            <div class="avatar-row" id="avatar-row" role="listbox" aria-label="选择头像"></div>
-            <p class="step-status" id="profile-status" aria-live="polite">请设定昵称并选择头像</p>
+            <p class="avatar-pick-label" data-i18n="kahoot.pickAvatar">选择冒险者立绘</p>
+            <div class="avatar-row" id="avatar-row" role="listbox" data-i18n-aria="kahoot.pickAvatar" aria-label="选择头像"></div>
+            <p class="step-status" id="profile-status" aria-live="polite" data-i18n="kahoot.profileNeed">请设定昵称并选择头像</p>
           </div>
 
           <div class="join-actions">
             <label class="round-pick stone-block">
-              <span class="sr-only">本场题量</span>
-              <select id="round-size" aria-label="本场题量">
-                <option value="5">本场题量 5 题 · 快闪</option>
-                <option value="8" selected>本场题量 8 题 · 标准</option>
-                <option value="10">本场题量 10 题 · 挑战</option>
+              <span class="sr-only" data-i18n="kahoot.roundSize">本场题量</span>
+              <select id="round-size" data-i18n-aria="kahoot.roundSize" aria-label="本场题量">
+                <option value="5" data-i18n="kahoot.round5">本场题量 5 题 · 快闪</option>
+                <option value="8" selected data-i18n="kahoot.round8">本场题量 8 题 · 标准</option>
+                <option value="10" data-i18n="kahoot.round10">本场题量 10 题 · 挑战</option>
               </select>
             </label>
             <button type="button" class="btn-primary btn-join gold-block" id="join-btn" disabled>
               <span class="btn-vines" aria-hidden="true"></span>
-              加入游戏
+              <span data-i18n="kahoot.joinBtn">加入游戏</span>
               <span class="btn-arrow" aria-hidden="true">→</span>
             </button>
           </div>
-          <p class="join-ready" id="join-ready">完成上方两步后即可加入</p>
+          <p class="join-ready" id="join-ready" data-i18n="kahoot.joinNeed">完成上方两步后即可加入</p>
         </div>
 
         <aside class="join-side">
           <div class="mascot-card brick-panel">
-            <p class="speech parchment-tile">准备好了吗？一起挑战 AI 素养，成为数位小达人吧！</p>
+            <p class="speech parchment-tile" data-i18n="kahoot.mascotSpeech">准备好了吗？一起挑战 AI 素养，成为数位小达人吧！</p>
             <div class="mascot-window brick-inset day-portal">
-              <img src="/assets/kahoot/pixel/bot-hero.png?v=2" alt="" class="mascot-img pixel-sprite" />
+              <img src="/assets/kahoot/pixel/bot-hero.png?v=2" alt="" class="mascot-img" />
             </div>
           </div>
           <div class="tips brick-panel dark-stone">
-            <h3><span class="tip-badge">①</span> 老师小提醒</h3>
+            <h3><span class="tip-badge">①</span> <span data-i18n="kahoot.tipsTitle">老师小提醒</span></h3>
             <ul>
-              <li><span class="tip-ico">①</span> 请先准备好 6 位数 PIN</li>
-              <li><span class="tip-ico">②</span> 使用友善积极的昵称</li>
-              <li><span class="tip-ico">③</span> 全员到齐后即可开赛</li>
+              <li><span class="tip-ico">①</span> <span data-i18n="kahoot.tip1">请先准备好 6 位数 PIN</span></li>
+              <li><span class="tip-ico">②</span> <span data-i18n="kahoot.tip2">使用友善积极的昵称</span></li>
+              <li><span class="tip-ico">③</span> <span data-i18n="kahoot.tip3">全员到齐后即可开赛</span></li>
             </ul>
           </div>
         </aside>
@@ -129,8 +118,8 @@
     </div>
 
     <footer class="join-foot stone-bar">
-      <p><span class="chest-ico" aria-hidden="true">📦</span> 准备好一起学习、一起思考、一起成长了吗？ Let's go! 🚀</p>
-      <p class="foot-tag"><span class="ai-chip">AI</span> 素养力，未来超给力！</p>
+      <p><span class="chest-ico" aria-hidden="true">📦</span> <span data-i18n="kahoot.footReady">准备好一起学习、一起思考、一起成长了吗？ Let's go! 🚀</span></p>
+      <p class="foot-tag"><span class="ai-chip">AI</span> <span data-i18n="kahoot.footTag">素养力，未来超给力！</span></p>
     </footer>
   </section>
 
@@ -138,10 +127,10 @@
   <section class="screen" id="screen-wait" aria-labelledby="wait-title">
     <header class="topbar wait-top">
       <div class="brand wood-sign">
-        <img class="brand-bot" src="/assets/bot-buddy.png" alt="" width="36" height="36" />
-        <strong id="wait-title">AI 素养挑战赛</strong>
+        <img class="brand-bot" src="/assets/kahoot/pixel/bot-buddy.png?v=2" alt="" width="36" height="36" />
+        <strong id="wait-title" data-i18n="kahoot.title">AI 素养挑战赛</strong>
       </div>
-      <button type="button" class="chip-btn wood-danger" id="leave-wait">离开房间</button>
+      <button type="button" class="chip-btn wood-danger" id="leave-wait" data-i18n="kahoot.leaveRoom">离开房间</button>
     </header>
 
     <div class="wait-layout">
@@ -150,7 +139,7 @@
         <div class="qr-box" aria-hidden="true">
           <div class="qr-fake"></div>
         </div>
-        <span class="qr-caption">扫描加入游戏</span>
+        <span class="qr-caption" data-i18n="kahoot.scanJoin">扫描加入游戏</span>
       </div>
 
       <div class="wait-main">
@@ -163,55 +152,55 @@
           <div class="board-torch right" aria-hidden="true"></div>
 
           <div class="room-code-block">
-            <span class="label label-orange">房间代码</span>
+            <span class="label label-orange" data-i18n="kahoot.roomCode">房间代码</span>
             <div class="code-row">
               <strong class="code-stone" id="room-code">AI2025</strong>
-              <button type="button" class="copy-btn" id="copy-code" title="复制房间代码">
+              <button type="button" class="copy-btn" id="copy-code" data-i18n-title="kahoot.copyTitle" title="复制房间代码">
                 <span class="copy-ico" aria-hidden="true">⧉</span>
-                复制
+                <span data-i18n="kahoot.copy">复制</span>
               </button>
             </div>
-            <p class="board-hint">邀请同学输入房间代码一起加入！</p>
+            <p class="board-hint" data-i18n="kahoot.inviteHint">邀请同学输入房间代码一起加入！</p>
           </div>
 
           <div class="board-divider" aria-hidden="true"></div>
 
           <div class="topic-block">
-            <span class="label label-green">本场题目</span>
-            <strong class="topic-title">AI 素养挑战赛</strong>
-            <p class="board-hint">一起挑战 AI 时代必备素养！📚</p>
+            <span class="label label-green" data-i18n="kahoot.topicLabel">本场题目</span>
+            <strong class="topic-title" data-i18n="kahoot.title">AI 素养挑战赛</strong>
+            <p class="board-hint" data-i18n="kahoot.topicHint">一起挑战 AI 时代必备素养！📚</p>
             <span class="topic-crystals" aria-hidden="true"></span>
           </div>
         </div>
 
         <h2 class="section-h">
           <span class="trophy-ico" aria-hidden="true">🏆</span>
-          参赛同学 <small id="player-count">1 / 12</small>
+          <span data-i18n="kahoot.players">参赛同学</span> <small id="player-count">1 / 12</small>
         </h2>
         <div class="player-grid" id="player-grid"></div>
       </div>
 
       <aside class="wait-right">
         <div class="brick-panel meta-card">
-          <span class="label label-cyan">在线人数</span>
+          <span class="label label-cyan" data-i18n="kahoot.online">在线人数</span>
           <strong id="online-count">1 / 12</strong>
         </div>
         <div class="cat-stack" id="cat-stack">
           <button type="button" class="cat is-cyan" data-cat="basic">
             <span class="cat-ico" aria-hidden="true">📖</span>
-            <span>AI 基础概念</span>
+            <span data-i18n="kahoot.catBasic">AI 基础概念</span>
           </button>
           <button type="button" class="cat is-violet" data-cat="data">
             <span class="cat-ico" aria-hidden="true">📊</span>
-            <span>资料与数据</span>
+            <span data-i18n="kahoot.catData">资料与数据</span>
           </button>
           <button type="button" class="cat is-orange" data-cat="ethics">
             <span class="cat-ico" aria-hidden="true">⚖️</span>
-            <span>AI 伦理与社会</span>
+            <span data-i18n="kahoot.catEthics">AI 伦理与社会</span>
           </button>
           <button type="button" class="cat is-green" data-cat="safe">
             <span class="cat-ico" aria-hidden="true">🛡️</span>
-            <span>安全与责任使用</span>
+            <span data-i18n="kahoot.catSafe">安全与责任使用</span>
           </button>
         </div>
       </aside>
@@ -219,15 +208,15 @@
 
     <div class="wait-bottom">
       <button type="button" class="chip-btn stone" id="room-settings">
-        <span aria-hidden="true">⚙</span> 房间设置
+        <span aria-hidden="true">⚙</span> <span data-i18n="kahoot.roomSettings">房间设置</span>
       </button>
       <button type="button" class="btn-primary btn-xl" id="start-btn">
-        开始挑战
+        <span data-i18n="kahoot.start">开始挑战</span>
         <span class="btn-arrow" aria-hidden="true">▶</span>
       </button>
       <div class="wait-mascot">
-        <img src="/assets/bot-buddy.png" alt="" width="72" height="72" />
-        <span class="speech-mini">准备好了吗？一起开启挑战吧！</span>
+        <img src="/assets/kahoot/pixel/bot-buddy.png?v=2" alt="" width="72" height="72" />
+        <span class="speech-mini" data-i18n="kahoot.waitSpeech">准备好了吗？一起开启挑战吧！</span>
       </div>
     </div>
   </section>
@@ -237,7 +226,7 @@
     <header class="play-top">
       <div class="brand wood-sign compact play-brand">
         <img class="brand-bot pixel-sprite" src="/assets/kahoot/pixel/bot-buddy.png?v=2" alt="" width="32" height="32" />
-        <strong>AI 素养挑战赛</strong>
+        <strong data-i18n="kahoot.title">AI 素养挑战赛</strong>
       </div>
       <div class="play-center-meta">
         <span class="meta-plaque stone-capsule ui-chip" id="q-index">第 1 / 8 题</span>
@@ -253,7 +242,7 @@
       </div>
       <div class="play-score-meta trophy-plaque">
         <span class="trophy-ico" aria-hidden="true">🏆</span>
-        <span>本题分数 <strong id="q-points-hint">最高 1000</strong></span>
+        <span><span data-i18n="kahoot.qPoints">本题分数</span> <strong id="q-points-hint" data-i18n="kahoot.qPointsMax">最高 1000</strong></span>
       </div>
     </header>
 
@@ -269,9 +258,9 @@
           <div class="you-head">
             <div class="avatar-lg gold-ring ui-frame ui-frame--avatar" id="you-avatar"></div>
             <div class="you-meta ui-frame ui-frame--banner-stone you-nickplate">
-              <strong id="you-name" class="pixel-name">玩家</strong>
-              <p class="score-line"><span id="you-score">0</span> 分</p>
-              <p class="streak-line" id="you-streak">连续答对 0 题</p>
+              <strong id="you-name" class="pixel-name" data-i18n="kahoot.player">玩家</strong>
+              <p class="score-line"><span id="you-score">0</span><span data-i18n="kahoot.pts"> 分</span></p>
+              <p class="streak-line" id="you-streak" data-i18n="kahoot.streak0">连续答对 0 题</p>
             </div>
           </div>
           <div class="stat-rails" aria-hidden="true">
@@ -281,11 +270,11 @@
           </div>
           <small id="xp-label" class="pixel-lv">Lv.1 初学者</small>
           <div class="buff-inset ui-frame ui-frame--banner-stone">
-            <h3><span class="gem-ico" aria-hidden="true"></span> 能力加成</h3>
+            <h3><span class="gem-ico" aria-hidden="true"></span> <span data-i18n="kahoot.buffs">能力加成</span></h3>
             <ul id="buff-list">
-              <li><span class="ico-book" aria-hidden="true"></span> 知识加成 <b>+0%</b></li>
-              <li><span class="ico-shield" aria-hidden="true"></span> 护盾 <b id="buff-shield">未启用</b></li>
-              <li><span class="ico-clock" aria-hidden="true"></span> 延时 <b id="buff-time">—</b></li>
+              <li><span class="ico-book" aria-hidden="true"></span> <span data-i18n="kahoot.buffKnow">知识加成</span> <b>+0%</b></li>
+              <li><span class="ico-shield" aria-hidden="true"></span> <span data-i18n="kahoot.buffShield">护盾</span> <b id="buff-shield" data-i18n="kahoot.shieldOff">未启用</b></li>
+              <li><span class="ico-clock" aria-hidden="true"></span> <span data-i18n="kahoot.buffTime">延时</span> <b id="buff-time">—</b></li>
             </ul>
           </div>
           <div class="hotbar-slots" aria-hidden="true">
@@ -301,11 +290,11 @@
           <span class="ui-moss ui-moss--br" aria-hidden="true"></span>
           <span class="q-corner-bl" aria-hidden="true"></span>
           <span class="q-corner-br" aria-hidden="true"></span>
-          <span class="q-tag pixel-tag" id="q-domain">AI 基础概念</span>
+          <span class="q-tag pixel-tag" id="q-domain" data-i18n="kahoot.catBasic">AI 基础概念</span>
           <h2 id="q-stem" class="q-stem"></h2>
           <img class="q-mascot pixel-sprite" src="/assets/kahoot/pixel/bot-buddy.png?v=2" alt="" width="64" height="64" />
         </article>
-        <div class="answers" id="answers" role="group" aria-label="选项"></div>
+        <div class="answers" id="answers" role="group" data-i18n-aria="kahoot.options" aria-label="选项"></div>
       </main>
 
       <aside class="side-right">
@@ -317,7 +306,7 @@
           <span class="ui-moss ui-moss--tl" aria-hidden="true"></span>
           <span class="ui-moss ui-moss--br" aria-hidden="true"></span>
           <div class="panel-torch right" aria-hidden="true"></div>
-          <h3 class="board-title"><span class="gem-ico green" aria-hidden="true"></span> 即时排行榜</h3>
+          <h3 class="board-title"><span class="gem-ico green" aria-hidden="true"></span> <span data-i18n="kahoot.liveBoard">即时排行榜</span></h3>
           <ol class="live-board" id="live-board"></ol>
         </div>
       </aside>
@@ -330,12 +319,12 @@
       </div>
       <div class="timeline stone-inset pixel-inset ui-frame ui-frame--banner-stone">
         <div class="timeline-track" id="timeline-track"></div>
-        <p class="timeline-tip" id="timeline-tip">保持节奏，冲向满分！</p>
+        <p class="timeline-tip" id="timeline-tip" data-i18n="kahoot.tipRhythm">保持节奏，冲向满分！</p>
       </div>
       <div class="items" id="items">
-        <button type="button" class="item-btn pixel-slot ui-slot" data-item="hint" title="提示">💡<small id="item-hint">×2</small></button>
-        <button type="button" class="item-btn pixel-slot ui-slot" data-item="fifty" title="去掉两个错误选项">50:50<small id="item-fifty">×1</small></button>
-        <button type="button" class="item-btn pixel-slot ui-slot" data-item="time" title="加时 5 秒">⏱️<small id="item-time">×1</small></button>
+        <button type="button" class="item-btn pixel-slot ui-slot" data-item="hint" data-i18n-title="kahoot.itemHint" title="提示">💡<small id="item-hint">×2</small></button>
+        <button type="button" class="item-btn pixel-slot ui-slot" data-item="fifty" data-i18n-title="kahoot.itemFifty" title="去掉两个错误选项">50:50<small id="item-fifty">×1</small></button>
+        <button type="button" class="item-btn pixel-slot ui-slot" data-item="time" data-i18n-title="kahoot.itemTime" title="加时 5 秒">⏱️<small id="item-time">×1</small></button>
       </div>
     </footer>
   </section>
@@ -345,7 +334,7 @@
     <header class="play-top compact">
       <div class="brand wood-sign compact">
         <img class="brand-bot pixel-sprite" src="/assets/kahoot/pixel/bot-buddy.png?v=2" alt="" width="32" height="32" />
-        <strong>AI 素养挑战赛</strong>
+        <strong data-i18n="kahoot.title">AI 素养挑战赛</strong>
       </div>
       <span class="meta-plaque" id="reveal-index">第 1 / 8 题</span>
       <span class="trophy-plaque gold" id="reveal-gain">本题获得 ★+0 分</span>
@@ -356,8 +345,8 @@
         <div class="stone-frame wood-trim player-card mini">
           <div class="avatar-lg" id="reveal-avatar"></div>
           <div>
-            <strong id="reveal-name">玩家</strong>
-            <p class="score-line"><span id="reveal-total">0</span> 分</p>
+            <strong id="reveal-name" data-i18n="kahoot.player">玩家</strong>
+            <p class="score-line"><span id="reveal-total">0</span><span data-i18n="kahoot.pts"> 分</span></p>
             <p class="streak-line" id="reveal-streak">连续 0</p>
           </div>
           <div class="hearts mini" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
@@ -367,17 +356,17 @@
       <div class="reveal-center">
         <div class="confetti" aria-hidden="true"></div>
         <div class="reveal-stage stone-frame">
-          <img class="reveal-bot" src="/assets/bot-hero.png" alt="" />
+          <img class="reveal-bot" src="/assets/kahoot/pixel/bot-hero.png?v=2" alt="" />
           <h2 class="reveal-title" id="reveal-title">答对了！</h2>
           <p class="reveal-sub" id="reveal-sub">太棒了！你展现了超强的学习力！</p>
         </div>
         <div class="reveal-cards">
           <div class="stone-frame parchment soft">
-            <span class="label">正确答案</span>
+            <span class="label" data-i18n="kahoot.correctAns">正确答案</span>
             <p id="reveal-answer"></p>
           </div>
           <div class="stone-frame parchment soft">
-            <span class="label">本题获得</span>
+            <span class="label" data-i18n="kahoot.gotPoints">本题获得</span>
             <p class="big-gold" id="reveal-points">+0 分</p>
           </div>
         </div>
@@ -385,14 +374,14 @@
         <div class="combo-bar stone-frame crystal-corners">
           <strong id="reveal-combo">0 COMBO!</strong>
           <div class="xp-bar"><i id="reveal-combo-fill"></i></div>
-          <span id="reveal-combo-tip">继续保持气势！</span>
+          <span id="reveal-combo-tip" data-i18n="kahoot.comboTip">继续保持气势！</span>
         </div>
-        <button type="button" class="btn-primary btn-xl" id="reveal-next">下一题 →</button>
+        <button type="button" class="btn-primary btn-xl" id="reveal-next" data-i18n="kahoot.nextQ">下一题 →</button>
       </div>
 
       <aside class="side-right">
         <div class="stone-frame board-card crystal-top">
-          <h3>即时排行榜</h3>
+          <h3 data-i18n="kahoot.liveBoard">即时排行榜</h3>
           <ol class="live-board" id="reveal-board"></ol>
         </div>
       </aside>
@@ -402,16 +391,16 @@
   <!-- PODIUM -->
   <section class="screen" id="screen-podium" aria-labelledby="podium-title">
     <p class="eyebrow">FINAL STANDINGS</p>
-    <h2 id="podium-title">决赛颁奖</h2>
+    <h2 id="podium-title" data-i18n="kahoot.podiumTitle">决赛颁奖</h2>
     <div class="podium" id="podium"></div>
     <ol class="live-board final" id="final-list"></ol>
     <div class="podium-actions">
-      <button type="button" class="chip-btn stone" id="again">再来一局</button>
-      <a class="btn-primary" href="/">返回大厅</a>
+      <button type="button" class="chip-btn stone" id="again" data-i18n="kahoot.again">再来一局</button>
+      <a class="btn-primary" href="/" data-i18n="kahoot.lobby">返回大厅</a>
     </div>
   </section>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="/kahoot/kahoot.js?v=6"></script>
+  <script type="module" src="/kahoot/kahoot.js?v=11"></script>
 </body>
 </html>
