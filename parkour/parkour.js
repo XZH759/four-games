@@ -6,6 +6,7 @@ import { AI_QUESTIONS, isCorrectOption, localizeQuestion } from "/monopoly/quest
 import { addCastlePoints, getEquippedLoadout } from "/castle/castle.js";
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
+import { logAnswer } from "/js/answer-log.js";
 import {
   drawFlightGear,
   drawOrbitAura,
@@ -1243,6 +1244,19 @@ function resolveQuiz(quiz, chosenLane, timedOut) {
   state.awaitingAnswer = false;
   const correct = !timedOut && chosenLane === quiz.correctLane;
   state.entities = state.entities.filter((e) => e.type === "quiz");
+
+  void logAnswer({
+    game: "parkour",
+    question_id: quiz.question?.id || `parkour-${state.quizSeen}`,
+    answer: { chosenLane, correctLane: quiz.correctLane, timedOut },
+    correct,
+    meta: {
+      distance: Math.round(state.distance),
+      quizSeen: state.quizSeen,
+      quizCorrect: state.quizCorrect + (correct ? 1 : 0),
+      sceneIndex: state.sceneIndex,
+    },
+  });
 
   if (correct) {
     state.targetLane = quiz.correctLane;

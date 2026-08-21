@@ -2,6 +2,7 @@ import { AI_QUESTIONS, isCorrectOption, localizeQuestion } from "/monopoly/quest
 import { addCastlePoints, getEquippedLoadout } from "/castle/castle.js";
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
+import { logAnswer } from "/js/answer-log.js";
 import {
   drawFlightGear,
   drawOrbitAura,
@@ -1106,6 +1107,19 @@ function answerQuestion(optionIndex, selectedButton) {
   const correct = isCorrectOption(activeQuestion.question, optionIndex);
   activeQuestion.wasCorrect = correct;
   activeQuestion.chosenOptionIndex = optionIndex;
+
+  void logAnswer({
+    game: "race",
+    question_id: activeQuestion.question?.id || `race-${game.answered}`,
+    answer: { optionIndex },
+    correct,
+    meta: {
+      trackId: selectedTrack?.id || null,
+      answered: game.answered,
+      correctCount: game.correct + (correct ? 1 : 0),
+    },
+  });
+
   if (correct) {
     game.correct += 1;
     if (loadout?.petBonus) {

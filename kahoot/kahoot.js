@@ -5,6 +5,7 @@
 import { AI_QUESTIONS, isCorrectOption, localizeQuestion } from "/monopoly/questions.js";
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
+import { logAnswer } from "/js/answer-log.js";
 
 initI18n({ toggleHost: "#lang-host" });
 onLangChange(() => {
@@ -566,6 +567,24 @@ function submitAnswer(optionIndex, button) {
     correct = true;
   }
   const points = scoreFromMs(elapsed, correct && !shielded) || (shielded ? Math.round(BASE_POINTS * 0.4) : 0);
+
+  void logAnswer(
+    {
+      game: "kahoot",
+      question_id: q.id || `kahoot-${state.index}`,
+      answer: { optionIndex, timedOut },
+      correct,
+      latency_ms: Math.round(elapsed),
+      meta: {
+        index: state.index,
+        points,
+        shielded,
+        timedOut,
+        streak: correct ? state.streak + 1 : 0,
+      },
+    },
+    { nick: you()?.name || state.nickname || "" },
+  );
 
   state.players.forEach((p) => {
     if (p.isYou) p.score += points;

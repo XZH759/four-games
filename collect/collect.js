@@ -14,6 +14,7 @@ import {
   loadCompanionDraft,
 } from "/js/nuannuan/companion-config.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
+import { logAnswers } from "/js/answer-log.js";
 
 mountLobbyExit();
 
@@ -150,6 +151,24 @@ async function submit() {
   state.answers[state.item.id] = value;
   saveLocalAnswers();
   els.itemRoot.removeEventListener("answerchange", onAnswerChange);
+
+  // Research log (Neon) — fire-and-forget; does not block map advance
+  const companion = loadConfirmedCompanion() || loadCompanionDraft();
+  void logAnswers([
+    {
+      game: "collect",
+      question_id: state.item.id,
+      level_index: state.levelId,
+      answer: value,
+      correct: null,
+      meta: {
+        arm: "collect",
+        zone: state.meta?.zone || null,
+        levelId: state.meta?.levelId || null,
+        companionId: companion?.id || null,
+      },
+    },
+  ]);
 
   const shell = window.Shells.collect;
   const betweenCtx = {

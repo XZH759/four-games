@@ -1,6 +1,7 @@
 import { AI_QUESTIONS, isCorrectOption, localizeQuestion } from "/monopoly/questions.js";
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
+import { logAnswer } from "/js/answer-log.js";
 
 initI18n({ toggleHost: "#lang-host" });
 onLangChange(() => {
@@ -885,7 +886,22 @@ function answerQuestion(optionIndex, selectedButton) {
   const { question, playerIndex } = activeQuestion;
   const correct = isCorrectOption(question, optionIndex);
   const player = state.players[playerIndex];
-  player.money += correct ? CORRECT_REWARD : -WRONG_PENALTY;
+  const delta = correct ? CORRECT_REWARD : -WRONG_PENALTY;
+  player.money += delta;
+
+  void logAnswer({
+    game: "monopoly",
+    question_id: question.id || `monopoly-${state.round}`,
+    answer: { optionIndex },
+    correct,
+    meta: {
+      playerIndex,
+      moneyDelta: delta,
+      moneyAfter: player.money,
+      round: state.round,
+      domain: question.domain || null,
+    },
+  });
 
   [...els.answerList.children].forEach((button, displayIndex) => {
     button.disabled = true;
