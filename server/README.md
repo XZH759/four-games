@@ -20,6 +20,28 @@
 `answer_attempts.question_id` aligns with `questions.question_id`.  
 `answer_attempts.session_id` aligns with `users.session_id`. No foreign keys in v1 (keeps logging fire-and-forget).
 
+### Seed questions into Neon
+
+**Option A — Neon SQL Editor (recommended)**  
+After `002_questions.sql`, run [`server/sql/002b_questions_seed.sql`](sql/002b_questions_seed.sql).  
+It upserts all 18 items from `items.seed.json` (with provisional game keys when available).
+
+**Option B — local script**  
+Needs `DATABASE_URL` in `.env.local`:
+
+```bash
+npm install
+node server/scripts/seed-questions.mjs
+```
+
+Regenerate the SQL dump after editing the seed JSON:
+
+```bash
+node server/scripts/generate-questions-seed-sql.mjs
+```
+
+The `users` table stays empty until login upsert is wired.
+
 ## 2. Configure Vercel
 
 In the Vercel project → **Settings → Environment Variables**:
