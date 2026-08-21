@@ -1,0 +1,8 @@
+{
+  "name": "ai-literacy-park",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1"
+  }
+}
