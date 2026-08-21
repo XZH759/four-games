@@ -1,10 +1,24 @@
 # Student answer database (Neon + Vercel)
 
-## 1. Create the table in Neon
+## 1. Create the tables in Neon
 
 1. Open https://console.neon.tech and create a project.
-2. Open **SQL Editor** and run [`server/sql/001_answer_attempts.sql`](sql/001_answer_attempts.sql).
+2. Open **SQL Editor** and run these scripts in order:
+   - [`server/sql/001_answer_attempts.sql`](sql/001_answer_attempts.sql) — answer log
+   - [`server/sql/002_questions.sql`](sql/002_questions.sql) — question bank
+   - [`server/sql/003_users.sql`](sql/003_users.sql) — user profiles
 3. On the Project Dashboard, click **Connect** and copy the **pooled** connection string.
+
+### Table overview
+
+| Table | Purpose | Key |
+|-------|---------|-----|
+| `answer_attempts` | Append-only answer log | `id` |
+| `questions` | All assessment/game items | `question_id` (e.g. `E-1-Q1`) |
+| `users` | Player profile from login | `session_id` (same as client `ailit_session_id`) |
+
+`answer_attempts.question_id` aligns with `questions.question_id`.  
+`answer_attempts.session_id` aligns with `users.session_id`. No foreign keys in v1 (keeps logging fire-and-forget).
 
 ## 2. Configure Vercel
 
