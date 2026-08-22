@@ -9,6 +9,7 @@ import {
   localizeCompanion,
   saveCompanionDraft,
 } from "/js/nuannuan/companion-config.js";
+import { upsertUser } from "/js/user-log.js";
 
 initI18n({ toggleHost: "#lang-host" });
 onLangChange(() => {
@@ -274,6 +275,7 @@ els.confirm.addEventListener("click", async () => {
     if (!confirmCompanion(state.selected.id)) throw new Error("Invalid companion");
     state.confirmed = state.selected;
     paintTeam(state.selected);
+    void upsertUser({ companion_id: state.selected.id });
     const label = state.selected.nameEn || state.selected.name;
     els.tipsText.textContent = t("partner.lockedTip", { name: label });
     announce(t("partner.chosen", { name: label }));

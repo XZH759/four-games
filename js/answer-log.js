@@ -38,13 +38,18 @@ function readJson(key) {
 /** @param {{ nick?: string }=} opts */
 export function getStudentContext(opts = {}) {
   const login = readJson(LOGIN_KEY) || {};
+  const avatar = readJson("nn_avatar_v2") || {};
   const kahoot = readJson(KAHOOT_PROFILE_KEY) || {};
   const nick = opts.nick || kahoot.nick || kahoot.name || "";
   return {
     session_id: getSessionId(),
-    student_name: String(nick || login.name || "").slice(0, 64) || null,
-    character_id: login.character_id || login.characterId || null,
-    role: login.role || null,
+    student_name: String(nick || login.name || avatar.name || "").slice(0, 64) || null,
+    character_id:
+      login.character_id ||
+      login.characterId ||
+      avatar.characterId ||
+      null,
+    role: login.role || avatar.role || null,
   };
 }
 

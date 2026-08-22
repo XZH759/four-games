@@ -29,6 +29,7 @@ import {
   resolveThemeSelection,
 } from "/js/nuannuan/career-theme-packs.js";
 import { localizePack } from "/js/nuannuan/login-theme-en.js";
+import { upsertUser } from "/js/user-log.js";
 
 initI18n({ toggleHost: "#lang-host" });
 onLangChange(() => {
@@ -828,6 +829,17 @@ els.confirm.addEventListener("click", async () => {
   });
   saveFinal(avatar);
   persist();
+  // Passwordless cloud profile — fire-and-forget; local progress still works offline
+  void upsertUser({
+    display_name: state.name,
+    character_id: state.characterId,
+    role: state.role,
+    gender: state.gender,
+    profile: {
+      referenceSheet: state.referenceSheet,
+      themePack: snapshot().theme,
+    },
+  });
   toast(t("login.toast.saved"));
   await new Promise((resolve) => setTimeout(resolve, 420));
   location.href = NEXT_URL;

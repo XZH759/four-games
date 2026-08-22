@@ -67,8 +67,20 @@ Copy `.env.example` → `.env.local` (or set env in the Vercel CLI) with the sam
 ## 4. Client wiring
 
 - Shared logger: `/js/answer-log.js`
+- Passwordless user sync: `/js/user-log.js` → `POST /api/users` on character login confirm and companion confirm
 - Writes on submit from: `collect`, `kahoot`, `parkour`, `race`, `monopoly`
 - Gameplay never waits on the network; failures only `console.warn`
+
+### Passwordless login (no password)
+
+1. Player finishes `/nuannuan/login` (name + role + gender) → local profile + `POST /api/users` upsert by `session_id`.
+2. Player confirms companion on `/nuannuan/partner` → updates `users.companion_id`.
+3. Teacher list:
+
+```bash
+curl -H "x-admin-secret: YOUR_SECRET" \
+  "https://YOUR_DOMAIN/api/users?limit=100"
+```
 
 ## 5. Teacher export
 
