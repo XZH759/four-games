@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="portal.title">AI世界游乐园 · 入园登录</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=2" />
+  <link rel="stylesheet" href="/portal/portal.css?v=1" />
+</head>
+<body class="portal-page">
+  <div class="portal-bg" aria-hidden="true">
+    <img src="/portal/assets/portal-bg.png" alt="" />
+    <div class="portal-bg-shade"></div>
+  </div>
+
+  <header class="portal-header">
+    <div class="portal-brand">
+      <img src="/assets/park/clay/explore.png" alt="" width="52" height="46" />
+      <div>
+        <h1 data-i18n="portal.brand">AI世界游乐园</h1>
+        <p data-i18n="portal.tagline">探索知识 · 挑战自我 · 创造无限可能</p>
+      </div>
+    </div>
+    <div id="lang-host" class="lang-host"></div>
+  </header>
+
+  <main class="portal-main">
+    <section class="portal-card" aria-labelledby="portal-card-title">
+      <div class="portal-mascot">
+        <img src="/assets/bot-buddy.png" alt="" width="88" height="88" />
+      </div>
+      <h2 id="portal-card-title">
+        <span aria-hidden="true">✦</span>
+        <span data-i18n="portal.welcome">欢迎入园</span>
+        <span aria-hidden="true">✦</span>
+      </h2>
+      <p class="portal-lead" data-i18n="portal.lead">输入昵称即可进入乐园，暂时无需密码</p>
+
+      <form class="portal-form" id="portal-form" novalidate>
+        <label class="field-label" for="portal-nick" data-i18n="portal.nickLabel">昵称</label>
+        <div class="field-wrap">
+          <span class="field-icon" aria-hidden="true">👤</span>
+          <input
+            id="portal-nick"
+            name="nickname"
+            type="text"
+            maxlength="16"
+            autocomplete="nickname"
+            data-i18n-placeholder="portal.nickPlaceholder"
+            placeholder="昵称 / 用户名"
+            required
+          />
+        </div>
+        <p class="field-error" id="portal-error" hidden></p>
+
+        <fieldset class="role-fieldset">
+          <legend data-i18n="portal.roleLegend">选择身份</legend>
+          <div class="role-grid" id="role-grid"></div>
+        </fieldset>
+
+        <button type="submit" class="btn-enter" id="btn-enter">
+          <span aria-hidden="true">✦</span>
+          <span data-i18n="portal.enter">进入AI世界游乐园</span>
+        </button>
+        <button type="button" class="btn-guest" id="btn-guest">
+          <span aria-hidden="true">👤</span>
+          <span data-i18n="portal.guest">游客进入</span>
+        </button>
+      </form>
+
+      <p class="portal-note">
+        <span aria-hidden="true">🛡️</span>
+        <span data-i18n="portal.note">首次登录将自动创建个人档案并保存进度</span>
+      </p>
+    </section>
+  </main>
+
+  <footer class="portal-features" aria-label="Features">
+    <article>
+      <span class="feat-icon">📚</span>
+      <strong data-i18n="portal.feat.explore">知识探索</strong>
+      <p data-i18n="portal.feat.exploreDesc">丰富有趣的知识冒险</p>
+    </article>
+    <article>
+      <span class="feat-icon">🏆</span>
+      <strong data-i18n="portal.feat.challenge">挑战自我</strong>
+      <p data-i18n="portal.feat.challengeDesc">多种竞赛等你来战</p>
+    </article>
+    <article>
+      <span class="feat-icon">💡</span>
+      <strong data-i18n="portal.feat.create">创造无限</strong>
+      <p data-i18n="portal.feat.createDesc">激发创意实现梦想</p>
+    </article>
+    <article>
+      <span class="feat-icon">🎁</span>
+      <strong data-i18n="portal.feat.daily">每日惊喜</strong>
+      <p data-i18n="portal.feat.dailyDesc">完成任务领取奖励</p>
+    </article>
+  </footer>
+
+  <div class="portal-toast" id="portal-toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/portal/portal.js?v=1"></script>
+</body>
+</html>

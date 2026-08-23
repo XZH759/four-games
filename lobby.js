@@ -1,7 +1,13 @@
 import { getEquippedLoadout } from "/castle/castle.js";
 import { initI18n, t, onLangChange, setLang, getLang, applyDom } from "/js/i18n.js";
+import { isPortalLoggedIn, loadPortalUser, roleLabelKey } from "/js/portal-auth.js";
 
 (() => {
+  if (!isPortalLoggedIn()) {
+    location.replace("/portal/");
+    return;
+  }
+
   initI18n({ toggleHost: "#lang-host" });
 
   const ZONE_META = () => ({
@@ -188,6 +194,7 @@ import { initI18n, t, onLangChange, setLang, getLang, applyDom } from "/js/i18n.
 
   function renderProfile() {
     try {
+      const portal = loadPortalUser();
       const load = getEquippedLoadout();
       const avatar = document.getElementById("profile-avatar");
       const name = document.getElementById("profile-name");
@@ -197,13 +204,16 @@ import { initI18n, t, onLangChange, setLang, getLang, applyDom } from "/js/i18n.
       if (avatar) avatar.textContent = load.frame?.icon || load.pet?.icon || "🧒";
       if (name) {
         name.removeAttribute("data-i18n");
-        name.textContent = load.name || t("lobby.explorerDefault");
+        name.textContent = portal?.display_name || load.name || t("lobby.explorerDefault");
       }
       if (level) {
         const lv = Math.max(1, Math.floor((Number(load.lifetime) || 0) / 500) + 1);
+        const roleTitle = portal ? t(roleLabelKey(portal.role)) : null;
         level.textContent = load.title
           ? `Lv.${lv} ${load.title.titleText || load.title.name.replace(/^称号·/, "")}`
-          : t("lobby.levelExplorer", { n: lv });
+          : roleTitle
+            ? `Lv.${lv} ${roleTitle}`
+            : t("lobby.levelExplorer", { n: lv });
       }
       if (points) points.textContent = String(Number(load.points) || 0);
       if (coins) {
