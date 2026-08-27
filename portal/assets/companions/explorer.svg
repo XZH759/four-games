@@ -1,0 +1,7 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="512" height="640" viewBox="0 0 512 640">
+  <rect width="512" height="640" rx="48" fill="#FFF3E6"/>
+  <circle cx="256" cy="250" r="110" fill="#F0A04B"/>
+  <text x="256" y="270" text-anchor="middle" font-size="72" fill="#fff">🧭</text>
+  <text x="256" y="430" text-anchor="middle" font-family="Nunito,sans-serif" font-size="36" font-weight="700" fill="#8A4B12">Explorer</text>
+  <text x="256" y="480" text-anchor="middle" font-family="Nunito,sans-serif" font-size="22" fill="#B07A40">placeholder</text>
+</svg>

@@ -47,8 +47,15 @@ function normalizeAttempt(raw) {
       ? null
       : Number(raw.latency_ms);
 
+  const userIdRaw = raw.user_id;
+  const user_id =
+    userIdRaw == null || userIdRaw === ""
+      ? null
+      : Number(userIdRaw);
+
   return {
     session_id: session_id.slice(0, 80),
+    user_id: Number.isFinite(user_id) && user_id > 0 ? Math.trunc(user_id) : null,
     student_name: raw.student_name != null ? String(raw.student_name).slice(0, 64) : null,
     character_id: raw.character_id != null ? String(raw.character_id).slice(0, 64) : null,
     role: raw.role != null ? String(raw.role).slice(0, 64) : null,
@@ -68,10 +75,11 @@ async function insertAttempts(sql, attempts) {
   for (const a of attempts) {
     await sql`
       INSERT INTO answer_attempts (
-        session_id, student_name, character_id, role,
+        session_id, user_id, student_name, character_id, role,
         game, question_id, level_index, answer, correct, latency_ms, meta
       ) VALUES (
         ${a.session_id},
+        ${a.user_id},
         ${a.student_name},
         ${a.character_id},
         ${a.role},
@@ -94,6 +102,7 @@ function toCsv(rows) {
     "id",
     "created_at",
     "session_id",
+    "user_id",
     "student_name",
     "character_id",
     "role",
@@ -164,7 +173,7 @@ export default async function handler(req, res) {
 
       const rows = game && ALLOWED_GAMES.has(game)
         ? await sql`
-            SELECT id, created_at, session_id, student_name, character_id, role,
+            SELECT id, created_at, session_id, user_id, student_name, character_id, role,
                    game, question_id, level_index, answer, correct, latency_ms, meta
             FROM answer_attempts
             WHERE game = ${game}
@@ -172,7 +181,7 @@ export default async function handler(req, res) {
             LIMIT ${limit}
           `
         : await sql`
-            SELECT id, created_at, session_id, student_name, character_id, role,
+            SELECT id, created_at, session_id, user_id, student_name, character_id, role,
                    game, question_id, level_index, answer, correct, latency_ms, meta
             FROM answer_attempts
             ORDER BY created_at DESC

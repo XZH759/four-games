@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title data-i18n="lobby.title">AI世界游乐园 · 园区首页</title>
+  <link rel="icon" href="/assets/park/clay/explore.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/js/i18n.css?v=2" />
-  <link rel="stylesheet" href="/lobby.css?v=17" />
+  <link rel="stylesheet" href="/lobby.css?v=18" />
 </head>
 <body class="park-home">
   <div class="sky-layer" aria-hidden="true">
@@ -240,8 +241,43 @@
     </form>
   </dialog>
 
+  <dialog class="onboarding-modal" id="onboarding-modal" aria-labelledby="onboarding-title">
+    <div class="onboarding-shell">
+      <button type="button" class="onboarding-close" id="onboarding-close" data-i18n-aria="common.close" aria-label="关闭">×</button>
+
+      <div class="onboarding-visual" aria-hidden="true">
+        <span class="onboarding-aurora"></span>
+        <img id="onboarding-art" src="/assets/park/clay/pin.png" alt="" />
+        <div class="onboarding-ticket">
+          <span id="onboarding-count">1 / 3</span>
+          <strong id="onboarding-ticket-title">MEET YOUR GUIDE</strong>
+        </div>
+      </div>
+
+      <section class="onboarding-copy">
+        <span class="onboarding-eyebrow" data-i18n="onboarding.eyebrow">FIRST VISIT · 首次入园</span>
+        <h2 id="onboarding-title">认识你的园区向导</h2>
+        <p id="onboarding-description">我会陪你逛遍园区，一起完成知识挑战、收集奖励。</p>
+
+        <ul class="onboarding-features" id="onboarding-features"></ul>
+
+        <div class="onboarding-actions">
+          <button type="button" class="onboarding-primary" id="onboarding-next">
+            <span id="onboarding-next-label">下一步</span>
+            <span aria-hidden="true">→</span>
+          </button>
+          <button type="button" class="onboarding-skip" id="onboarding-skip" data-i18n="onboarding.skip">暂时跳过</button>
+        </div>
+
+        <div class="onboarding-dots" id="onboarding-dots" role="tablist" data-i18n-aria="onboarding.progress" aria-label="引导进度"></div>
+      </section>
+
+      <nav class="onboarding-tabs" id="onboarding-tabs" data-i18n-aria="onboarding.progress" aria-label="引导进度"></nav>
+    </div>
+  </dialog>
+
   <div class="page-toast" id="page-toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="/lobby.js?v=15"></script>
+  <script type="module" src="/lobby.js?v=17"></script>
 </body>
 </html>

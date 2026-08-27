@@ -1,6 +1,6 @@
 import { getEquippedLoadout } from "/castle/castle.js";
 import { initI18n, t, onLangChange, setLang, getLang, applyDom } from "/js/i18n.js";
-import { isPortalLoggedIn, loadPortalUser, roleLabelKey } from "/js/portal-auth.js";
+import { isPortalLoggedIn, loadPortalUser, companionLabelKey, ONBOARDING_KEY } from "/js/portal-auth.js";
 
 (() => {
   if (!isPortalLoggedIn()) {
@@ -57,8 +57,58 @@ import { isPortalLoggedIn, loadPortalUser, roleLabelKey } from "/js/portal-auth.
   const pickerTitle = document.getElementById("zone-picker-title");
   const pickerLinks = document.getElementById("zone-picker-links");
   const pickerClose = document.getElementById("zone-picker-close");
+  const onboardingModal = document.getElementById("onboarding-modal");
+  const onboardingArt = document.getElementById("onboarding-art");
+  const onboardingCount = document.getElementById("onboarding-count");
+  const onboardingTicketTitle = document.getElementById("onboarding-ticket-title");
+  const onboardingTitle = document.getElementById("onboarding-title");
+  const onboardingDescription = document.getElementById("onboarding-description");
+  const onboardingFeatures = document.getElementById("onboarding-features");
+  const onboardingNext = document.getElementById("onboarding-next");
+  const onboardingNextLabel = document.getElementById("onboarding-next-label");
+  const onboardingSkip = document.getElementById("onboarding-skip");
+  const onboardingClose = document.getElementById("onboarding-close");
+  const onboardingDots = document.getElementById("onboarding-dots");
+  const onboardingTabs = document.getElementById("onboarding-tabs");
 
   let activeZone = null;
+  let onboardingIndex = 0;
+
+  const ONBOARDING_SLIDES = [
+    {
+      art: "/assets/park/clay/pin.png",
+      ticketKey: "onboarding.guide.ticket",
+      titleKey: "onboarding.guide.title",
+      descriptionKey: "onboarding.guide.copy",
+      features: [
+        ["🗺️", "onboarding.guide.feature1", "onboarding.guide.feature1Desc", "#e4f5e9"],
+        ["❓", "onboarding.guide.feature2", "onboarding.guide.feature2Desc", "#eee4ff"],
+        ["⭐", "onboarding.guide.feature3", "onboarding.guide.feature3Desc", "#fff0cb"],
+      ],
+    },
+    {
+      art: "/assets/park/clay/arena.png",
+      ticketKey: "onboarding.quiz.ticket",
+      titleKey: "onboarding.quiz.title",
+      descriptionKey: "onboarding.quiz.copy",
+      features: [
+        ["🏰", "onboarding.quiz.feature1", "onboarding.quiz.feature1Desc", "#fff0d9"],
+        ["⚡", "onboarding.quiz.feature2", "onboarding.quiz.feature2Desc", "#e7f5ec"],
+        ["🏆", "onboarding.quiz.feature3", "onboarding.quiz.feature3Desc", "#eee7fb"],
+      ],
+    },
+    {
+      art: "/assets/park/clay/gift.png",
+      ticketKey: "onboarding.reward.ticket",
+      titleKey: "onboarding.reward.title",
+      descriptionKey: "onboarding.reward.copy",
+      features: [
+        ["🎁", "onboarding.reward.feature1", "onboarding.reward.feature1Desc", "#fff0dc"],
+        ["✨", "onboarding.reward.feature2", "onboarding.reward.feature2Desc", "#f1e9ff"],
+        ["🧭", "onboarding.reward.feature3", "onboarding.reward.feature3Desc", "#e5f4e9"],
+      ],
+    },
+  ];
 
   function announce(text) {
     if (!toast) return;
@@ -208,11 +258,11 @@ import { isPortalLoggedIn, loadPortalUser, roleLabelKey } from "/js/portal-auth.
       }
       if (level) {
         const lv = Math.max(1, Math.floor((Number(load.lifetime) || 0) / 500) + 1);
-        const roleTitle = portal ? t(roleLabelKey(portal.role)) : null;
+        const companionTitle = portal ? t(companionLabelKey(portal.companion)) : null;
         level.textContent = load.title
           ? `Lv.${lv} ${load.title.titleText || load.title.name.replace(/^称号·/, "")}`
-          : roleTitle
-            ? `Lv.${lv} ${roleTitle}`
+          : companionTitle
+            ? `Lv.${lv} ${companionTitle}`
             : t("lobby.levelExplorer", { n: lv });
       }
       if (points) points.textContent = String(Number(load.points) || 0);
@@ -277,19 +327,124 @@ import { isPortalLoggedIn, loadPortalUser, roleLabelKey } from "/js/portal-auth.
     announce(t("lobby.toast.explore"));
   });
 
-  const openGuide = () => {
-    if (typeof guideModal?.showModal === "function") guideModal.showModal();
-    else announce(t("lobby.guide.step1"));
-  };
-  document.getElementById("newbie-guide")?.addEventListener("click", openGuide);
-  document.getElementById("guide-start")?.addEventListener("click", () => {
-    announce(t("lobby.toast.startTown"));
-    window.location.href = "/nuannuan/login";
+  function paintOnboarding() {
+    const slide = ONBOARDING_SLIDES[onboardingIndex] || ONBOARDING_SLIDES[0];
+    if (!slide || !onboardingFeatures) return;
+    if (onboardingArt) onboardingArt.src = slide.art;
+    if (onboardingCount) onboardingCount.textContent = `${onboardingIndex + 1} / ${ONBOARDING_SLIDES.length}`;
+    if (onboardingTicketTitle) onboardingTicketTitle.textContent = t(slide.ticketKey);
+    if (onboardingTitle) onboardingTitle.textContent = t(slide.titleKey);
+    if (onboardingDescription) onboardingDescription.textContent = t(slide.descriptionKey);
+    if (onboardingNextLabel) {
+      onboardingNextLabel.textContent = t(
+        onboardingIndex === ONBOARDING_SLIDES.length - 1
+          ? "onboarding.getStarted"
+          : "onboarding.next",
+      );
+    }
+
+    onboardingFeatures.replaceChildren(
+      ...slide.features.map(([icon, titleKey, descKey, background]) => {
+        const item = document.createElement("li");
+        const art = document.createElement("span");
+        const copy = document.createElement("div");
+        const title = document.createElement("strong");
+        const description = document.createElement("small");
+        art.textContent = icon;
+        art.style.setProperty("--feature-bg", background);
+        title.textContent = t(titleKey);
+        description.textContent = t(descKey);
+        copy.append(title, description);
+        item.append(art, copy);
+        return item;
+      }),
+    );
+
+    if (onboardingDots) {
+      onboardingDots.replaceChildren(
+        ...ONBOARDING_SLIDES.map((_, index) => {
+          const dot = document.createElement("button");
+          dot.type = "button";
+          dot.className = `onboarding-dot${index === onboardingIndex ? " is-on" : ""}`;
+          dot.setAttribute("role", "tab");
+          dot.setAttribute("aria-selected", index === onboardingIndex ? "true" : "false");
+          dot.setAttribute("aria-label", t("onboarding.step", { n: index + 1 }));
+          dot.addEventListener("click", () => goToOnboarding(index));
+          return dot;
+        }),
+      );
+    }
+
+    if (onboardingTabs) {
+      onboardingTabs.replaceChildren(
+        ...ONBOARDING_SLIDES.map((tabSlide, index) => {
+          const tab = document.createElement("button");
+          tab.type = "button";
+          tab.className = `onboarding-tab${index === onboardingIndex ? " is-on" : ""}`;
+          tab.setAttribute("aria-current", index === onboardingIndex ? "step" : "false");
+          tab.innerHTML = `<b>${index + 1}/3</b><img src="${tabSlide.art}" alt="" /><span>${t(tabSlide.ticketKey)}</span>`;
+          tab.addEventListener("click", () => goToOnboarding(index));
+          return tab;
+        }),
+      );
+    }
+  }
+
+  function goToOnboarding(index) {
+    onboardingIndex = Math.min(ONBOARDING_SLIDES.length - 1, Math.max(0, Number(index) || 0));
+    try { localStorage.setItem(ONBOARDING_KEY, String(onboardingIndex + 1)); } catch (_) {}
+    paintOnboarding();
+  }
+
+  function closeOnboarding(status = -1) {
+    try { localStorage.setItem(ONBOARDING_KEY, String(status)); } catch (_) {}
+    if (onboardingModal?.open) onboardingModal.close();
+  }
+
+  function openOnboarding({ restart = false } = {}) {
+    if (!onboardingModal) {
+      announce(t("onboarding.guide.title"));
+      return;
+    }
+    let saved = 0;
+    try { saved = Number(localStorage.getItem(ONBOARDING_KEY) || 0); } catch (_) {}
+    onboardingIndex = restart ? 0 : saved >= 1 && saved < 3 ? saved - 1 : 0;
+    paintOnboarding();
+    if (typeof onboardingModal.showModal === "function") onboardingModal.showModal();
+    else onboardingModal.setAttribute("open", "");
+    onboardingNext?.focus({ preventScroll: true });
+  }
+
+  onboardingNext?.addEventListener("click", () => {
+    if (onboardingIndex < ONBOARDING_SLIDES.length - 1) {
+      goToOnboarding(onboardingIndex + 1);
+      return;
+    }
+    closeOnboarding(3);
+    announce(t("onboarding.readyToast"));
   });
+  onboardingSkip?.addEventListener("click", () => closeOnboarding(-1));
+  onboardingClose?.addEventListener("click", () => closeOnboarding(-1));
+  onboardingModal?.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeOnboarding(-1);
+  });
+  onboardingModal?.addEventListener("click", (event) => {
+    if (event.target === onboardingModal) closeOnboarding(-1);
+  });
+  document.getElementById("newbie-guide")?.addEventListener("click", () => openOnboarding({ restart: true }));
+
   try {
-    if (!localStorage.getItem("nn_park_guide_seen")) {
-      setTimeout(openGuide, 700);
-      localStorage.setItem("nn_park_guide_seen", "1");
+    const params = new URLSearchParams(location.search);
+    const forced = params.get("onboarding") === "1";
+    const saved = Number(localStorage.getItem(ONBOARDING_KEY) || 0);
+    if (forced || saved === 0 || saved === 1 || saved === 2) {
+      setTimeout(() => openOnboarding(), 520);
+    }
+    if (forced) {
+      params.delete("onboarding");
+      const query = params.toString();
+      history.replaceState(null, "", `${location.pathname}${query ? `?${query}` : ""}${location.hash}`);
     }
   } catch (_) {}
 
@@ -298,5 +453,6 @@ import { isPortalLoggedIn, loadPortalUser, roleLabelKey } from "/js/portal-auth.
     renderProfile();
     renderWeek();
     if (activeZone && picker && !picker.hidden) openPicker(activeZone);
+    if (onboardingModal?.open) paintOnboarding();
   });
 })();

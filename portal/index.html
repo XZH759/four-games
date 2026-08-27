@@ -3,105 +3,259 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f6eadb" />
   <title data-i18n="portal.title">AI世界游乐园 · 入园登录</title>
+  <link rel="icon" href="/assets/park/clay/explore.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/js/i18n.css?v=2" />
-  <link rel="stylesheet" href="/portal/portal.css?v=1" />
+  <link rel="stylesheet" href="/portal/portal.css?v=3" />
 </head>
-<body class="portal-page">
-  <div class="portal-bg" aria-hidden="true">
-    <img src="/portal/assets/portal-bg.png" alt="" />
-    <div class="portal-bg-shade"></div>
+<body class="portal-page" data-flow-view="welcome">
+  <div class="portal-sparkles" aria-hidden="true">
+    <i></i><i></i><i></i><i></i><i></i><i></i>
   </div>
 
-  <header class="portal-header">
-    <div class="portal-brand">
-      <img src="/assets/park/clay/explore.png" alt="" width="52" height="46" />
-      <div>
-        <h1 data-i18n="portal.brand">AI世界游乐园</h1>
-        <p data-i18n="portal.tagline">探索知识 · 挑战自我 · 创造无限可能</p>
+  <main class="portal-shell" aria-label="AI World Park login">
+    <section class="portal-hero" aria-labelledby="scene-title">
+      <div class="hero-art" aria-hidden="true">
+        <img src="/portal/assets/portal-bg.png" alt="" />
+        <span class="hero-wash"></span>
       </div>
-    </div>
-    <div id="lang-host" class="lang-host"></div>
-  </header>
 
-  <main class="portal-main">
+      <div class="scene-step" aria-hidden="true">
+        <span id="scene-step-number">01</span>
+        <i></i>
+        <em>ADMIT ONE</em>
+      </div>
+
+      <div class="hero-story">
+        <p class="scene-kicker" id="scene-kicker">PARK GATE · 入园处</p>
+        <h2 id="scene-title" data-i18n="portal.scene.welcomeTitle">你的 AI 冒险，从这里启程</h2>
+        <p id="scene-copy" data-i18n="portal.scene.welcomeCopy">领取入园通行证，选择一位伙伴，一起探索知识世界。</p>
+      </div>
+
+      <div class="memory-trail" aria-hidden="true">
+        <span class="memory-node n1">★</span>
+        <span class="memory-node n2">✦</span>
+        <span class="memory-node n3">◆</span>
+      </div>
+
+      <aside class="hero-toast" id="hero-toast">
+        <span class="hero-toast-ico" aria-hidden="true">🎁</span>
+        <p data-i18n="portal.dailyToast">每日任务已刷新！去探索、学习，赢取精彩奖励。</p>
+      </aside>
+    </section>
+
     <section class="portal-card" aria-labelledby="portal-card-title">
-      <div class="portal-mascot">
-        <img src="/assets/bot-buddy.png" alt="" width="88" height="88" />
-      </div>
-      <h2 id="portal-card-title">
-        <span aria-hidden="true">✦</span>
-        <span data-i18n="portal.welcome">欢迎入园</span>
-        <span aria-hidden="true">✦</span>
-      </h2>
-      <p class="portal-lead" data-i18n="portal.lead">输入昵称即可进入乐园，暂时无需密码</p>
-
-      <form class="portal-form" id="portal-form" novalidate>
-        <label class="field-label" for="portal-nick" data-i18n="portal.nickLabel">昵称</label>
-        <div class="field-wrap">
-          <span class="field-icon" aria-hidden="true">👤</span>
-          <input
-            id="portal-nick"
-            name="nickname"
-            type="text"
-            maxlength="16"
-            autocomplete="nickname"
-            data-i18n-placeholder="portal.nickPlaceholder"
-            placeholder="昵称 / 用户名"
-            required
-          />
+      <header class="card-head">
+        <div class="card-brand">
+          <span class="brand-mark" aria-hidden="true">★</span>
+          <div>
+            <h1 id="portal-card-title" data-i18n="portal.brand">AI世界游乐园</h1>
+            <p data-i18n="portal.taglineShort">探索 · 挑战 · 创造</p>
+          </div>
         </div>
-        <p class="field-error" id="portal-error" hidden></p>
+        <div id="lang-host" class="lang-host"></div>
+      </header>
 
-        <fieldset class="role-fieldset">
-          <legend data-i18n="portal.roleLegend">选择身份</legend>
-          <div class="role-grid" id="role-grid"></div>
-        </fieldset>
+      <div class="flow-progress" aria-label="Login progress">
+        <ol id="flow-steps">
+          <li data-flow-step="1" class="is-on"><span>1</span><em data-i18n="portal.progress.signin">登录</em></li>
+          <li data-flow-step="2"><span>2</span><em data-i18n="portal.progress.profile">档案</em></li>
+          <li data-flow-step="3"><span>3</span><em data-i18n="portal.progress.journey">旅程</em></li>
+          <li data-flow-step="4"><span>4</span><em data-i18n="portal.progress.ready">就绪</em></li>
+        </ol>
+      </div>
 
-        <button type="submit" class="btn-enter" id="btn-enter">
-          <span aria-hidden="true">✦</span>
-          <span data-i18n="portal.enter">进入AI世界游乐园</span>
+      <section class="portal-view is-active" id="view-welcome" data-view="welcome" aria-labelledby="welcome-title">
+        <div class="view-heading">
+          <span class="eyebrow" data-i18n="portal.step1.eyebrow">STEP 1 · WELCOME</span>
+          <h2 id="welcome-title" data-i18n="portal.step1.title">欢迎来到乐园</h2>
+          <p data-i18n="portal.step1.lead">填写你的入园信息，选择今天并肩出发的伙伴。</p>
+        </div>
+
+        <form class="portal-form" id="portal-form" novalidate>
+          <label class="field" for="portal-nick">
+            <span class="field-ico" aria-hidden="true">🐻</span>
+            <span class="sr-only" data-i18n="portal.nickLabel">昵称</span>
+            <input id="portal-nick" name="nickname" type="text" maxlength="20" autocomplete="nickname" data-i18n-placeholder="portal.nickPlaceholder" placeholder="昵称" required />
+            <span class="field-count" id="nick-count" aria-live="polite">0/20</span>
+          </label>
+
+          <label class="field" for="portal-pid">
+            <span class="field-ico" aria-hidden="true">🪪</span>
+            <span class="sr-only" data-i18n="portal.pidLabel">学号 / 参与者 ID</span>
+            <input id="portal-pid" name="participant_id" type="text" maxlength="20" autocomplete="username" data-i18n-placeholder="portal.pidPlaceholder" placeholder="学号 / 参与者 ID" required />
+            <span class="field-count" id="pid-count" aria-live="polite">0/20</span>
+          </label>
+
+          <fieldset class="companion-fieldset">
+            <legend><span aria-hidden="true">✦</span> <span data-i18n="portal.companionLegend">选择你的同伴</span> <span aria-hidden="true">✦</span></legend>
+            <div class="companion-grid" id="companion-grid" role="radiogroup" aria-label="Companions"></div>
+          </fieldset>
+
+          <p class="field-error" id="portal-error" role="alert" hidden></p>
+
+          <button type="submit" class="btn-primary" id="btn-enter">
+            <span aria-hidden="true">★</span>
+            <span data-i18n="portal.enter">开始冒险</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <p class="portal-continue" id="portal-continue" hidden>
+          <button type="button" class="link-button" id="btn-continue">
+            <span data-i18n="portal.continue">老玩家？继续</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </p>
+      </section>
+
+      <section class="portal-view" id="view-profile" data-view="profile" aria-labelledby="profile-title" hidden>
+        <div class="view-heading compact">
+          <span class="eyebrow" data-i18n="portal.step2.eyebrow">STEP 2 · NEW EXPLORER</span>
+          <h2 id="profile-title" data-i18n="portal.step2.title">制作你的探险家档案</h2>
+          <p data-i18n="portal.step2.lead">挑选一个造型和起始徽章，之后仍可在装扮小镇更换。</p>
+        </div>
+
+        <form class="profile-form" id="profile-form" novalidate>
+          <div class="profile-id-card">
+            <div class="profile-avatar" id="profile-avatar" aria-hidden="true">🦁</div>
+            <label>
+              <span data-i18n="portal.nickLabel">昵称</span>
+              <input id="profile-nick" type="text" maxlength="20" autocomplete="nickname" />
+            </label>
+            <label>
+              <span data-i18n="portal.pidLabel">学号 / 参与者 ID</span>
+              <input id="profile-pid" type="text" readonly aria-readonly="true" />
+            </label>
+          </div>
+
+          <fieldset class="choice-fieldset look-fieldset">
+            <legend><span aria-hidden="true">✦</span> <span data-i18n="portal.profile.lookLegend">选择你的造型</span> <span aria-hidden="true">✦</span></legend>
+            <div class="look-grid" id="look-grid" role="radiogroup" aria-label="Avatar styles"></div>
+          </fieldset>
+
+          <fieldset class="choice-fieldset badge-fieldset">
+            <legend><span aria-hidden="true">✦</span> <span data-i18n="portal.profile.badgeLegend">选择起始徽章</span> <span aria-hidden="true">✦</span></legend>
+            <div class="badge-grid" id="badge-grid" role="radiogroup" aria-label="Starter badges"></div>
+          </fieldset>
+
+          <label class="research-consent">
+            <input id="research-consent" type="checkbox" />
+            <span data-i18n="portal.profile.consent">我同意收集和使用游戏数据，用于改进 AI 世界游乐园与学术研究。</span>
+          </label>
+          <p class="field-error" id="profile-error" role="alert" hidden></p>
+
+          <button type="submit" class="btn-primary" id="btn-create-profile">
+            <span aria-hidden="true">★</span>
+            <span data-i18n="portal.profile.create">创建我的档案</span>
+            <span aria-hidden="true">✦</span>
+          </button>
+          <button type="button" class="link-button centered" id="btn-profile-back" data-i18n="portal.back">← 返回</button>
+        </form>
+      </section>
+
+      <section class="portal-view" id="view-returning" data-view="returning" aria-labelledby="returning-title" hidden>
+        <div class="returning-welcome">
+          <span class="returning-medal" aria-hidden="true">★</span>
+          <div>
+            <span class="eyebrow" data-i18n="portal.step3.eyebrow">STEP 3 · SAVE POINT</span>
+            <h2 id="returning-title" data-i18n="portal.step3.title">欢迎回来，探险家！</h2>
+            <p data-i18n="portal.step3.lead">你的旅程和奖励都已妥善保存。</p>
+          </div>
+        </div>
+
+        <article class="player-pass">
+          <span class="player-face" id="returning-avatar" aria-hidden="true">🦁</span>
+          <div class="player-name">
+            <strong id="returning-name">Explorer</strong>
+            <span id="returning-role">探索者</span>
+          </div>
+          <dl class="player-currency">
+            <div><dt aria-label="Points">✦</dt><dd id="returning-points">0</dd></div>
+            <div><dt aria-label="Level">Lv.</dt><dd id="returning-level">1</dd></div>
+          </dl>
+        </article>
+
+        <div class="returning-meta">
+          <span>📅 <b data-i18n="portal.returning.lastPlayed">上次游玩</b> <em id="returning-last">刚刚</em></span>
+          <span>🧸 <b data-i18n="portal.returning.companion">伙伴</b> <em id="returning-companion">探索者</em></span>
+        </div>
+
+        <div class="journey-title"><span>✦</span><strong data-i18n="portal.returning.journey">继续你的旅程</strong><span>✦</span></div>
+        <div class="journey-grid">
+          <article class="journey-card castle-card">
+            <header><img src="/assets/park/clay/castle.png" alt="" /><div><strong data-i18n="lobby.zone.castle">知识城堡</strong><span id="castle-chapter">Chapter 1</span></div></header>
+            <div class="journey-stat"><span data-i18n="portal.returning.progress">进度</span><b id="castle-progress-label">1 / 5</b></div>
+            <div class="mini-progress"><i id="castle-progress"></i></div>
+            <p>✥ <span data-i18n="lobby.link.castleExchange">积分兑换区</span> · <span id="castle-items">0</span></p>
+          </article>
+          <article class="journey-card sprint-card">
+            <header><img src="/assets/park/clay/adventure.png" alt="" /><div><strong data-i18n="lobby.zone.adventure">冒险冲刺区</strong><span id="sprint-stage">Stage 1</span></div></header>
+            <div class="journey-stat"><span data-i18n="portal.returning.progress">进度</span><b id="sprint-progress-label">0%</b></div>
+            <div class="mini-progress"><i id="sprint-progress"></i></div>
+            <p>◉ <span data-i18n="lobby.link.parkour">云城冲刺</span> · <span id="sprint-best">0</span></p>
+          </article>
+        </div>
+
+        <button type="button" class="btn-primary" id="btn-resume">
+          <span aria-hidden="true">★</span>
+          <span data-i18n="portal.returning.resume">继续上次旅程</span>
+          <span aria-hidden="true">→</span>
         </button>
-        <button type="button" class="btn-guest" id="btn-guest">
-          <span aria-hidden="true">👤</span>
-          <span data-i18n="portal.guest">游客进入</span>
-        </button>
-      </form>
+        <button type="button" class="btn-secondary" id="btn-start-fresh">↻ <span data-i18n="portal.returning.fresh">重新开始</span></button>
+        <button type="button" class="link-button centered" id="btn-switch-account"><span data-i18n="portal.returning.switch">不是这个账号？切换账号</span> →</button>
+      </section>
 
-      <p class="portal-note">
-        <span aria-hidden="true">🛡️</span>
-        <span data-i18n="portal.note">首次登录将自动创建个人档案并保存进度</span>
-      </p>
+      <section class="portal-view loading-view" id="view-loading" data-view="loading" aria-labelledby="loading-title" hidden>
+        <div class="success-badge" aria-hidden="true"><span>✓</span></div>
+        <div class="view-heading loading-heading">
+          <span class="eyebrow" data-i18n="portal.step4.eyebrow">STEP 4 · PARK READY</span>
+          <h2 id="loading-title" data-i18n="portal.step4.title">登录成功！</h2>
+          <p data-i18n="portal.step4.lead">档案同步完成，正在开启乐园大门。</p>
+        </div>
+
+        <div class="sync-summary">
+          <span id="loading-avatar" aria-hidden="true">🦁</span>
+          <div><small data-i18n="portal.nickLabel">昵称</small><strong id="loading-name">Explorer</strong></div>
+          <div><small data-i18n="portal.returning.companion">伙伴</small><strong id="loading-companion">探索者</strong></div>
+          <div><small data-i18n="portal.loading.starter">起始物品</small><strong id="loading-items">5</strong></div>
+        </div>
+
+        <div class="loading-progress-head">
+          <strong data-i18n="portal.loading.preparing">正在准备你的乐园冒险…</strong>
+          <span id="loading-percent">0%</span>
+        </div>
+        <div class="loading-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="loading-progress"><i id="loading-fill"></i><span aria-hidden="true">★</span></div>
+
+        <ol class="sync-list" id="sync-list">
+          <li data-threshold="18"><span class="sync-ico">🪪</span><div><strong data-i18n="portal.loading.user">用户已载入</strong><small data-i18n="portal.loading.userDesc">账号验证与用户数据已载入</small></div><b>✓</b></li>
+          <li data-threshold="44"><span class="sync-ico">🏰</span><div><strong data-i18n="portal.loading.profile">档案已同步</strong><small data-i18n="portal.loading.profileDesc">造型、设置与偏好已同步</small></div><b>✓</b></li>
+          <li data-threshold="70"><span class="sync-ico">🎁</span><div><strong data-i18n="portal.loading.rewards">每日奖励已准备</strong><small data-i18n="portal.loading.rewardsDesc">任务与奖励已初始化</small></div><b>✓</b></li>
+          <li data-threshold="96"><span class="sync-ico">🧭</span><div><strong data-i18n="portal.loading.redirect">正在前往园区首页</strong><small data-i18n="portal.loading.redirectDesc">马上就到，准备出发</small></div><b>✓</b></li>
+        </ol>
+
+        <button type="button" class="btn-secondary loading-skip" id="btn-skip-loading">» <span data-i18n="portal.loading.skip">跳过动画</span></button>
+      </section>
     </section>
   </main>
 
-  <footer class="portal-features" aria-label="Features">
-    <article>
-      <span class="feat-icon">📚</span>
-      <strong data-i18n="portal.feat.explore">知识探索</strong>
-      <p data-i18n="portal.feat.exploreDesc">丰富有趣的知识冒险</p>
-    </article>
-    <article>
-      <span class="feat-icon">🏆</span>
-      <strong data-i18n="portal.feat.challenge">挑战自我</strong>
-      <p data-i18n="portal.feat.challengeDesc">多种竞赛等你来战</p>
-    </article>
-    <article>
-      <span class="feat-icon">💡</span>
-      <strong data-i18n="portal.feat.create">创造无限</strong>
-      <p data-i18n="portal.feat.createDesc">激发创意实现梦想</p>
-    </article>
-    <article>
-      <span class="feat-icon">🎁</span>
-      <strong data-i18n="portal.feat.daily">每日惊喜</strong>
-      <p data-i18n="portal.feat.dailyDesc">完成任务领取奖励</p>
-    </article>
-  </footer>
+  <dialog class="reset-modal" id="reset-modal" aria-labelledby="reset-title">
+    <form method="dialog" class="reset-card">
+      <span class="reset-icon" aria-hidden="true">↻</span>
+      <h2 id="reset-title" data-i18n="portal.reset.title">重新开始旅程？</h2>
+      <p data-i18n="portal.reset.copy">将清除本机上的关卡与小游戏进度，但保留你的账号。</p>
+      <div>
+        <button value="cancel" class="btn-secondary" data-i18n="portal.reset.cancel">取消</button>
+        <button value="confirm" class="btn-primary danger" id="btn-confirm-reset" data-i18n="portal.reset.confirm">清除并重新开始</button>
+      </div>
+    </form>
+  </dialog>
 
   <div class="portal-toast" id="portal-toast" role="status" aria-live="polite"></div>
-  <script type="module" src="/portal/portal.js?v=1"></script>
+  <script type="module" src="/portal/portal.js?v=3"></script>
 </body>
 </html>

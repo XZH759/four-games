@@ -1,7 +1,10 @@
 /**
  * Fire-and-forget student answer logger → POST /api/answers (Neon via Vercel).
  * Never blocks gameplay; failures are console-warned only.
+ * Attaches portal user_id when available so rows join to users.id.
  */
+
+import { getStoredUserId, loadPortalUser } from "/js/portal-auth.js";
 
 const SESSION_KEY = "ailit_session_id";
 const LOGIN_KEY = "nn_login_avatar_v1";
@@ -40,16 +43,20 @@ export function getStudentContext(opts = {}) {
   const login = readJson(LOGIN_KEY) || {};
   const avatar = readJson("nn_avatar_v2") || {};
   const kahoot = readJson(KAHOOT_PROFILE_KEY) || {};
+  const portal = loadPortalUser();
   const nick = opts.nick || kahoot.nick || kahoot.name || "";
   return {
     session_id: getSessionId(),
-    student_name: String(nick || login.name || avatar.name || "").slice(0, 64) || null,
+    user_id: getStoredUserId() || portal?.user_id || login.user_id || null,
+    student_name:
+      String(nick || portal?.display_name || login.name || avatar.name || "").slice(0, 64) ||
+      null,
     character_id:
       login.character_id ||
       login.characterId ||
       avatar.characterId ||
       null,
-    role: login.role || avatar.role || null,
+    role: login.companion || portal?.companion || login.role || avatar.role || null,
   };
 }
 
@@ -59,6 +66,7 @@ function buildAttempt(partial, ctx) {
   }
   return {
     session_id: ctx.session_id,
+    user_id: partial.user_id ?? ctx.user_id,
     student_name: partial.student_name ?? ctx.student_name,
     character_id: partial.character_id ?? ctx.character_id,
     role: partial.role ?? ctx.role,
@@ -88,17 +96,19 @@ export function logAnswers(payload, opts = {}) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ attempts }),
       keepalive: true,
-    }).then(async (res) => {
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        console.warn("[answer-log] POST failed", res.status, text);
-        return { ok: false, status: res.status };
-      }
-      return res.json().catch(() => ({ ok: true }));
-    }).catch((err) => {
-      console.warn("[answer-log] network error", err);
-      return { ok: false, error: String(err) };
-    });
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          console.warn("[answer-log] POST failed", res.status, text);
+          return { ok: false, status: res.status };
+        }
+        return res.json().catch(() => ({ ok: true }));
+      })
+      .catch((err) => {
+        console.warn("[answer-log] network error", err);
+        return { ok: false, error: String(err) };
+      });
   } catch (err) {
     console.warn("[answer-log] threw", err);
     return Promise.resolve({ ok: false, error: String(err) });
