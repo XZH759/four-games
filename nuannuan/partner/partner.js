@@ -1,15 +1,23 @@
 import { loadFinal } from "/js/nuannuan/avatar-config.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
+import { setActiveBoutique, getBoutique, invalidBoutiqueFromUrl } from "/js/nuannuan/fashion-town.js";
 import {
   COMPANIONS,
   confirmCompanion,
+  getCompanion,
   loadCompanionDraft,
   loadConfirmedCompanion,
   localizeCompanion,
   saveCompanionDraft,
 } from "/js/nuannuan/companion-config.js";
 import { upsertUser } from "/js/user-log.js";
+import {
+  isFashionTownMode,
+  mountFashionTownPartner,
+  loginRedirectUrl,
+  resolveTownBoutiqueId,
+} from "/nuannuan/partner/partner-fashion.js";
 
 initI18n({ toggleHost: "#lang-host" });
 onLangChange(() => {
@@ -20,14 +28,34 @@ mountLobbyExit();
 
 const TEST_URL = "/nuannuan/map";
 const TEAM_SLOT_COUNT = 6;
+const townMode = isFashionTownMode();
+const boutiqueId = townMode ? resolveTownBoutiqueId() : null;
+
+function initialSelection() {
+  const draft = loadCompanionDraft();
+  const confirmed = loadConfirmedCompanion();
+  if (draft || confirmed) return draft || confirmed;
+  if (townMode && boutiqueId) {
+    const rec = getBoutique(boutiqueId)?.companionId;
+    return getCompanion(rec) || COMPANIONS[0] || null;
+  }
+  return COMPANIONS[5] || COMPANIONS[0] || null;
+}
 
 const state = {
-  selected: loadCompanionDraft() || loadConfirmedCompanion() || COMPANIONS[5] || COMPANIONS[0] || null,
+  selected: initialSelection(),
   confirmed: loadConfirmedCompanion(),
   busy: false,
+  townMode,
+  boutiqueId,
+  recommendedId: townMode ? getBoutique(boutiqueId)?.companionId : null,
 };
 
 const els = {
+  back: document.getElementById("back-link"),
+  h1: document.getElementById("page-h1"),
+  sub: document.getElementById("page-sub"),
+  notice: document.getElementById("notice-text"),
   list: document.getElementById("candidate-list"),
   detailAvatar: document.getElementById("detail-avatar"),
   detailName: document.getElementById("detail-name"),
@@ -49,7 +77,7 @@ const els = {
 };
 
 if (!loadFinal()) {
-  location.replace("/nuannuan/login");
+  location.replace(townMode ? loginRedirectUrl(boutiqueId) : "/nuannuan/login");
 }
 
 function current(companion = state.selected) {
@@ -80,13 +108,28 @@ function applyTheme(companion) {
 }
 
 function portraitImg(src, alt = "") {
-  return `<img src="${src}" alt="${alt}" draggable="false" decoding="async" />`;
+  return `<img src="${src}" alt="${alt}" draggable="false" decoding="async" loading="lazy" />`;
+}
+
+function traitMarkup(trait) {
+  if (state.townMode) {
+    return `
+      <div class="trait">
+        <span class="trait-icon trait-icon--text" aria-hidden="true">${trait.name.slice(0, 1)}</span>
+        <span><strong>${trait.name}</strong><small>${trait.text}</small></span>
+      </div>`;
+  }
+  return `
+    <div class="trait">
+      <span class="trait-icon" aria-hidden="true">${trait.icon}</span>
+      <span><strong>${trait.name}</strong><small>${trait.text}</small></span>
+    </div>`;
 }
 
 function paintCandidates() {
   els.list.innerHTML = "";
   if (!COMPANIONS.length) {
-    els.list.innerHTML = `<p class="empty-state">${t("partner.emptyList")}</p>`;
+    els.list.innerHTML = `<p class="empty-state" role="status">${t("partner.emptyList")}</p>`;
     els.confirm.disabled = true;
     els.start.disabled = true;
     return;
@@ -95,9 +138,11 @@ function paintCandidates() {
   COMPANIONS.forEach((raw, index) => {
     const companion = localizeCompanion(raw, getLang());
     const selected = state.selected?.id === companion.id;
+    const recommended = state.recommendedId === companion.id;
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "candidate-card";
+    button.className = `candidate-card${recommended ? " is-recommended" : ""}`;
+    button.tabIndex = selected ? 0 : -1;
     button.setAttribute("role", "option");
     button.setAttribute("aria-selected", String(selected));
     button.setAttribute(
@@ -110,7 +155,8 @@ function paintCandidates() {
     );
     button.innerHTML = `
       <span class="candidate-number" aria-hidden="true">${index + 1}</span>
-      <span class="selected-badge">SELECTED</span>
+      ${recommended ? `<span class="recommended-badge">${t("partner.ft.recommended")}</span>` : ""}
+      <span class="selected-badge">${t("partner.ft.selected")}</span>
       <span class="candidate-avatar">${portraitImg(companion.portrait, "")}</span>
       <span class="candidate-copy">
         <span class="candidate-name">${companion.nameEn || companion.name}</span>
@@ -122,9 +168,14 @@ function paintCandidates() {
 
     button.addEventListener("click", () => selectCompanion(raw, button));
     button.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        selectCompanion(raw, button);
+        return;
+      }
       if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].includes(event.key)) return;
       event.preventDefault();
-      const cols = 2;
+      const cols = window.matchMedia("(max-width: 980px)").matches ? 1 : 2;
       let nextIndex = index;
       if (event.key === "ArrowRight") nextIndex = (index + 1) % COMPANIONS.length;
       if (event.key === "ArrowLeft") nextIndex = (index - 1 + COMPANIONS.length) % COMPANIONS.length;
@@ -151,7 +202,9 @@ async function selectCompanion(companion, button) {
   saveCompanionDraft(companion.id);
 
   [...els.list.children].forEach((item) => {
-    item.setAttribute("aria-selected", String(item === button));
+    const on = item === button;
+    item.setAttribute("aria-selected", String(on));
+    item.tabIndex = on ? 0 : -1;
   });
   applyTheme(companion);
   paintDetail(companion);
@@ -184,15 +237,7 @@ function paintDetail(raw) {
   els.detailRole.textContent = companion.role;
   els.detailBio.textContent = companion.description;
   els.detailIntro.textContent = companion.intro || companion.summary;
-  els.traits.innerHTML = companion.traits
-    .map(
-      (trait) => `
-        <div class="trait">
-          <span class="trait-icon" aria-hidden="true">${trait.icon}</span>
-          <span><strong>${trait.name}</strong><small>${trait.text}</small></span>
-        </div>`,
-    )
-    .join("");
+  els.traits.innerHTML = companion.traits.map(traitMarkup).join("");
 }
 
 function paintTeam(raw) {
@@ -214,21 +259,30 @@ function paintTeam(raw) {
   }
 }
 
+function startLabel() {
+  return state.townMode ? t("partner.ft.start") : t("partner.start");
+}
+
 function syncActions() {
   const hasSelection = Boolean(state.selected);
   const isConfirmed = hasSelection && state.confirmed?.id === state.selected.id;
   els.confirm.disabled = !hasSelection || state.busy;
-  els.confirm.innerHTML = isConfirmed
-    ? `<span aria-hidden="true">✓</span>${t("partner.picked")}`
-    : `<span aria-hidden="true">✦</span>${t("partner.pick")}`;
+  const confirmText = els.confirm.querySelector("span:last-child");
+  if (confirmText) confirmText.textContent = isConfirmed ? t("partner.picked") : t("partner.pick");
   els.confirm.classList.toggle("is-confirmed", isConfirmed);
   els.start.disabled = !isConfirmed || state.busy;
-  els.start.innerHTML = `<span aria-hidden="true">◎</span>${t("partner.start")}`;
+  const startText = els.start.querySelector("span:last-child");
+  if (startText) {
+    startText.textContent =
+      state.busy && isConfirmed ? t("partner.entering") : startLabel();
+  }
   els.viewDetail.disabled = !hasSelection;
-  els.viewDetail.innerHTML = `<span aria-hidden="true">📄</span>${t("partner.viewDetail")}`;
 }
 
 function refreshUi() {
+  if (state.townMode) {
+    mountFashionTownPartner({ state, els, t });
+  }
   paintCandidates();
   paintDetail(state.selected);
   paintTeam(state.selected);
@@ -268,9 +322,14 @@ els.confirm.addEventListener("click", async () => {
     announce(t("partner.needPick"));
     return;
   }
+  if (state.confirmed?.id === state.selected.id) {
+    announce(t("partner.ft.alreadyConfirmed"));
+    return;
+  }
   state.busy = true;
   syncActions();
-  els.confirm.textContent = t("partner.saving");
+  const confirmText = els.confirm.querySelector("span:last-child");
+  if (confirmText) confirmText.textContent = t("partner.saving");
   try {
     if (!confirmCompanion(state.selected.id)) throw new Error("Invalid companion");
     state.confirmed = state.selected;
@@ -296,8 +355,23 @@ els.start.addEventListener("click", () => {
   }
   state.busy = true;
   syncActions();
-  els.start.textContent = t("partner.entering");
-  location.href = TEST_URL;
+  const params = new URLSearchParams(location.search);
+  const boutique = params.get("boutique") || state.boutiqueId;
+  if (boutique && getBoutique(boutique)) setActiveBoutique(boutique);
+  const mapUrl =
+    boutique && getBoutique(boutique)
+      ? `/nuannuan/map?boutique=${encodeURIComponent(boutique)}`
+      : TEST_URL;
+  location.href = mapUrl;
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.target.closest("dialog")) return;
+  if (document.activeElement === els.confirm && !els.confirm.disabled) {
+    els.confirm.click();
+  } else if (document.activeElement === els.start && !els.start.disabled) {
+    els.start.click();
+  }
 });
 
 els.guideOpen.addEventListener("click", () => {
@@ -318,4 +392,9 @@ function preloadStages() {
 }
 
 preloadStages();
+if (state.townMode) {
+  mountFashionTownPartner({ state, els, t });
+  const invalid = invalidBoutiqueFromUrl();
+  if (invalid) announce(t("town.invalidBoutique", { id: invalid }));
+}
 refreshUi();

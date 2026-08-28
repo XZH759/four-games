@@ -1,0 +1,21 @@
+All five references are PNG, 1448 x 1086.
+
+01_enter-fashion-town/reference.png
+source: C:/Users/ZHan-/Downloads/28f80084-74e9-492d-bfe0-877a4fdfdedf.png
+sha256: 93618DD12F8390EF62321090E6BEA14D00C9AE01985196B77F374D8782BC71A7
+
+02_build-explorer/reference.png
+source: C:/Users/ZHan-/Downloads/ea5caabb-3c84-403a-b5f9-cf5d0ad63431.png
+sha256: 488BC204C825AE6FB6A86A1AD8B30C741B1B1DA252DDD5D3F600DC95AC719B3F
+
+04_fashion-challenge/reference.png
+source: C:/Users/ZHan-/Downloads/944a0eb8-f724-4a5d-b357-708dd6462a46.png
+sha256: BA0294895404EAF41E17573AF650530BA028CFB5A4DE841404E8B97B2767AF4F
+
+04b_design-complete/reference.png
+source: C:/Users/ZHan-/Downloads/693040d8-d179-4913-89c0-95869b2fa297.png
+sha256: AA2E4620449EA2D2F799EE1B49F14B52BD6629052E32BB6112DFA4F8C375A738
+
+05_assemble-outfit/reference.png
+source: C:/Users/ZHan-/Downloads/c049f8f3-2bb0-49c8-85fd-77b8973cfc70.png
+sha256: E33A81B0BEF69E8B1EEF17EF91AE100261E14A81A081A993F55D50B47C2A9FB4

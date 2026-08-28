@@ -1,0 +1,131 @@
+{
+  "at": "2026-08-28T15:15:32.440Z",
+  "results": [
+    {
+      "viewport": "1440x900",
+      "route": "town",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/town-1440x900.png"
+    },
+    {
+      "viewport": "1440x900",
+      "route": "login",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/login-1440x900.png"
+    },
+    {
+      "viewport": "1440x900",
+      "route": "partner",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/partner-1440x900.png"
+    },
+    {
+      "viewport": "1440x900",
+      "route": "map",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/map-1440x900.png"
+    },
+    {
+      "viewport": "1440x900",
+      "route": "collect",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/collect-1440x900.png"
+    },
+    {
+      "viewport": "1440x900",
+      "route": "wardrobe",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/wardrobe-1440x900.png"
+    },
+    {
+      "viewport": "1024x768",
+      "route": "town",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/town-1024x768.png"
+    },
+    {
+      "viewport": "1024x768",
+      "route": "login",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/login-1024x768.png"
+    },
+    {
+      "viewport": "1024x768",
+      "route": "partner",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/partner-1024x768.png"
+    },
+    {
+      "viewport": "1024x768",
+      "route": "map",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/map-1024x768.png"
+    },
+    {
+      "viewport": "1024x768",
+      "route": "collect",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/collect-1024x768.png"
+    },
+    {
+      "viewport": "1024x768",
+      "route": "wardrobe",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/wardrobe-1024x768.png"
+    },
+    {
+      "viewport": "390x844",
+      "route": "town",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/town-390x844.png"
+    },
+    {
+      "viewport": "390x844",
+      "route": "login",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/login-390x844.png"
+    },
+    {
+      "viewport": "390x844",
+      "route": "partner",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/partner-390x844.png"
+    },
+    {
+      "viewport": "390x844",
+      "route": "map",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/map-390x844.png"
+    },
+    {
+      "viewport": "390x844",
+      "route": "collect",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/collect-390x844.png"
+    },
+    {
+      "viewport": "390x844",
+      "route": "wardrobe",
+      "overflow": false,
+      "consoleErrors": 0,
+      "file": "reports/fashion-town-qa-screenshots/wardrobe-390x844.png"
+    }
+  ]
+}

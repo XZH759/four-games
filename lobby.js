@@ -1,10 +1,15 @@
 import { getEquippedLoadout } from "/castle/castle.js";
 import { initI18n, t, onLangChange, setLang, getLang, applyDom } from "/js/i18n.js";
-import { isPortalLoggedIn, loadPortalUser, companionLabelKey, ONBOARDING_KEY } from "/js/portal-auth.js";
+import { isPortalLoggedIn, loadPortalUser, companionLabelKey, ONBOARDING_KEY, isProfileComplete } from "/js/portal-auth.js";
 
 (() => {
   if (!isPortalLoggedIn()) {
     location.replace("/portal/");
+    return;
+  }
+  const portalUser = loadPortalUser();
+  if (portalUser && !isProfileComplete(portalUser)) {
+    location.replace("/portal/?step=profile");
     return;
   }
 
@@ -39,8 +44,8 @@ import { isPortalLoggedIn, loadPortalUser, companionLabelKey, ONBOARDING_KEY } f
       titleKey: "lobby.zone.town",
       ico: "/assets/park/clay/town.png",
       links: [
+        { href: "/nuannuan/town", nameKey: "lobby.link.fashionTown", descKey: "lobby.link.fashionTownDesc" },
         { href: "/nuannuan/login", nameKey: "lobby.link.login", descKey: "lobby.link.loginDesc" },
-        { href: "/explorer", nameKey: "lobby.link.explorer", descKey: "lobby.link.explorerDesc" },
       ],
     },
   });

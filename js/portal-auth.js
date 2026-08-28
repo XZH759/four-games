@@ -144,6 +144,16 @@ export function isPortalLoggedIn() {
   return !!(u?.participant_id && u?.user_id && u?.display_name);
 }
 
+/** STEP 2 complete — required before entering the park home. */
+export function isProfileComplete(user = loadPortalUser()) {
+  if (!user) return false;
+  const profile = user.profile || {};
+  return (
+    user.agree_research === true &&
+    !!(profile.profile_completed_at || user.profile?.profile_completed_at)
+  );
+}
+
 export function clearPortalUser() {
   try {
     localStorage.removeItem(PORTAL_KEY);

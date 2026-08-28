@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "name": "AI World Park Fashion Town Journey",
+  "designReferenceSize": { "width": 1448, "height": 1086 },
+  "steps": [
+    {
+      "id": "enter-town",
+      "order": 1,
+      "route": "/nuannuan/town",
+      "reference": "../interfaces/01_enter-fashion-town/reference.png",
+      "requires": [],
+      "produces": ["activeBoutiqueId"]
+    },
+    {
+      "id": "build-explorer",
+      "order": 2,
+      "route": "/nuannuan/login",
+      "reference": "../interfaces/02_build-explorer/reference.png",
+      "requires": ["activeBoutiqueId"],
+      "produces": ["avatarConfig", "fashionRole"]
+    },
+    {
+      "id": "choose-companion",
+      "order": 3,
+      "route": "/nuannuan/partner",
+      "referencePointer": "../../../奇迹暖暖素材/design-kit/interfaces/02_companion-selection/reference.png",
+      "requires": ["activeBoutiqueId", "avatarConfig"],
+      "produces": ["confirmedCompanionId"]
+    },
+    {
+      "id": "boutique-map",
+      "order": 3.5,
+      "route": "/nuannuan/map",
+      "referencePointer": "../../../奇迹暖暖素材/design-kit/interfaces/04_level-map/reference.png",
+      "requires": ["activeBoutiqueId", "confirmedCompanionId"],
+      "produces": ["activeChallengeId"]
+    },
+    {
+      "id": "fashion-challenge",
+      "order": 4,
+      "route": "/collect",
+      "reference": "../interfaces/04_fashion-challenge/reference.png",
+      "requires": ["activeChallengeId", "confirmedCompanionId"],
+      "produces": ["answerLog", "unlockedModule", "sessionDesigned"]
+    },
+    {
+      "id": "design-complete",
+      "order": 4.5,
+      "route": "/collect#settle",
+      "reference": "../interfaces/04b_design-complete/reference.png",
+      "requires": ["sessionDesigned"],
+      "produces": ["inventory", "boutiqueProgress", "companionBond"]
+    },
+    {
+      "id": "assemble-outfit",
+      "order": 5,
+      "route": "/nuannuan/wardrobe",
+      "reference": "../interfaces/05_assemble-outfit/reference.png",
+      "requires": ["inventory", "avatarConfig"],
+      "produces": ["savedLook", "activeLookId", "styleIdentity"]
+    }
+  ]
+}

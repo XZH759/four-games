@@ -30,6 +30,13 @@ import {
 } from "/js/nuannuan/career-theme-packs.js";
 import { localizePack } from "/js/nuannuan/login-theme-en.js";
 import { upsertUser } from "/js/user-log.js";
+import {
+  isFashionTownMode,
+  bootstrapFashionAssets,
+  fashionPreviewConfig,
+  mountFashionTown,
+} from "/nuannuan/login/login-fashion.js";
+import { invalidBoutiqueFromUrl } from "/js/nuannuan/fashion-town.js";
 
 initI18n({ toggleHost: "#lang-host" });
 onLangChange(() => {
@@ -38,10 +45,23 @@ onLangChange(() => {
   paintRoles();
   paintProfile();
   paintModules();
+  state.paintFashionTown?.();
 });
 mountLobbyExit();
 
 const NEXT_URL = "/nuannuan/partner";
+
+function nextUrlAfterLogin() {
+  const params = new URLSearchParams(location.search);
+  const boutique = params.get("boutique");
+  if (params.get("from") === "town") {
+    const q = new URLSearchParams();
+    q.set("from", "town");
+    if (boutique) q.set("boutique", boutique);
+    return `/nuannuan/partner?${q}`;
+  }
+  return NEXT_URL;
+}
 const STORAGE_LOGIN = "nn_login_avatar_v1";
 const CAREERS = ["researcher", "programmer", "engineer"];
 const ROLE_BACKGROUNDS = {
@@ -92,6 +112,7 @@ function preloadRoleBackgrounds() {
 }
 
 const els = {
+  sysBack: document.querySelector(".sys-back"),
   doll: document.getElementById("doll"),
   genderList: document.getElementById("gender-list"),
   roleList: document.getElementById("role-list"),
@@ -149,6 +170,16 @@ const state = {
   viewed: new Set(["researcher"]),
   theme: defaultThemeSelection(null),
   focusItemId: null,
+  townMode: isFashionTownMode(),
+  boutiqueId: null,
+  fashionRole: null,
+  ftTab: "hair",
+  mood: "soft",
+  layerSelection: null,
+  assetsReady: false,
+  rotateDeg: 0,
+  paintFashionTown: null,
+  paintLayerPicker: null,
 };
 
 function currentPackRaw() {
@@ -235,12 +266,16 @@ function persist() {
       gender: state.gender,
       name: state.name,
       role: state.role,
+      fashionRole: state.fashionRole,
+      boutiqueId: state.boutiqueId,
       characterId: state.characterId,
       referenceSheet: state.referenceSheet,
-      selection: null,
+      selection: state.layerSelection,
       themePack: snapshot().theme,
       step: state.step,
       viewed: [...state.viewed],
+      ftTab: state.ftTab,
+      mood: state.mood,
     }),
   );
 }
@@ -256,6 +291,7 @@ function loadSaved() {
 }
 
 function paintSteps() {
+  if (state.townMode) return;
   document.body.dataset.step = String(state.step);
   els.stepPrev.disabled = state.step <= 1;
   els.stepNext.disabled = state.step >= 3;
@@ -471,6 +507,29 @@ async function toggleThemeItem(module, id) {
 }
 
 function paintModules() {
+  if (state.townMode) {
+    els.moduleDock.querySelectorAll(".module-btn").forEach((btn) => {
+      const on = btn.dataset.ftTab === state.ftTab;
+      btn.classList.toggle("is-on", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    const tab = state.ftTab;
+    if (tab === "accessory" || tab === "palette") {
+      state.module = tab === "palette" ? "theme" : "accessory";
+    }
+    if (tab === "skirt" || tab === "shoes") {
+      els.themePicker.hidden = true;
+      els.stageHint.textContent = t("login.ft.gapLayer", {
+        slot: t(tab === "skirt" ? "login.ft.mod.skirt" : "login.ft.mod.shoes"),
+      });
+      return;
+    }
+    if (tab === "hair" || tab === "outfit") {
+      state.paintLayerPicker?.();
+      return;
+    }
+  }
+
   els.moduleDock.querySelectorAll(".module-btn").forEach((btn) => {
     const on = btn.dataset.module === state.module;
     btn.classList.toggle("is-on", on);
@@ -523,10 +582,13 @@ function paintProfile() {
   const meta = ROLE_META[career.role];
   const code = characterCode(career);
   const rLabel = isEn() ? (meta?.labelEn || career.displayNameEn) : (meta?.labelCn || career.displayNameCn);
-  els.stageRole.textContent = rLabel;
+  const fashionLabel = state.townMode && state.fashionRole
+    ? t(`town.fashionRole.${state.fashionRole}`)
+    : rLabel;
+  els.stageRole.textContent = fashionLabel;
   els.stageId.textContent = code;
   els.detailSub.textContent = isEn() ? career.displayNameEn : career.displayNameCn;
-  els.profileRole.textContent = `${rLabel} · ${gLabel}`;
+  els.profileRole.textContent = `${fashionLabel} · ${gLabel}`;
   els.profileCode.textContent = code;
   els.profileAff.textContent = isEn()
     ? (career.affiliationEn || career.affiliation)
@@ -543,13 +605,17 @@ async function paintPreview() {
   paintSteps();
   const pack = currentPack();
   const accessoryOverlays = resolveAccessoryOverlays(pack, state.theme);
+  const previewCfg = state.townMode
+    ? fashionPreviewConfig(state)
+    : {
+        gender: state.gender,
+        selection: null,
+        referenceSheet: state.referenceSheet,
+      };
   await renderAvatar(
     els.doll,
     {
-      gender: state.gender,
-      selection: null,
-      referenceSheet: state.referenceSheet,
-      useFixtures: false,
+      ...previewCfg,
       accessoryOverlays,
     },
     {
@@ -765,6 +831,7 @@ els.share.addEventListener("click", async () => {
 });
 
 els.moduleDock.addEventListener("click", (event) => {
+  if (state.townMode) return;
   const btn = event.target.closest(".module-btn");
   if (!btn) return;
   state.module = btn.dataset.module;
@@ -807,6 +874,7 @@ els.stepNext.addEventListener("click", () => {
 });
 
 els.confirm.addEventListener("click", async () => {
+  if (state.busy) return;
   const check = validateName(state.name || els.name.value);
   if (!check.ok) {
     els.nameError.hidden = false;
@@ -816,6 +884,8 @@ els.confirm.addEventListener("click", async () => {
     paintSteps();
     return;
   }
+  state.busy = true;
+  els.confirm.disabled = true;
   state.name = check.name;
   applyCareer();
   const avatar = toSavedCharacter({
@@ -824,12 +894,11 @@ els.confirm.addEventListener("click", async () => {
     role: state.role,
     characterId: state.characterId,
     referenceSheet: state.referenceSheet,
-    selection: null,
+    selection: state.layerSelection,
     themePack: snapshot().theme,
   });
   saveFinal(avatar);
   persist();
-  // Passwordless cloud profile — fire-and-forget; local progress still works offline
   void upsertUser({
     display_name: state.name,
     character_id: state.characterId,
@@ -838,11 +907,14 @@ els.confirm.addEventListener("click", async () => {
     profile: {
       referenceSheet: state.referenceSheet,
       themePack: snapshot().theme,
+      fashionRole: state.fashionRole,
+      boutiqueId: state.boutiqueId,
+      selection: state.layerSelection,
     },
   });
-  toast(t("login.toast.saved"));
+  toast(t(state.townMode ? "login.ft.toast.saved" : "login.toast.saved"));
   await new Promise((resolve) => setTimeout(resolve, 420));
-  location.href = NEXT_URL;
+  location.href = nextUrlAfterLogin();
 });
 
 async function boot() {
@@ -857,12 +929,41 @@ async function boot() {
     if (saved?.role && ROLE_META[saved.role]) state.role = saved.role;
     if (Number(saved?.step) >= 1 && Number(saved?.step) <= 3) state.step = Number(saved.step);
     if (Array.isArray(saved?.viewed)) state.viewed = new Set(saved.viewed);
+    if (saved?.fashionRole) state.fashionRole = saved.fashionRole;
+    if (saved?.boutiqueId) state.boutiqueId = saved.boutiqueId;
+    if (saved?.ftTab) state.ftTab = saved.ftTab;
+    if (saved?.mood) state.mood = saved.mood;
+    if (saved?.selection) state.layerSelection = saved.selection;
 
     applyCareer();
     state.theme = resolveThemeSelection(currentPackRaw(), saved?.themePack);
+    if (state.townMode) {
+      await bootstrapFashionAssets(state);
+      const ft = mountFashionTown({
+        state,
+        els,
+        t,
+        getLang,
+        applySelection,
+        paintPreview,
+        paintModules,
+        paintThemePicker,
+        persist,
+        snapshot,
+        resolveAccessoryOverlays,
+        currentPack,
+      });
+      state.paintFashionTown = ft?.paintFashionTown || null;
+      state.paintLayerPicker = ft?.paintLayerPicker || null;
+      state.module = state.ftTab === "palette" ? "theme" : state.ftTab === "accessory" ? "accessory" : state.ftTab;
+      const invalid = invalidBoutiqueFromUrl();
+      if (invalid) toast(t("town.invalidBoutique", { id: invalid }));
+    }
     state.ready = true;
-    paintGenders();
-    paintRoles();
+    if (!state.townMode) {
+      paintGenders();
+      paintRoles();
+    }
     paintSteps();
     persist();
     await paintPreview();

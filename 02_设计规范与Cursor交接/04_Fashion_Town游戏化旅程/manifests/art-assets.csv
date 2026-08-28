@@ -1,0 +1,42 @@
+step,kind,project_path,purpose,status
+global,theme,奇迹暖暖素材/design-kit/styles/game-theme.css,共享颜色圆角阴影按钮,ready
+global,brand,assets/park/clay/town.png,Fashion Town 面包屑图标,ready
+01,scene,nuannuan/login/assets/bg-lobby.png,小镇柔焦背景,ready
+01,map,assets/park/clay/island.png,左侧 AI World Park 小地图,ready
+01,zone,assets/park/clay/zones/zone-4-town.png,Fashion Town 区域插画,ready
+01,button,nuannuan/素材/01_ui_controls/001_large_button_purple_1.png,Enter Boutique 主按钮参考,ready
+01,progress,nuannuan/素材/01_ui_controls/049_stepper_1_to_5.png,五步旅程导航参考,ready
+01,building,ART-TODO/boutiques/style-lab.png,Style Lab 透明建筑立绘,missing
+01,building,ART-TODO/boutiques/dream-atelier.png,Dream Atelier 透明建筑立绘,missing
+01,building,ART-TODO/boutiques/tech-garage.png,Tech Garage 透明建筑立绘,missing
+01,building,ART-TODO/boutiques/pattern-house.png,Pattern House 透明建筑立绘,missing
+02,avatar-manifest,assets/nuannuan/avatar-standardized/asset_index.json,统一分层角色索引,ready
+02,avatar-layer,assets/nuannuan/avatar-standardized/assets/female/hairFront/F_HAIRFRONT_001.png,角色发型示例,ready
+02,avatar-layer,assets/nuannuan/avatar-standardized/assets/female/outfit/F_OUTFIT_001.png,角色服装示例,ready
+02,avatar-layer,assets/nuannuan/avatar-standardized/assets/female/accessory/F_ACCESSORY_001.png,角色配饰示例,ready
+02,scene,nuannuan/素材/03_decorations/011_stage_large.png,中央角色舞台,ready
+02,control,nuannuan/素材/01_ui_controls/012_circle_dice.png,随机造型按钮,ready
+03,companion,nuannuan/partner/assets/companions/eileen.png,Eileen 卡片/头像,ready
+03,companion,nuannuan/partner/assets/companions/fiona.png,Fiona 卡片/头像,ready
+03,companion,nuannuan/partner/assets/companions/gladys.png,Gladys 卡片/头像,ready
+03,companion,nuannuan/partner/assets/companions/diana.png,Diana 卡片/头像,ready
+03,companion-stage,nuannuan/partner/assets/stages/fiona.png,伙伴场景立绘示例,ready
+03,map,nuannuan/map/assets/world-map.png,精品店关卡地图,ready
+03,map-ui,nuannuan/map/assets/kit/node-current.png,当前关卡节点,ready
+03,map-ui,nuannuan/map/assets/kit/node-locked.png,锁定关卡节点,ready
+04,panel,nuannuan/素材/02_panels_cards/001_panel_large_stage.png,答题主面板与设计板,ready
+04,module,nuannuan/素材/02_panels_cards/011_item_hair.png,发型模块缩略图,ready
+04,module,nuannuan/素材/02_panels_cards/012_item_dress.png,服装模块缩略图,ready
+04,module,nuannuan/素材/02_panels_cards/013_item_shoes.png,鞋履模块缩略图,ready
+04,module,nuannuan/素材/02_panels_cards/014_item_necklace.png,配饰模块缩略图,ready
+04,control,nuannuan/素材/01_ui_controls/004_large_button_pink_1.png,Submit Answer 主按钮参考,ready
+04,option-art,ART-TODO/challenges/<challenge-id>/<option-id>.png,四选一服装题独立透明插图,missing
+04b,reward,nuannuan/素材/02_panels_cards/018_reward_card.png,奖励卡,ready
+04b,effect,nuannuan/素材/03_decorations/059_magic_effect_01.png,解锁光效,ready
+04b,effect,nuannuan/素材/03_decorations/039_sparkle_cluster_pink.png,庆祝星光,ready
+04b,ribbon,nuannuan/素材/03_decorations/073_ribbon_purple_top.png,完成横幅装饰,ready
+05,card,nuannuan/素材/02_panels_cards/007_outfit_card_selected.png,已选择服装卡,ready
+05,card,nuannuan/素材/02_panels_cards/008_outfit_card_locked.png,未解锁服装卡,ready
+05,stage,nuannuan/素材/03_decorations/001_background_arch_scene.png,衣柜中央拱门场景,ready
+05,stage,nuannuan/素材/03_decorations/012_platform_round_purple.png,角色站台,ready
+05,avatar-layers,ART-TODO/avatar-modules/<slot>/<module-id>.png,top/skirt/shoes 独立同画布图层,missing

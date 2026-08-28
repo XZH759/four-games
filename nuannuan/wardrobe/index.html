@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="wardrobe.title">装扮小镇 · 合成时装</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=2" />
+  <link rel="stylesheet" href="/css/avatar-motion.css" />
+  <link rel="stylesheet" href="/nuannuan/wardrobe/wardrobe.css?v=1" />
+</head>
+<body class="wardrobe-page is-fashion-wardrobe">
+  <header class="wr-top">
+    <a class="wr-back" id="wr-back-town" href="/nuannuan/town" data-i18n="wardrobe.backTown">← 装扮小镇</a>
+    <div class="wr-brand">
+      <img src="/assets/park/clay/town.png" alt="" width="24" height="22" />
+      <span data-i18n="town.crumb">Fashion Town</span>
+    </div>
+    <div id="lang-host" class="lang-host"></div>
+  </header>
+
+  <p class="boot-error" id="boot-error" hidden></p>
+
+  <main class="wr-shell" id="wr-shell" hidden>
+    <header class="wr-hero">
+      <h1 data-i18n="wardrobe.heading">合成你的专属造型</h1>
+      <p data-i18n="wardrobe.lead">你的风格，你的旅程，你的故事</p>
+    </header>
+
+    <div class="wr-grid">
+      <aside class="wr-inventory" aria-labelledby="wr-inventory-title">
+        <header class="wr-inventory-head">
+          <h2 id="wr-inventory-title" data-i18n="wardrobe.inventoryTitle">已收集模块</h2>
+          <p id="wr-inventory-count">0/16</p>
+        </header>
+        <nav class="wr-filters" id="wr-filters" aria-label="Module filters"></nav>
+        <div class="wr-module-grid" id="wr-module-grid" role="listbox"></div>
+      </aside>
+
+      <section class="wr-preview" aria-labelledby="wr-preview-title">
+        <h2 id="wr-preview-title" class="visually-hidden" data-i18n="wardrobe.previewTitle">造型预览</h2>
+        <div class="wr-avatar-stage layered-character" id="wr-avatar"></div>
+        <p class="wr-gap-note" id="wr-gap-note" hidden></p>
+        <ul class="wr-draft-chips" id="wr-draft-chips" aria-live="polite"></ul>
+        <label class="wr-name-field">
+          <span data-i18n="wardrobe.nameLabel">造型名称</span>
+          <input type="text" id="wr-look-name" maxlength="24" data-i18n-placeholder="wardrobe.namePh" placeholder="输入名称" />
+        </label>
+        <p class="wr-form-error" id="wr-form-error" hidden role="alert"></p>
+        <div class="wr-preview-actions">
+          <button type="button" class="btn-wr-primary" id="btn-save-look" data-i18n="wardrobe.saveLook">保存造型</button>
+          <button type="button" class="btn-wr-secondary" id="btn-show-park" disabled data-i18n="wardrobe.showParkPending">在园区展示 · 待接入</button>
+          <a class="btn-wr-quiet" id="btn-visit-boutique" href="/nuannuan/map" data-i18n="wardrobe.visitBoutique">返回精品店</a>
+        </div>
+      </section>
+
+      <aside class="wr-stats">
+        <section class="wr-panel wr-identity" aria-labelledby="wr-identity-title">
+          <h2 id="wr-identity-title" data-i18n="wardrobe.identityTitle">风格身份</h2>
+          <div class="wr-score-row">
+            <strong id="wr-style-score">0</strong>
+            <span class="wr-rank" id="wr-style-rank">C</span>
+          </div>
+          <ul class="wr-tag-list" id="wr-style-tags"></ul>
+          <p class="wr-inspiration" id="wr-inspiration"></p>
+        </section>
+        <section class="wr-panel wr-bond" aria-labelledby="wr-bond-title">
+          <h2 id="wr-bond-title" data-i18n="wardrobe.bondTitle">伙伴羁绊</h2>
+          <div class="wr-companion-row">
+            <img id="wr-companion-portrait" alt="" width="44" height="44" />
+            <div>
+              <strong id="wr-companion-name"></strong>
+              <p id="wr-bond-line"></p>
+            </div>
+          </div>
+        </section>
+        <section class="wr-panel wr-role" aria-labelledby="wr-role-title">
+          <h2 id="wr-role-title" data-i18n="wardrobe.roleTitle">Fashion 角色影响</h2>
+          <p class="wr-fashion-role" id="wr-fashion-role"></p>
+          <p class="wr-role-bonus" id="wr-role-bonus"></p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <section class="wr-empty" id="wr-empty" hidden>
+    <h2 data-i18n="wardrobe.emptyTitle">还没有可装配的模块</h2>
+    <p data-i18n="wardrobe.emptyCopy">去精品店答对题目，设计出模块后再回来合成造型。</p>
+    <a class="btn-wr-primary" id="wr-empty-cta" href="/nuannuan/town" data-i18n="wardrobe.emptyCta">前往装扮小镇</a>
+  </section>
+
+  <footer class="ft-journey-flow" id="ft-journey-flow" aria-label="Journey steps">
+    <ol>
+      <li class="is-done" data-step="1"><span class="flow-icon" aria-hidden="true"></span><strong data-i18n="town.flow1">进入装扮小镇</strong></li>
+      <li class="is-done" data-step="2"><span class="flow-icon" aria-hidden="true"></span><strong data-i18n="town.flow2">建立探索者</strong></li>
+      <li class="is-done" data-step="3"><span class="flow-icon" aria-hidden="true"></span><strong data-i18n="town.flow3">选择伙伴</strong></li>
+      <li class="is-done" data-step="4"><span class="flow-icon" aria-hidden="true"></span><strong data-i18n="collect.ft.flow4">时尚挑战答题</strong></li>
+      <li class="is-current" data-step="5"><span class="flow-icon" aria-hidden="true"></span><strong data-i18n="town.flow5">合成时装</strong></li>
+    </ol>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/nuannuan/wardrobe/wardrobe.js?v=1"></script>
+</body>
+</html>

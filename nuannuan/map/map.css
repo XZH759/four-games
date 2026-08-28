@@ -340,6 +340,10 @@ body {
   50% { opacity: 1; transform: scale(1.08); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .bird, .star { animation: none; opacity: 0.65; }
+}
+
 .region-titles { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .region-title {
   position: absolute;
@@ -686,4 +690,186 @@ body {
   .region-dock { grid-template-columns: 1fr; }
   .map-stage { width: 760px; height: 1010px; }
   .region-title { font-size: 0.62rem; letter-spacing: 0.08em; }
+}
+
+/* ========== Fashion Town · Boutique Map ========== */
+body.is-fashion-map {
+  --ink: #55382f;
+  --muted: #806b63;
+  --panel: rgba(255, 250, 243, 0.91);
+  --line: rgba(201, 164, 92, 0.58);
+  --violet: #8f63c7;
+  --display: "Fredoka", "Noto Sans SC", sans-serif;
+  --body: "Nunito", "Noto Sans SC", sans-serif;
+  font-family: var(--body);
+  background: #efe5f7;
+}
+body.is-fashion-map[data-boutique-tone="purple"] { --boutique-accent: #8f63c7; }
+body.is-fashion-map[data-boutique-tone="pink"] { --boutique-accent: #e97aa4; }
+body.is-fashion-map[data-boutique-tone="teal"] { --boutique-accent: #79bdb6; }
+body.is-fashion-map[data-boutique-tone="blue"] { --boutique-accent: #6a9fd4; }
+body.is-fashion-map { --boutique-accent: var(--violet); }
+
+body.is-fashion-map .sky {
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.92), transparent 32%),
+    linear-gradient(180deg, #e9e0f5 0%, #f7eef5 48%, #efe5f7 100%);
+}
+body.is-fashion-map .brand h1 {
+  font-family: "Noto Serif SC", Georgia, serif;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+body.is-fashion-map .brand p { color: var(--muted); }
+
+.ft-boutique-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: min(1400px, calc(100% - 1rem));
+  margin: 0 auto 0.45rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: 0 10px 26px rgba(76, 56, 103, 0.12);
+}
+.ft-boutique-bar img { object-fit: contain; }
+.ft-boutique-copy strong { display: block; font-size: 0.82rem; color: var(--ink); }
+.ft-boutique-copy small { color: var(--muted); font-size: 0.62rem; font-weight: 700; }
+.ft-boutique-companion {
+  margin-left: auto;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(76, 56, 103, 0.12);
+}
+
+body.is-fashion-map .side-left,
+body.is-fashion-map .side-right,
+body.is-fashion-map .map-panel {
+  border-color: var(--line);
+}
+
+.module-panel {
+  padding: 0.65rem 0.75rem;
+  border-radius: 16px;
+  background: rgba(255, 252, 247, 0.88);
+  border: 1px solid var(--line);
+}
+.module-panel h2 {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.module-progress-line {
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.module-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.module-chip {
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--boutique-accent) 12%, white);
+  color: var(--boutique-accent);
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+.module-chip.is-unlocked {
+  background: color-mix(in srgb, #69b86f 18%, white);
+  color: #3d7a44;
+}
+
+.detail-module {
+  margin: 0.35rem 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--boutique-accent, var(--violet)) 10%, white);
+  border: 1px dashed color-mix(in srgb, var(--boutique-accent, var(--violet)) 35%, transparent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.node .node-status {
+  position: absolute;
+  left: 50%;
+  bottom: -1.1rem;
+  transform: translateX(-50%);
+  padding: 0.08rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--line);
+  font-size: 0.46rem;
+  font-weight: 800;
+  color: var(--muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+body.is-fashion-map .node.is-current .node-status {
+  color: var(--boutique-accent);
+  border-color: color-mix(in srgb, var(--boutique-accent) 45%, transparent);
+}
+body.is-fashion-map .node.is-done .node-status { color: #3d7a44; }
+
+.ft-journey-flow {
+  width: min(1400px, calc(100% - 1rem));
+  margin: 0 auto 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(201, 164, 92, 0.58);
+  border-radius: 22px;
+  background: rgba(255, 250, 243, 0.91);
+  box-shadow: 0 14px 38px rgba(76, 56, 103, 0.14);
+}
+.ft-journey-flow ol {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ft-journey-flow li {
+  display: grid;
+  gap: 0.12rem;
+  justify-items: center;
+  padding: 0.5rem 0.35rem;
+  border-radius: 14px;
+  text-align: center;
+  color: #806b63;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+.ft-journey-flow li.is-done { color: #8b6fc3; }
+.ft-journey-flow li.is-current {
+  border: 1px solid var(--boutique-accent, #8f63c7);
+  background: linear-gradient(180deg, rgba(143, 99, 199, 0.12), rgba(255, 255, 255, 0.7));
+  color: #55382f;
+}
+.ft-journey-flow .flow-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #eee8fb;
+  border: 1px solid rgba(139, 111, 195, 0.25);
+}
+.ft-journey-flow li.is-current .flow-icon {
+  background: var(--boutique-accent, #8f63c7);
+  border-color: transparent;
+}
+
+@media (max-width: 720px) {
+  .ft-journey-flow ol {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.4rem;
+  }
+  .ft-journey-flow li { flex: 0 0 min(42vw, 150px); }
+  body.is-fashion-map .map-panel { order: -1; }
 }

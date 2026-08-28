@@ -14,14 +14,34 @@ import {
   isUnlocked,
   isCompleted,
   regionProgress,
+  localizeNode,
+  localizeReward,
+  localizeRegion,
 } from "/js/nuannuan/map-config.js";
+import { setActiveBoutique, getBoutique, invalidBoutiqueFromUrl } from "/js/nuannuan/fashion-town.js";
+import {
+  isFashionMapMode,
+  resolveMapBoutiqueId,
+  mountFashionMap,
+  paintFashionModules,
+  fashionModuleLabel,
+} from "/nuannuan/map/map-fashion.js";
 import { loadFinal } from "/js/nuannuan/avatar-config.js";
 import {
   loadConfirmedCompanion,
   loadCompanionDraft,
+  localizeCompanion,
 } from "/js/nuannuan/companion-config.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
+import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 
+initI18n({ toggleHost: "#lang-host" });
+onLangChange(() => {
+  applyDom();
+  hydratePlayer();
+  paintAll();
+  if (state.selectedId) openDetail(state.selectedId, { quiet: true });
+});
 mountLobbyExit();
 
 const KIT = "/nuannuan/map/assets/kit";
@@ -45,9 +65,14 @@ const state = {
   selectedId: null,
   zoom: 1,
   points: pathPoints(),
+  boutiqueId: resolveMapBoutiqueId(),
+  fashionMode: isFashionMapMode(),
 };
 
 const els = {
+  back: document.getElementById("back-link"),
+  h1: document.getElementById("page-h1"),
+  sub: document.getElementById("page-sub"),
   stage: document.getElementById("map-stage"),
   viewport: document.getElementById("map-viewport"),
   nodes: document.getElementById("map-nodes"),
@@ -59,13 +84,14 @@ const els = {
   gemCount: document.getElementById("gem-count"),
   progressRing: document.getElementById("progress-ring"),
   progressPct: document.getElementById("progress-pct"),
-  doneCount: document.getElementById("done-count"),
+  levelsDoneLine: document.getElementById("levels-done-line"),
   rewardList: document.getElementById("reward-list"),
   detailCard: document.getElementById("detail-card"),
   detailBadge: document.getElementById("detail-badge"),
   detailStatus: document.getElementById("detail-status"),
   detailTitle: document.getElementById("detail-title"),
   detailSummary: document.getElementById("detail-summary"),
+  detailModule: document.getElementById("detail-module"),
   detailReward: document.getElementById("detail-reward"),
   detailClose: document.getElementById("detail-close"),
   detailEnter: document.getElementById("detail-enter"),
@@ -81,6 +107,8 @@ const els = {
   companionLine: document.getElementById("companion-line"),
   helpOpen: document.getElementById("help-open"),
   helpDialog: document.getElementById("help-dialog"),
+  modulePanel: document.getElementById("module-panel"),
+  rewardCard: document.getElementById("reward-card"),
 };
 
 function toast(message) {
@@ -91,14 +119,7 @@ function toast(message) {
 }
 
 function statusLabel(status) {
-  return (
-    {
-      done: "已完成",
-      current: "进行中",
-      open: "可进入",
-      locked: "未解锁",
-    }[status] || status
-  );
+  return t(`map.status.${status}`) || status;
 }
 
 function pointOf(id) {
@@ -112,15 +133,17 @@ function paintHud() {
   els.gemCount.textContent = String(p.gems);
   els.progressRing.style.setProperty("--p", String(pct));
   els.progressPct.textContent = `${pct}%`;
-  els.doneCount.textContent = String(p.completed.length);
+  if (els.levelsDoneLine) {
+    els.levelsDoneLine.textContent = t("map.levelsDone", { n: p.completed.length });
+  }
   els.playerLv.textContent = `Lv.${Math.max(1, Math.floor(p.completed.length / 2) + 1)}`;
 
-  const rewards = nextRewards(p);
+  const rewards = nextRewards(p).map((item) => localizeReward(item, getLang()));
   els.rewardList.innerHTML = rewards
     .map(
       (item) => `
       <div class="reward-item">
-        <img src="${KIT}/${item.kind === "星星" ? "icon-star.png" : "chest-claimable.png"}" alt="" />
+        <img src="${KIT}/${item.kind === "星星" || item.kind === "Star" ? "icon-star.png" : "chest-claimable.png"}" alt="" />
         <span><strong>${item.label}</strong><small>${item.kind}</small></span>
       </div>`,
     )
@@ -128,33 +151,39 @@ function paintHud() {
 }
 
 function paintRegions() {
-  els.regionDock.innerHTML = REGIONS.map((region) => {
-    const { done, total } = regionProgress(state.progress, region);
+  els.regionDock.innerHTML = REGIONS.map((raw) => {
+    const region = localizeRegion(raw, getLang());
+    const { done, total } = regionProgress(state.progress, raw);
     const active =
-      state.progress.current >= region.range[0] &&
-      state.progress.current <= region.range[1];
+      state.progress.current >= raw.range[0] &&
+      state.progress.current <= raw.range[1];
+    const label = getLang() === "en" ? region.titleEn : region.title;
     return `
-      <button type="button" class="region-btn${active ? " is-active" : ""}" data-region="${region.id}">
-        <img src="${KIT}/region-banner-${region.index}.png" alt="${region.titleEn}" />
-        <span class="en">${region.titleEn} · ${done}/${total}</span>
+      <button type="button" class="region-btn${active ? " is-active" : ""}" data-region="${raw.id}">
+        <img src="${KIT}/region-banner-${raw.index}.png" alt="${region.titleEn}" />
+        <span class="en">${label} · ${done}/${total}</span>
       </button>`;
   }).join("");
 
   els.regionTitles.innerHTML = REGIONS.map(
     (region) => `
       <div class="region-title" style="left:${region.focus.x}%;top:${Math.max(8, region.focus.y - 10)}%">
-        ${region.titleEn}
+        ${getLang() === "en" ? region.titleEn : region.title}
       </div>`,
   ).join("");
+}
 
-  els.regionDock.querySelectorAll(".region-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const region = REGIONS.find((r) => r.id === btn.dataset.region);
-      if (!region) return;
-      focusPercent(region.focus.x, region.focus.y);
-      toast(region.titleEn);
-    });
+function bindRegionDock() {
+  if (els.regionDock._bound) return;
+  els.regionDock.addEventListener("click", (event) => {
+    const btn = event.target.closest(".region-btn");
+    if (!btn) return;
+    const region = REGIONS.find((r) => r.id === btn.dataset.region);
+    if (!region) return;
+    focusPercent(region.focus.x, region.focus.y);
+    toast(getLang() === "en" ? region.titleEn : region.title);
   });
+  els.regionDock._bound = true;
 }
 
 function segmentClass(fromId) {
@@ -217,11 +246,16 @@ function paintNodes() {
     btn.setAttribute("role", "listitem");
     btn.setAttribute(
       "aria-label",
-      `第 ${pt.id} 关，${statusLabel(status)}${meta?.isChest ? "，奖励关" : ""}`,
+      t("map.nodeAria", { n: pt.id, status: statusLabel(status) }) +
+        (meta?.isChest ? t("map.nodeChest") : ""),
     );
     btn.innerHTML = `
       <img class="art" src="${artMap[status]}" alt="" draggable="false" />
-      <span class="num">${pt.id}</span>`;
+      <span class="num">${pt.id}</span>${
+        state.fashionMode
+          ? `<span class="node-status">${statusLabel(status)}</span>`
+          : ""
+      }`;
     btn.tabIndex = status === "locked" ? -1 : 0;
     btn.addEventListener("click", () => openDetail(pt.id));
     btn.addEventListener("keydown", (event) => {
@@ -233,9 +267,10 @@ function paintNodes() {
   });
 }
 
-function openDetail(id) {
-  const node = getNode(id);
-  if (!node) return;
+function openDetail(id, { quiet = false } = {}) {
+  const raw = getNode(id);
+  if (!raw) return;
+  const node = localizeNode(raw, getLang());
   const status = nodeStatus(state.progress, id);
   state.selectedId = id;
   paintNodes();
@@ -245,14 +280,26 @@ function openDetail(id) {
   els.detailStatus.textContent = statusLabel(status);
   els.detailTitle.textContent = node.title;
   els.detailSummary.textContent = node.summary;
-  els.detailReward.textContent = `奖励：${node.reward.label}`;
+  const boutique = getBoutique(state.boutiqueId);
+  if (state.fashionMode && boutique && els.detailModule) {
+    const modLabel = fashionModuleLabel(id, boutique, t);
+    els.detailModule.hidden = false;
+    els.detailModule.textContent = t("map.ft.designModule", { module: modLabel });
+  } else if (els.detailModule) {
+    els.detailModule.hidden = true;
+  }
+  els.detailReward.textContent = t("map.rewardPrefix", { label: node.reward.label });
   els.detailEnter.disabled = status === "locked";
   els.detailEnter.setAttribute(
     "aria-label",
-    status === "done" ? "再次进入" : status === "locked" ? "尚未解锁" : "进入关卡",
+    status === "done"
+      ? t("map.enterAgain")
+      : status === "locked"
+        ? t("map.notUnlocked")
+        : t("map.enter"),
   );
 
-  if (status === "locked") toast("请先完成前一关后再解锁");
+  if (!quiet && status === "locked") toast(t("map.lockPrev"));
 }
 
 function closeDetail() {
@@ -278,63 +325,98 @@ function locateCurrent({ quiet = false } = {}) {
   const id = state.progress.current;
   const pt = pointOf(id);
   if (!pt) return;
-  openDetail(id);
+  openDetail(id, { quiet: true });
   focusPercent(pt.x, pt.y, {
     quiet,
-    message: `已定位到第 ${id} 关`,
+    message: t("map.located", { n: id }),
   });
 }
 
 function enterLevel(id) {
   const status = nodeStatus(state.progress, id);
   if (status === "locked") {
-    toast("关卡尚未解锁");
+    toast(t("map.lockLevel"));
     return;
   }
   state.progress.current = id;
   saveProgress(state.progress);
-  location.href = quizUrlFor(id);
+  location.href = quizUrlFor(id, state.boutiqueId);
 }
 
 function hydratePlayer() {
   const avatar = loadFinal();
-  const companion = loadConfirmedCompanion() || loadCompanionDraft();
-  if (avatar?.name) els.playerName.textContent = avatar.name;
+  const companionRaw = loadConfirmedCompanion() || loadCompanionDraft();
+  const companion = localizeCompanion(companionRaw, getLang());
+  if (avatar?.name) {
+    els.playerName.textContent = avatar.name;
+  } else {
+    els.playerName.textContent = t("map.traveler");
+  }
 
   const frame = els.profileAvatar.querySelector(".frame-art");
+  const existing = els.profileAvatar.querySelector(".portrait");
+  if (existing) existing.remove();
   if (companion?.portrait) {
     els.profileAvatar.classList.remove("is-empty");
-    const existing = els.profileAvatar.querySelector(".portrait");
-    if (existing) existing.remove();
     const img = document.createElement("img");
     img.className = "portrait";
     img.src = companion.portrait;
     img.alt = companion.name || "";
     els.profileAvatar.insertBefore(img, frame);
-    els.companionLine.textContent =
-      companion.intro || "我在这里陪你。一步一步，我们就能走完全程。";
+    els.companionLine.textContent = state.fashionMode
+      ? companion.summary || companion.intro || t("map.ft.companionEncourage")
+      : companion.intro || t("map.companionFallback");
   } else {
     els.profileAvatar.classList.add("is-empty");
+    els.companionLine.textContent = t("map.companionDefault");
   }
 }
 
 function absorbQueryFlags() {
   const params = new URLSearchParams(location.search);
-  const complete = Number(params.get("complete"));
-  if (complete >= 1 && complete <= TOTAL_LEVELS && isUnlocked(state.progress, complete)) {
+  const boutiqueId = params.get("boutique") || state.boutiqueId;
+  if (boutiqueId && getBoutique(boutiqueId)) {
+    setActiveBoutique(boutiqueId);
+    state.boutiqueId = boutiqueId;
+    state.fashionMode = true;
+  }
+  const raw = params.get("complete");
+  if (!raw) return;
+  const ids = raw
+    .split(",")
+    .map((n) => Number(n.trim()))
+    .filter((n) => n >= 1 && n <= TOTAL_LEVELS)
+    .sort((a, b) => a - b);
+  if (!ids.length) return;
+  let last = null;
+  ids.forEach((complete) => {
+    if (!isUnlocked(state.progress, complete)) return;
     if (!state.progress.completed.includes(complete)) {
       state.progress.completed.push(complete);
       state.progress.stars += 1;
       if (CHEST_NODES.includes(complete)) state.progress.gems += 5;
     }
-    state.progress.current = Math.min(TOTAL_LEVELS, complete + 1);
+    last = complete;
+  });
+  if (last != null) {
+    state.progress.current = Math.min(TOTAL_LEVELS, last + 1);
     saveProgress(state.progress);
-    history.replaceState({}, "", location.pathname);
-    toast(`第 ${complete} 关已记入完成`);
+    toast(t("map.completedToast", { n: last }));
   }
+  const keep = state.boutiqueId ? `?boutique=${encodeURIComponent(state.boutiqueId)}` : "";
+  history.replaceState({}, "", `${location.pathname}${keep}`);
 }
 
 function paintAll() {
+  if (state.fashionMode) {
+    mountFashionMap({ state, els, t, getLang });
+    paintFashionModules({ state, els, t });
+    if (els.rewardCard) els.rewardCard.hidden = true;
+    if (els.modulePanel) els.modulePanel.hidden = false;
+  } else {
+    if (els.rewardCard) els.rewardCard.hidden = false;
+    if (els.modulePanel) els.modulePanel.hidden = true;
+  }
   paintHud();
   paintRegions();
   paintLinks();
@@ -347,10 +429,16 @@ els.detailEnter.addEventListener("click", () => {
   if (!state.selectedId) return;
   enterLevel(state.selectedId);
 });
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || !state.selectedId || els.detailCard.hidden) return;
+  if (document.activeElement === els.detailEnter && !els.detailEnter.disabled) {
+    enterLevel(state.selectedId);
+  }
+});
 els.continueBtn.addEventListener("click", () => {
   const id = state.progress.current;
   if (!isUnlocked(state.progress, id)) {
-    toast("当前关卡仍锁定");
+    toast(t("map.lockCurrent"));
     return;
   }
   locateCurrent();
@@ -371,7 +459,10 @@ els.helpOpen.addEventListener("click", () => {
 });
 
 absorbQueryFlags();
+bindRegionDock();
 hydratePlayer();
+const invalidBoutique = invalidBoutiqueFromUrl();
+if (invalidBoutique) toast(t("town.invalidBoutique", { id: invalidBoutique }));
 paintAll();
 applyZoom();
 locateCurrent({ quiet: true });

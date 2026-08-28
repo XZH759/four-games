@@ -6,11 +6,11 @@
   <title data-i18n="partner.title">学习伙伴选择 · AI Literacy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/js/i18n.css?v=2" />
   <link rel="stylesheet" href="/css/terra-mosaic-bg.css" />
   <link rel="stylesheet" href="/css/pixel-ui.css" />
-  <link rel="stylesheet" href="/nuannuan/partner/partner.css" />
+  <link rel="stylesheet" href="/nuannuan/partner/partner.css?v=4" />
 </head>
 <body class="partner-page pixel-page" data-companion="diana">
   <div class="terra-mosaic terra-mosaic--partner" aria-hidden="true">
@@ -25,10 +25,10 @@
   </div>
 
   <header class="topbar">
-    <a class="icon-btn" href="/nuannuan/login" data-i18n-aria="partner.back" aria-label="返回登录建角">←</a>
+    <a class="icon-btn" id="back-link" href="/nuannuan/login" data-i18n-aria="partner.back" aria-label="返回登录建角">←</a>
     <div class="topbar-title">
-      <h1 data-i18n="partner.h1">学习伙伴选择</h1>
-      <p data-i18n="partner.sub">选择 1 位 AI 助手陪伴你完成本次测试</p>
+      <h1 id="page-h1" data-i18n="partner.h1">学习伙伴选择</h1>
+      <p id="page-sub" data-i18n="partner.sub">选择 1 位 AI 助手陪伴你完成本次测试</p>
     </div>
     <div class="topbar-actions">
       <div id="lang-host" class="lang-host"></div>
@@ -39,8 +39,10 @@
 
   <p class="notice" id="partner-note">
     <span class="notice-ico" aria-hidden="true">!</span>
-    <span data-i18n="partner.notice">重要说明：伙伴只提供鼓励与提醒，不会直接告诉你答案。</span>
+    <span id="notice-text" data-i18n="partner.notice">重要说明：伙伴只提供鼓励与提醒，不会直接告诉你答案。</span>
   </p>
+
+  <div class="ft-boutique-bar" id="ft-boutique-bar" hidden></div>
 
   <main class="layout">
     <section class="candidates" aria-labelledby="candidate-title">
@@ -83,24 +85,49 @@
     </section>
 
     <aside class="tips" data-i18n-aria="partner.tipsAria" aria-label="操作提示">
-      <span class="tips-ico" aria-hidden="true">📘</span>
+      <span class="tips-ico" aria-hidden="true"></span>
       <div>
-        <strong>TIPS</strong>
+        <strong data-i18n="partner.tipsLabel">TIPS</strong>
         <p id="tips-text" data-i18n="partner.tipsDefault">点击左侧卡片预览伙伴，确认后再开始答题。</p>
       </div>
     </aside>
 
     <div class="actions">
       <button type="button" class="btn btn-detail" id="view-detail">
-        <span aria-hidden="true">📄</span><span data-i18n="partner.viewDetail">查看详情</span>
+        <span class="btn-ico" aria-hidden="true"></span><span data-i18n="partner.viewDetail">查看详情</span>
       </button>
       <button type="button" class="btn btn-confirm" id="confirm-partner">
-        <span aria-hidden="true">✦</span><span data-i18n="partner.pick">选择伙伴</span>
+        <span class="btn-ico" aria-hidden="true"></span><span data-i18n="partner.pick">选择伙伴</span>
       </button>
       <button type="button" class="btn btn-start" id="start-test" disabled>
-        <span aria-hidden="true">◎</span><span data-i18n="partner.start">开始答题</span>
+        <span class="btn-ico" aria-hidden="true"></span><span data-i18n="partner.start">开始答题</span>
       </button>
     </div>
+  </footer>
+
+  <footer class="ft-journey-flow" id="ft-journey-flow" hidden aria-label="Journey steps">
+    <ol>
+      <li class="is-done" data-step="1">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow1">进入装扮小镇</strong>
+      </li>
+      <li class="is-done" data-step="2">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow2">建立探索者</strong>
+      </li>
+      <li class="is-current" data-step="3">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow3">选择伙伴</strong>
+      </li>
+      <li data-step="4">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow4">时尚挑战答题</strong>
+      </li>
+      <li data-step="5">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow5">合成时装</strong>
+      </li>
+    </ol>
   </footer>
 
   <dialog class="guide-dialog" id="guide-dialog" aria-labelledby="guide-title">
@@ -125,6 +152,6 @@
   </dialog>
 
   <div class="toast" id="page-message" role="status" aria-live="polite"></div>
-  <script type="module" src="/nuannuan/partner/partner.js?v=3"></script>
+  <script type="module" src="/nuannuan/partner/partner.js?v=4"></script>
 </body>
 </html>

@@ -7,36 +7,29 @@
   <meta name="description" content="选择性别与职业路线，确认形象后进入。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/js/i18n.css?v=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=2" />
   <link rel="stylesheet" href="/css/avatar-motion.css" />
-  <link rel="stylesheet" href="/css/terra-mosaic-bg.css" />
-  <link rel="stylesheet" href="/css/pixel-ui.css" />
-  <link rel="stylesheet" href="/nuannuan/login/login.css" />
+  <link rel="stylesheet" href="/nuannuan/login/login.css?v=5" />
 </head>
-<body class="pixel-page" data-role="researcher" data-step="1">
-  <div class="terra-mosaic terra-mosaic--login" aria-hidden="true">
-    <div class="terra-mosaic__sky"></div>
-    <div class="terra-mosaic__clouds"></div>
-    <div class="terra-mosaic__hills"></div>
-    <div class="terra-mosaic__trees"></div>
-    <div class="terra-mosaic__ground"></div>
-    <div class="terra-mosaic__pixels"></div>
-    <div class="terra-mosaic__noise"></div>
-    <div class="terra-mosaic__vignette"></div>
+<body class="acs-page" data-role="researcher" data-step="1">
+  <div class="acs-backdrop" aria-hidden="true">
+    <img src="/nuannuan/login/assets/bg-lobby.png" alt="" />
+    <span class="acs-backdrop-wash"></span>
   </div>
 
   <header class="sys-top">
-    <a class="sys-back" href="/" data-i18n="login.back">← 游戏大厅</a>
+    <a class="sys-back" href="/" data-i18n="login.back">← Lobby</a>
     <div class="sys-brand">
-      <span class="sys-bolt" aria-hidden="true">AI</span>
+      <span class="sys-sparkle" aria-hidden="true">✦</span>
       <div>
-        <strong>AI CHARACTER SYSTEM</strong>
-        <small>LOGIN · ROLE SELECT</small>
+        <strong>AI Character System</strong>
+        <small>Login · Role Select</small>
       </div>
+      <span class="sys-sparkle" aria-hidden="true">✦</span>
     </div>
     <div id="lang-host" class="lang-host"></div>
-    <span class="sys-ver">// SYSTEM ONLINE</span>
+    <span class="sys-ver"><i class="sys-dot" aria-hidden="true"></i> System Online</span>
   </header>
 
   <main class="sys-shell">
@@ -51,14 +44,16 @@
 
       <p class="section-label" data-i18n="login.role">职业路线 / ROLE</p>
       <div class="role-grid" id="role-list" role="listbox" data-i18n-aria="login.role" aria-label="职业路线"></div>
+      <p class="ft-path-note" id="ft-path-note" hidden data-i18n="login.ft.pathNote"></p>
 
       <button type="button" class="btn btn-secondary btn-block" id="random">
-        <span class="btn-ico" aria-hidden="true">⚄</span><span data-i18n="login.random">随机生成</span>
+        <span class="btn-ico" aria-hidden="true"></span><span data-i18n="login.random">随机生成</span>
       </button>
     </aside>
 
     <section class="stage-col" aria-labelledby="preview-title">
       <h2 id="preview-title" class="sr-only" data-i18n="login.preview">角色实时预览</h2>
+      <div class="ft-mood-row" id="ft-mood-tabs" hidden role="tablist" aria-label="Mood"></div>
       <div class="stage-frame holo-panel">
         <div class="stage-meta">
           <span id="stage-role">研究员</span>
@@ -87,6 +82,8 @@
         </div>
 
         <p class="stage-hint" id="stage-hint" data-i18n="login.hintDefault">选择职业后可预览形象</p>
+        <p class="ft-gap-note" id="ft-gap-note" hidden role="status"></p>
+        <p class="ft-layer-note" id="ft-layer-note" hidden role="status"></p>
 
         <div class="theme-equip" id="theme-equip" aria-live="polite" hidden></div>
 
@@ -105,23 +102,28 @@
 
         <div class="module-dock" id="module-dock" role="tablist" aria-label="档案焦点">
           <button type="button" class="module-btn is-on" data-module="role" role="tab" aria-selected="true">
-            <span class="module-ico" aria-hidden="true">◇</span><small data-i18n="login.mod.role">职业</small>
+            <span class="module-ico" aria-hidden="true"></span><small data-i18n="login.mod.role">职业</small>
           </button>
           <button type="button" class="module-btn" data-module="outfit" role="tab" aria-selected="false">
-            <span class="module-ico" aria-hidden="true">▦</span><small data-i18n="login.mod.outfit">服装</small>
+            <span class="module-ico" aria-hidden="true"></span><small data-i18n="login.mod.outfit">服装</small>
           </button>
           <button type="button" class="module-btn" data-module="accessory" role="tab" aria-selected="false">
-            <span class="module-ico" aria-hidden="true">✦</span><small data-i18n="login.mod.accessory">配饰</small>
+            <span class="module-ico" aria-hidden="true"></span><small data-i18n="login.mod.accessory">配饰</small>
           </button>
           <button type="button" class="module-btn" data-module="mark" role="tab" aria-selected="false">
-            <span class="module-ico" aria-hidden="true">◎</span><small data-i18n="login.mod.mark">印记</small>
+            <span class="module-ico" aria-hidden="true"></span><small data-i18n="login.mod.mark">印记</small>
           </button>
           <button type="button" class="module-btn" data-module="eyes" role="tab" aria-selected="false">
-            <span class="module-ico" aria-hidden="true">◉</span><small data-i18n="login.mod.eyes">眼部</small>
+            <span class="module-ico" aria-hidden="true"></span><small data-i18n="login.mod.eyes">眼部</small>
           </button>
           <button type="button" class="module-btn" data-module="theme" role="tab" aria-selected="false">
-            <span class="module-ico" aria-hidden="true">◐</span><small data-i18n="login.mod.theme">主题</small>
+            <span class="module-ico" aria-hidden="true"></span><small data-i18n="login.mod.theme">主题</small>
           </button>
+        </div>
+
+        <div class="ft-stage-tools" id="ft-stage-tools" hidden>
+          <button type="button" class="tool-btn" id="ft-random-look" data-i18n="login.ft.randomLook">随机造型</button>
+          <button type="button" class="tool-btn" id="ft-rotate" data-i18n="login.ft.rotate">旋转</button>
         </div>
       </div>
     </section>
@@ -131,6 +133,16 @@
         <h2 id="detail-title" data-i18n="login.detailTitle">角色档案</h2>
         <p id="detail-sub" data-i18n="login.detailSub">当前职业信息</p>
       </header>
+
+      <div class="ft-companion-preview" id="ft-companion-preview" hidden>
+        <div class="ft-companion-stage" id="ft-companion-stage"></div>
+        <p class="ft-companion-kicker" data-i18n="login.ft.recommendedCompanion">推荐伙伴</p>
+        <strong id="ft-companion-name"></strong>
+        <p id="ft-companion-summary"></p>
+        <p class="ft-companion-note" data-i18n="login.ft.companionPreviewNote">伙伴预告 · 下一步确认结伴</p>
+        <p class="section-label" data-i18n="login.ft.modulesPreview">可设计模块</p>
+        <div class="ft-module-preview" id="ft-module-preview"></div>
+      </div>
 
       <label class="name-field">
         <span data-i18n="login.name">角色名称</span>
@@ -191,7 +203,32 @@
     </ol>
   </footer>
 
+  <footer class="ft-journey-flow" id="ft-journey-flow" hidden aria-label="Journey steps">
+    <ol>
+      <li class="is-done" data-step="1">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow1">进入装扮小镇</strong>
+      </li>
+      <li class="is-current" data-step="2">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow2">建立探索者</strong>
+      </li>
+      <li data-step="3">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow3">选择伙伴</strong>
+      </li>
+      <li data-step="4">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow4">时尚挑战答题</strong>
+      </li>
+      <li data-step="5">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow5">合成时装</strong>
+      </li>
+    </ol>
+  </footer>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="/nuannuan/login/login.js?v=3"></script>
+  <script type="module" src="/nuannuan/login/login.js?v=4"></script>
 </body>
 </html>

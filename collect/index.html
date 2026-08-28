@@ -3,62 +3,209 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>collect · AI 素养测评</title>
-  <meta name="description" content="角色登录旅程中的 AI 素养测评答题（ailit_assessment 题库 · collect 养成壳）。" />
+  <title data-i18n="journey.title">AI 素养挑战 · 陪伴答题</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
-  <link rel="stylesheet" href="/collect/collect.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700;900&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/js/i18n.css?v=2" />
+  <link rel="stylesheet" href="/css/pixel-ui.css" />
+  <link rel="stylesheet" href="/css/avatar-motion.css" />
+  <link rel="stylesheet" href="/collect/collect.css?v=5" />
 </head>
-<body class="collect-page">
-  <div class="bg" aria-hidden="true"></div>
-
-  <header class="topbar">
-    <a class="brand" href="/nuannuan/map">
-      <img src="/assets/bot-buddy.png" width="36" height="36" alt="" />
-      <span>AI知识之旅 · 答题</span>
-    </a>
-    <p class="top-note" id="level-chip">collect</p>
-  </header>
-
+<body class="journey-page pixel-page" data-phase="brief" data-companion="diana">
+  <div id="lang-host" class="lang-host journey-lang"></div>
   <p class="boot-error" id="boot-error" hidden></p>
 
-  <main class="assess" id="assess">
-    <div class="assess-frame">
-      <div class="assess-toolbar">
-        <button type="button" class="linkish" id="btn-exit">← 返回地图</button>
-        <span class="assess-meta" id="assess-meta"></span>
+  <section class="phase phase-brief" id="phase-brief">
+    <header class="brief-top">
+      <a class="back-link" href="/nuannuan/map" data-i18n="journey.backMap">← 返回地图</a>
+    </header>
+    <article class="buddy-card">
+      <div class="buddy-hero">
+        <img class="buddy-stage" id="brief-stage" alt="" />
+        <img class="buddy-portrait" id="brief-portrait" alt="" />
       </div>
-
-      <aside class="companion-rail" id="companion-rail" hidden>
-        <img id="companion-portrait" alt="" width="56" height="56" />
-        <p id="companion-encourage">我在旁边陪你。慢慢想，提交就能继续前进。</p>
-      </aside>
-
-      <div class="shell-bar" id="shell-bar" aria-live="polite"></div>
-      <div class="item-root" id="item-root"></div>
-
-      <div class="assess-actions">
-        <p class="neutral-copy">提交即接通 · 与对错无关</p>
-        <button type="button" class="primary" id="btn-submit" disabled>提交并继续</button>
+      <div class="buddy-card-copy">
+        <p class="active-tag" data-i18n="journey.activeBuddy">当前伙伴</p>
+        <h1 id="brief-name">DIANA</h1>
+        <p class="brief-role" id="brief-role">Academic Support</p>
+        <p class="brief-bio" id="brief-bio"></p>
+        <ul class="brief-skills" id="brief-skills"></ul>
+        <p class="brief-focus" id="brief-focus"></p>
+        <p class="brief-rule"><span aria-hidden="true">✦</span><span data-i18n="journey.neverAnswers">只鼓励，绝不给答案。</span></p>
+        <button type="button" class="btn-next" id="brief-start" data-i18n="journey.startQuiz">开始答题</button>
       </div>
-    </div>
-  </main>
-
-  <div class="between-host" id="between-host" aria-live="polite"></div>
-
-  <section class="end-screen" id="end-screen" hidden>
-    <div class="end-card">
-      <img src="/assets/bot-buddy.png" width="72" height="72" alt="" />
-      <h1>本题已接通</h1>
-      <p id="end-summary">正在返回地图…</p>
-      <a class="primary" id="btn-back-map" href="/nuannuan/map">返回地图</a>
-    </div>
+    </article>
   </section>
 
+  <section class="phase phase-quiz" id="phase-quiz" hidden>
+    <header class="quiz-top" id="quiz-top-legacy">
+      <span class="level-badge" id="level-badge">L1</span>
+      <div class="quiz-brand">
+        <strong data-i18n="journey.challenge">AI Literacy Challenge</strong>
+        <span class="star-spark" aria-hidden="true">✦</span>
+      </div>
+      <div class="quiz-progress">
+        <p id="progress-label">Question 1 of 3</p>
+        <div class="bar" aria-hidden="true"><i id="progress-fill"></i></div>
+      </div>
+      <div class="star-count">
+        <span id="star-pair">0/3</span>
+        <img src="/nuannuan/map/assets/kit/icon-star.png" alt="" />
+      </div>
+    </header>
+
+    <header class="ft-quiz-head" id="ft-quiz-head" hidden>
+      <a class="back-link" id="ft-back-map" href="/nuannuan/map" data-i18n="collect.ft.backMap">← 返回精品店地图</a>
+      <div class="ft-quiz-title">
+        <img class="ft-boutique-icon" id="ft-boutique-icon" alt="" width="44" height="44" />
+        <div>
+          <h1 id="ft-challenge-title">Dream Atelier Challenge</h1>
+          <p id="ft-challenge-sub" data-i18n="collect.ft.challengeSub">答对题目，设计出本店时尚模块</p>
+        </div>
+        <span class="ft-stage-pill" id="ft-stage-pill">1 / 3</span>
+      </div>
+      <div class="ft-quiz-score" aria-label="Progress">
+        <span id="ft-score-pair">0 / 3</span>
+      </div>
+    </header>
+
+    <main class="quiz-layout" id="quiz-layout">
+      <aside class="ft-side-player" id="ft-player-panel" hidden>
+        <section class="ft-player-card">
+          <h2 data-i18n="collect.ft.youLabel">你</h2>
+          <div class="ft-player-avatar layered-character" id="ft-player-avatar"></div>
+          <p class="ft-player-name" id="ft-player-name"></p>
+          <p class="ft-player-role" id="ft-player-role"></p>
+          <p class="ft-player-tagline" id="ft-player-tagline"></p>
+        </section>
+        <section class="ft-companion-card">
+          <h2 data-i18n="collect.ft.companionLabel">伙伴</h2>
+          <div class="ft-companion-row">
+            <img class="ft-companion-portrait" id="ft-companion-portrait" alt="" width="48" height="48" />
+            <div>
+              <p class="ft-companion-name" id="ft-companion-name"></p>
+              <p class="ft-companion-role" id="ft-companion-role"></p>
+            </div>
+          </div>
+          <p class="ft-companion-line" id="ft-companion-line"></p>
+        </section>
+        <p class="ft-kind-reminder" data-i18n="collect.ft.kindReminder">伙伴只鼓励、提醒检查主题与条件，不会指明正确选项。</p>
+      </aside>
+
+      <section class="quiz-panel" aria-labelledby="q-stem">
+        <header class="ft-challenge-head" id="ft-challenge-head" hidden>
+          <h2 data-i18n="collect.ft.challengeLabel">挑战题目</h2>
+          <p class="ft-target-module" id="ft-target-module"></p>
+        </header>
+        <span class="domain-pill" id="domain-pill">Engaging</span>
+        <div class="item-root" id="item-root"></div>
+        <p class="ft-feedback" id="ft-feedback" hidden role="alert"></p>
+      </section>
+
+      <aside class="companion-stage" id="companion-stage">
+        <img class="scene-art" id="scene-art" alt="" />
+        <img class="buddy-sprite" id="buddy-sprite" alt="" />
+        <blockquote class="speech" id="quiz-speech"></blockquote>
+      </aside>
+
+      <aside class="ft-design-board" id="ft-design-board" hidden aria-live="polite"></aside>
+    </main>
+
+    <footer class="quiz-foot" id="quiz-foot-legacy">
+      <button type="button" class="btn-skip" id="btn-skip" data-i18n="journey.skip">Skip</button>
+      <p class="foot-hint"><span aria-hidden="true">✦</span><span data-i18n="journey.reviewLater">未答的题稍后还可以回来。</span><span aria-hidden="true">✦</span></p>
+      <button type="button" class="btn-next" id="btn-next" disabled>
+        <span data-i18n="journey.next">Next</span> →
+      </button>
+    </footer>
+
+    <footer class="ft-quiz-actions" id="ft-quiz-actions" hidden>
+      <button type="button" class="btn-draft" id="btn-draft" data-i18n="collect.ft.saveDraft">保存草稿</button>
+      <button type="button" class="btn-skip" id="btn-skip-ft" data-i18n="journey.skip">跳过</button>
+      <button type="button" class="btn-submit" id="btn-submit" disabled data-i18n="collect.ft.submit">提交答案</button>
+    </footer>
+  </section>
+
+  <section class="phase phase-settle" id="phase-settle" hidden>
+    <article class="settle-card" id="settle-legacy">
+      <p class="active-tag" data-i18n="journey.challengeComplete">Challenge Complete</p>
+      <div class="settle-hero">
+        <img class="settle-stage" id="settle-stage" alt="" />
+        <img class="settle-portrait" id="settle-portrait" alt="" />
+        <blockquote class="speech" id="settle-speech"></blockquote>
+      </div>
+      <h2 id="settle-title">本区旅程已接通</h2>
+      <ul class="settle-stats">
+        <li><span data-i18n="journey.statAnswered">已答</span><strong id="stat-answered">0</strong></li>
+        <li><span data-i18n="journey.statDesigned">设计出</span><strong id="stat-designed">0</strong></li>
+        <li><span data-i18n="journey.statSkipped">跳过</span><strong id="stat-skipped">0</strong></li>
+        <li><span data-i18n="journey.statStars">星星</span><strong id="stat-stars">0</strong></li>
+      </ul>
+      <p class="settle-note" data-i18n="journey.settleNoteFashion">答对题目可设计服装模块；集齐各店模块后合成共同时装。</p>
+      <div class="settle-actions">
+        <a class="btn-skip" id="settle-review" href="#quiz" hidden data-i18n="journey.reviewSkipped">回顾跳过的题</a>
+        <button type="button" class="btn-next" id="settle-continue" data-i18n="journey.continueMap">继续旅程</button>
+      </div>
+    </article>
+
+    <article class="ft-settle" id="ft-settle" hidden>
+      <div class="ft-confetti-host" id="ft-confetti" aria-hidden="true"></div>
+      <header class="ft-settle-banner">
+        <h1 id="ft-settle-title" data-i18n="collect.settle.title">设计完成！</h1>
+        <p id="ft-settle-sub" data-i18n="collect.settle.sub">你的创意已成为时尚模块</p>
+      </header>
+      <main class="ft-settle-grid">
+        <aside class="ft-settle-companion">
+          <h2 id="ft-settle-companion-title" data-i18n="collect.settle.cheerTitle">看看谁在为你欢呼</h2>
+          <img class="ft-settle-portrait" id="ft-settle-portrait" alt="" width="120" height="120" />
+          <blockquote class="ft-settle-speech" id="ft-settle-speech"></blockquote>
+          <p class="ft-settle-bond" id="ft-settle-bond"></p>
+        </aside>
+        <section class="ft-settle-modules" aria-labelledby="ft-settle-modules-title">
+          <h2 id="ft-settle-modules-title" data-i18n="collect.settle.modulesTitle">新模块已解锁</h2>
+          <p class="ft-settle-modules-lead" data-i18n="collect.settle.modulesLead">这些模块已加入收藏，可在衣柜中使用</p>
+          <div class="ft-module-cards" id="ft-module-cards"></div>
+        </section>
+        <aside class="ft-settle-slots" id="ft-slot-board"></aside>
+      </main>
+      <section class="ft-settle-rewards" id="ft-rewards"></section>
+      <footer class="ft-settle-actions">
+        <button type="button" class="btn-settle-primary" id="settle-continue-ft" data-i18n="collect.settle.continue">继续设计</button>
+        <a class="btn-settle-secondary" id="settle-wardrobe" href="/nuannuan/wardrobe" data-i18n="collect.settle.wardrobe">查看衣柜</a>
+        <a class="btn-settle-quiet" id="settle-review-ft" href="#quiz" hidden data-i18n="journey.reviewSkipped">回顾跳过的题</a>
+      </footer>
+    </article>
+  </section>
+
+  <footer class="ft-journey-flow" id="ft-journey-flow" hidden aria-label="Journey steps">
+    <ol>
+      <li class="is-done" data-step="1">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow1">进入装扮小镇</strong>
+      </li>
+      <li class="is-done" data-step="2">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow2">建立探索者</strong>
+      </li>
+      <li class="is-done" data-step="3">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow3">选择伙伴</strong>
+      </li>
+      <li class="is-current" data-step="4">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="collect.ft.flow4">时尚挑战答题</strong>
+      </li>
+      <li data-step="5">
+        <span class="flow-icon" aria-hidden="true"></span>
+        <strong data-i18n="town.flow5">合成时装</strong>
+      </li>
+    </ol>
+  </footer>
+
+  <div class="between-host" id="between-host" aria-live="polite"></div>
   <script src="/js/item-renderer.js"></script>
   <script src="/js/shells.js"></script>
-  <script type="module" src="/collect/collect.js?v=2"></script>
+  <script type="module" src="/collect/collect.js?v=7"></script>
 </body>
 </html>

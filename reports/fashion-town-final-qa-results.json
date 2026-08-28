@@ -1,0 +1,45 @@
+{
+  "at": "2026-08-28T15:07:30.224Z",
+  "results": [
+    {
+      "name": "legacy nn_fashion_town_v1 migration preserves progress",
+      "pass": true,
+      "detail": "{\"unlocked\":[\"dress\",\"tops\"],\"sharedOutfit\":true,\"sessionDesignedLen\":1}"
+    },
+    {
+      "name": "settle refresh does not duplicate unlock/rewards",
+      "pass": true,
+      "detail": "before={\"unlocked\":1,\"bondXp\":5} after={\"unlocked\":1,\"bondXp\":5}"
+    },
+    {
+      "name": "invalid boutique shows notice on town",
+      "pass": true,
+      "detail": "精品店「not-a-real-shop」无效，已切换到可用路线"
+    },
+    {
+      "name": "reduced-motion map has no running CSS animations",
+      "pass": true,
+      "detail": "{\"keyframes\":2,\"runningAnimations\":0}"
+    },
+    {
+      "name": "i18n toggle town no overflow",
+      "pass": true,
+      "detail": "lang=zh-CN"
+    },
+    {
+      "name": "wrong answer shows feedback, no unlock flash",
+      "pass": true,
+      "detail": "feedback visible=true"
+    },
+    {
+      "name": "quiz flow reaches settle after skip",
+      "pass": true,
+      "detail": "settle visible=true"
+    },
+    {
+      "name": "duplicate look name does not create second entry",
+      "pass": true,
+      "detail": "count=1"
+    }
+  ]
+}
