@@ -375,8 +375,33 @@ button { -webkit-tap-highlight-color: transparent; }
 .field:focus-within { border-color: #e9a34a; box-shadow: 0 0 0 4px rgba(235, 163, 74, 0.14), inset 0 1px 0 #fff; transform: translateY(-1px); }
 .field-ico { font-size: 1.05rem; }
 .field input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-weight: 800; }
+.field select {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 800;
+  font-family: inherit;
+  font-size: inherit;
+  appearance: none;
+  cursor: pointer;
+}
+.field select:invalid,
+.field select option[value=""] {
+  color: #ad9b8c;
+}
 .field input::placeholder { color: #ad9b8c; font-weight: 700; }
 .field-count { flex: 0 0 auto; color: #ae9581; font-size: 0.68rem; font-weight: 800; }
+.field-chevron {
+  flex: 0 0 auto;
+  color: #ae9581;
+  font-size: 0.72rem;
+  font-weight: 800;
+  pointer-events: none;
+}
+.field-select:focus-within .field-chevron { color: var(--orange); }
 
 .companion-fieldset, .choice-fieldset { margin: 0; padding: 0; border: 0; }
 .companion-fieldset legend, .choice-fieldset legend { width: 100%; margin: 0 0 0.48rem; color: #694937; text-align: center; font-size: 0.75rem; font-weight: 900; }

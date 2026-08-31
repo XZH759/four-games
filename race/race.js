@@ -3,6 +3,9 @@ import { addCastlePoints, getEquippedLoadout } from "/castle/castle.js";
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
 import { logAnswer } from "/js/answer-log.js";
+import { createDwellTracker } from "/js/dwell-log.js";
+
+const dwell = createDwellTracker("race");
 import {
   drawFlightGear,
   drawOrbitAura,
@@ -1006,6 +1009,9 @@ function openQuiz() {
   const question = nextQuestion();
   const order = shuffle(question.options.map((_, index) => index));
   activeQuestion = { question, order, answered: false, pendingEffect: null };
+  dwell.beginQuestion(question.id || `race-${game.answered + 1}`, {
+    trackId: selectedTrack?.id || null,
+  });
   refreshQuizUi();
   els.feedback.hidden = true;
   els.feedback.className = "answer-feedback";
@@ -1108,15 +1114,24 @@ function answerQuestion(optionIndex, selectedButton) {
   activeQuestion.wasCorrect = correct;
   activeQuestion.chosenOptionIndex = optionIndex;
 
+  const dwellMs =
+    dwell.endQuestion(activeQuestion.question?.id || `race-${game.answered}`, {
+      optionIndex,
+      correct,
+      trackId: selectedTrack?.id || null,
+    }) ?? null;
+
   void logAnswer({
     game: "race",
     question_id: activeQuestion.question?.id || `race-${game.answered}`,
     answer: { optionIndex },
     correct,
+    latency_ms: dwellMs,
     meta: {
       trackId: selectedTrack?.id || null,
       answered: game.answered,
       correctCount: game.correct + (correct ? 1 : 0),
+      dwell_ms: dwellMs,
     },
   });
 

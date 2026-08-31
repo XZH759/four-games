@@ -7,6 +7,9 @@ import { addCastlePoints, getEquippedLoadout } from "/castle/castle.js";
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
 import { logAnswer } from "/js/answer-log.js";
+import { createDwellTracker } from "/js/dwell-log.js";
+
+const dwell = createDwellTracker("parkour");
 import {
   drawFlightGear,
   drawOrbitAura,
@@ -1245,16 +1248,26 @@ function resolveQuiz(quiz, chosenLane, timedOut) {
   const correct = !timedOut && chosenLane === quiz.correctLane;
   state.entities = state.entities.filter((e) => e.type === "quiz");
 
+  const dwellMs =
+    dwell.endQuestion(quiz.question?.id || `parkour-${state.quizSeen}`, {
+      timedOut,
+      correct,
+      chosenLane,
+      correctLane: quiz.correctLane,
+    }) ?? null;
+
   void logAnswer({
     game: "parkour",
     question_id: quiz.question?.id || `parkour-${state.quizSeen}`,
     answer: { chosenLane, correctLane: quiz.correctLane, timedOut },
     correct,
+    latency_ms: dwellMs,
     meta: {
       distance: Math.round(state.distance),
       quizSeen: state.quizSeen,
       quizCorrect: state.quizCorrect + (correct ? 1 : 0),
       sceneIndex: state.sceneIndex,
+      dwell_ms: dwellMs,
     },
   });
 
@@ -1525,6 +1538,9 @@ function update(dt) {
     state.awaitingAnswer = true;
     state.quizTimeLeft = QUIZ_TIME;
     state.nextQuizAt = state.distance + 190 + Math.random() * 110;
+    dwell.beginQuestion(quiz.question?.id || `parkour-${state.quizSeen + 1}`, {
+      quizSeen: state.quizSeen + 1,
+    });
     setQuizBanner(quiz);
   }
 

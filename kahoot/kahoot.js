@@ -6,6 +6,9 @@ import { AI_QUESTIONS, isCorrectOption, localizeQuestion } from "/monopoly/quest
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
 import { logAnswer } from "/js/answer-log.js";
+import { createDwellTracker } from "/js/dwell-log.js";
+
+const dwell = createDwellTracker("kahoot");
 
 initI18n({ toggleHost: "#lang-host" });
 onLangChange(() => {
@@ -506,6 +509,8 @@ function beginQuestion() {
   paintQuestionText();
   paintYouHud();
   show(els.play);
+  const q = state.questions[state.index];
+  dwell.beginQuestion(q?.id || `kahoot-${state.index + 1}`, { index: state.index });
   state.startedAt = performance.now();
   state.endsAt = state.startedAt + TIME_LIMIT_MS;
   tickTimer();
@@ -566,6 +571,12 @@ function submitAnswer(optionIndex, button) {
     shielded = true;
     correct = true;
   }
+  const dwellMs =
+    dwell.endQuestion(q?.id || `kahoot-${state.index + 1}`, {
+      timedOut,
+      correct: correct && !shielded,
+      shielded,
+    }) ?? Math.round(elapsed);
   const points = scoreFromMs(elapsed, correct && !shielded) || (shielded ? Math.round(BASE_POINTS * 0.4) : 0);
 
   void logAnswer(
@@ -574,12 +585,13 @@ function submitAnswer(optionIndex, button) {
       question_id: q.id || `kahoot-${state.index}`,
       answer: { optionIndex, timedOut },
       correct,
-      latency_ms: Math.round(elapsed),
+      latency_ms: dwellMs,
       meta: {
         index: state.index,
         points,
         shielded,
         timedOut,
+        dwell_ms: dwellMs,
         streak: correct ? state.streak + 1 : 0,
       },
     },

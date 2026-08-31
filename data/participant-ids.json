@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "description": "Portal login whitelist — edit ids to match your class roster.",
+  "ids": [
+    "20240001",
+    "20240002",
+    "20240003",
+    "20240004",
+    "20240005",
+    "20240006",
+    "20240007",
+    "20240008",
+    "20240009",
+    "20240010"
+  ]
+}

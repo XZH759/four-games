@@ -23,6 +23,7 @@ import {
   loadConfirmedCompanion,
   localizeCompanion,
 } from "/js/nuannuan/companion-config.js";
+import { trackPageView } from "/js/event-log.js";
 
 const LOGIN_KEY = "nn_login_avatar_v1";
 const DRAFT_KEY = "nn_wardrobe_draft_v1";
@@ -358,6 +359,7 @@ async function onSaveLook() {
 }
 
 async function boot() {
+  void trackPageView();
   state.boutiqueId = resolveBoutiqueId();
   const invalid = invalidBoutiqueFromUrl();
   if (state.boutiqueId) setActiveBoutique(state.boutiqueId);

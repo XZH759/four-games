@@ -37,6 +37,10 @@ import {
 } from "/js/nuannuan/companion-config.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
 import { logAnswers } from "/js/answer-log.js";
+import { logEvent, trackPageView } from "/js/event-log.js";
+import { createDwellTracker } from "/js/dwell-log.js";
+
+const dwell = createDwellTracker("collect");
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 
 initI18n({ toggleHost: "#lang-host" });
@@ -509,6 +513,7 @@ function showItem() {
   if (state.fashionMode) hideFashionFeedback(els);
   paintChrome();
   updateNext();
+  dwell.beginQuestion(slot.item.id, { level: slot.level, levelId: slot.meta?.levelId || null });
   state.startedAt = performance.now();
 }
 
@@ -517,6 +522,13 @@ function logCurrent(value, extra = {}) {
   if (!slot || state.logged.has(slot.item.id)) return;
   state.logged.add(slot.item.id);
   const correct = extra.correct ?? null;
+  const dwellMs =
+    dwell.endQuestion(slot.item.id, {
+      skipped: extra.skipped === true,
+      correct,
+      level: slot.level,
+      boutiqueId: getActiveBoutique()?.id || null,
+    }) ?? Math.round(performance.now() - state.startedAt);
   return logAnswers([
     {
       game: "collect",
@@ -524,13 +536,14 @@ function logCurrent(value, extra = {}) {
       level_index: slot.level,
       answer: value,
       correct,
-      latency_ms: Math.round(performance.now() - state.startedAt),
+      latency_ms: dwellMs,
       meta: {
         arm: "collect",
         zone: slot.meta?.zone || null,
         levelId: slot.meta?.levelId || null,
         companionId: companionId(),
         boutiqueId: getActiveBoutique()?.id || null,
+        dwell_ms: dwellMs,
         ...extra,
       },
     },
@@ -644,6 +657,16 @@ async function commitAndAdvance({ skip = false } = {}) {
   if (skip) {
     state.skipped.add(slot.item.id);
     logCurrent({ skipped: true }, { skipped: true, correct: null });
+    void logEvent({
+      event_type: "collect.question_skip",
+      category: "collect",
+      payload: {
+        question_id: slot.item.id,
+        level: slot.level,
+        boutiqueId: state.boutiqueId || getActiveBoutique()?.id || null,
+        fashionMode: state.fashionMode,
+      },
+    });
   } else {
     state.answers[slot.item.id] = collected.value;
     state.skipped.delete(slot.item.id);
@@ -677,6 +700,16 @@ function showSettle() {
     document.body.classList.remove("is-fashion-challenge");
     document.body.classList.add("is-fashion-settle");
     mountFashionSettle({ state, els, t, getLang });
+    void logEvent({
+      event_type: "fashion.settle_complete",
+      category: "fashion",
+      payload: {
+        boutiqueId: state.boutiqueId || getActiveBoutique()?.id || null,
+        designed: (state.settleDesigned || []).length,
+        answered: answeredInSession(),
+        skipped: state.session.filter((s) => state.skipped.has(s.item.id)).length,
+      },
+    });
   }
   setPhase("settle");
   paintSettle();
@@ -714,6 +747,7 @@ async function boot() {
     state.boutiqueId = entry.boutiqueId;
     state.fashionMode = isFashionCollectMode();
   }
+  void trackPageView({ fashionMode: state.fashionMode });
   mountLobbyExit({
     href: state.boutiqueId
       ? `/nuannuan/map?boutique=${encodeURIComponent(state.boutiqueId)}`

@@ -1,10 +1,10 @@
 import { initI18n, onLangChange, applyDom, t, getLang } from "/js/i18n.js";
 import { loginPortalUser } from "/js/user-log.js";
+import { logEvent, trackPageView } from "/js/event-log.js";
 import {
   PORTAL_COMPANIONS,
   ONBOARDING_KEY,
   validateNickname,
-  validateParticipantId,
   validateCompanion,
   loadPortalUser,
   savePortalUser,
@@ -13,6 +13,7 @@ import {
   isProfileComplete,
   isPortalLoggedIn,
 } from "/js/portal-auth.js";
+import { loadParticipantIds, validateParticipantInList } from "/js/portal-participants.js";
 
 const HOME_URL = "/";
 const VIEW_STEP = { welcome: 1, profile: 2, returning: 3, loading: 4 };
@@ -53,7 +54,6 @@ const els = {
   nick: document.getElementById("portal-nick"),
   pid: document.getElementById("portal-pid"),
   nickCount: document.getElementById("nick-count"),
-  pidCount: document.getElementById("pid-count"),
   error: document.getElementById("portal-error"),
   companionGrid: document.getElementById("companion-grid"),
   enter: document.getElementById("btn-enter"),
@@ -117,6 +117,7 @@ const state = {
   avatarKey: "explorer",
   badgeKey: "curious",
   user: loadPortalUser(),
+  participantIds: [],
   busy: false,
   loadingTimer: 0,
   loadingRedirectTimer: 0,
@@ -225,7 +226,26 @@ function setView(view, { focus = true } = {}) {
 
 function updateCounts() {
   setText(els.nickCount, `${els.nick.value.length}/20`);
-  setText(els.pidCount, `${els.pid.value.length}/20`);
+}
+
+function paintParticipantSelect() {
+  if (!els.pid) return;
+  const selected = els.pid.value;
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.disabled = true;
+  placeholder.selected = !selected || !state.participantIds.includes(selected);
+  placeholder.textContent = t("portal.pidSelectPlaceholder");
+  els.pid.replaceChildren(
+    placeholder,
+    ...state.participantIds.map((id) => {
+      const option = document.createElement("option");
+      option.value = id;
+      option.textContent = id;
+      if (id === selected) option.selected = true;
+      return option;
+    }),
+  );
 }
 
 function clearError(target = els.error) {
@@ -239,7 +259,8 @@ function showError(code, target = els.error) {
     nickEmpty: "portal.error.nickEmpty",
     nickLength: "portal.error.nickLength",
     pidEmpty: "portal.error.pidEmpty",
-    pidLength: "portal.error.pidLength",
+    pidInvalid: "portal.error.pidInvalid",
+    participantList: "portal.error.participantList",
     companion: "portal.error.companion",
     consent: "portal.error.consent",
     network: "portal.error.network",
@@ -470,7 +491,9 @@ function paintContinue() {
   }
   els.continueWrap.hidden = false;
   if (!els.nick.value) els.nick.value = existing.display_name || "";
-  if (!els.pid.value) els.pid.value = existing.participant_id || "";
+  if (!els.pid.value && existing.participant_id) {
+    els.pid.value = existing.participant_id;
+  }
   state.companion = existing.companion || "explorer";
   updateCounts();
   paintCompanions();
@@ -511,7 +534,7 @@ async function submitWelcome(event) {
     els.nick.focus();
     return;
   }
-  const pid = validateParticipantId(els.pid.value);
+  const pid = validateParticipantInList(els.pid.value, state.participantIds);
   if (!pid.ok) {
     showError(pid.code);
     els.pid.focus();
@@ -526,11 +549,22 @@ async function submitWelcome(event) {
   setBusy(true, els.enter);
   try {
     const result = await authenticate({ display_name: nick.name, participant_id: pid.id, companion: companion.id });
+    void logEvent({
+      event_type: result.created ? "portal.register" : "portal.login",
+      category: "portal",
+      payload: { companion: companion.id, participant_id: pid.id },
+    });
     announce(t("portal.toast.welcome", { name: result.saved.display_name }));
     setView(nextViewAfterLogin(result.saved, result.created));
   } catch (error) {
     console.warn("[portal] login failed", error);
-    showError("network");
+    const msg = String(error?.message || "");
+    if (msg.includes("not allowed") || msg.includes("403")) {
+      showError("pidInvalid");
+      els.pid?.focus();
+    } else {
+      showError("network");
+    }
   } finally {
     setBusy(false, els.enter);
   }
@@ -546,6 +580,11 @@ async function openReturningPlayer() {
       display_name: existing.display_name,
       participant_id: existing.participant_id,
       companion: existing.companion || "explorer",
+    });
+    void logEvent({
+      event_type: "portal.login_returning",
+      category: "portal",
+      payload: { companion: existing.companion || "explorer" },
     });
     setView(nextViewAfterLogin(result.saved, false));
   } catch (error) {
@@ -600,6 +639,15 @@ async function submitProfile(event) {
       onboarding_step: 0,
     });
     localStorage.setItem(ONBOARDING_KEY, "0");
+    void logEvent({
+      event_type: "portal.profile_complete",
+      category: "portal",
+      payload: {
+        avatar_key: state.avatarKey,
+        badge_key: state.badgeKey,
+        companion: state.user.companion,
+      },
+    });
     startLoading({ onboarding: true });
   } catch (error) {
     console.warn("[portal] profile sync failed", error);
@@ -757,7 +805,9 @@ els.profileAvatarBtn?.addEventListener("click", () => {
 els.profileForm.addEventListener("submit", submitProfile);
 els.profileBack.addEventListener("click", () => setView("welcome"));
 els.nick.addEventListener("input", () => { clearError(); updateCounts(); });
-els.pid.addEventListener("input", () => { clearError(); updateCounts(); });
+els.pid?.addEventListener("change", () => {
+  clearError();
+});
 els.profileNick.addEventListener("input", () => clearError(els.profileError));
 els.consent.addEventListener("change", () => clearError(els.profileError));
 els.resume.addEventListener("click", async () => {
@@ -788,12 +838,14 @@ els.resetModal.addEventListener("close", () => {
   if (els.resetModal.returnValue === "confirm") resetJourneyProgress();
 });
 els.switchAccount.addEventListener("click", () => {
+  void logEvent({ event_type: "portal.switch_account", category: "portal" });
   clearPortalUser();
   localStorage.removeItem(ONBOARDING_KEY);
   state.user = null;
   state.companion = "explorer";
   els.nick.value = "";
   els.pid.value = "";
+  paintParticipantSelect();
   els.continueWrap.hidden = true;
   updateCounts();
   paintCompanions();
@@ -819,6 +871,7 @@ bindRadioKeyboard(els.badgeGrid, ".badge-card", (card) => {
 
 onLangChange(() => {
   applyDom();
+  paintParticipantSelect();
   paintCompanions();
   paintLooks();
   paintBadges();
@@ -831,26 +884,42 @@ onLangChange(() => {
 paintCompanions();
 paintLooks();
 paintBadges();
-paintContinue();
-updateCounts();
-applyDom();
-sceneFor();
 
-if (new URLSearchParams(location.search).has("force")) {
-  els.continueWrap.hidden = true;
-  els.nick.value = "";
-  els.pid.value = "";
-  updateCounts();
-} else if (new URLSearchParams(location.search).get("step") === "profile") {
-  const existing = loadPortalUser();
-  if (existing) {
-    state.user = existing;
-    state.companion = existing.companion || "explorer";
-    setView("profile", { focus: false });
+async function bootPortal() {
+  void trackPageView();
+  try {
+    state.participantIds = await loadParticipantIds();
+    paintParticipantSelect();
+    paintContinue();
+  } catch (error) {
+    console.warn("[portal] participant list failed", error);
+    showError("participantList");
+    if (els.enter) els.enter.disabled = true;
   }
-} else if (isPortalLoggedIn() && loadPortalUser() && isProfileComplete(loadPortalUser())) {
-  state.user = loadPortalUser();
-  setView("returning", { focus: false });
-} else {
-  els.nick.focus();
+
+  updateCounts();
+  applyDom();
+  sceneFor();
+
+  if (new URLSearchParams(location.search).has("force")) {
+    els.continueWrap.hidden = true;
+    els.nick.value = "";
+    if (els.pid) els.pid.value = "";
+    paintParticipantSelect();
+    updateCounts();
+  } else if (new URLSearchParams(location.search).get("step") === "profile") {
+    const existing = loadPortalUser();
+    if (existing) {
+      state.user = existing;
+      state.companion = existing.companion || "explorer";
+      setView("profile", { focus: false });
+    }
+  } else if (isPortalLoggedIn() && loadPortalUser() && isProfileComplete(loadPortalUser())) {
+    state.user = loadPortalUser();
+    setView("returning", { focus: false });
+  } else {
+    els.nick.focus();
+  }
 }
+
+void bootPortal();

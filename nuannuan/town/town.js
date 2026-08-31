@@ -1,4 +1,5 @@
 import { initI18n, applyDom, onLangChange, t, getLang } from "/js/i18n.js";
+import { logEvent, trackPageView } from "/js/event-log.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
 import {
   BOUTIQUES,
@@ -204,6 +205,11 @@ function moveSelection(delta) {
 function enterBoutique() {
   if (!state.selected) return;
   setActiveBoutique(state.selected);
+  void logEvent({
+    event_type: "fashion.boutique_enter",
+    category: "fashion",
+    payload: { boutiqueId: state.selected },
+  });
   const login = readLogin() || loadFinal();
   const companion = loadConfirmedCompanion();
   if (!login?.name && !login?.characterId) {
@@ -254,3 +260,4 @@ paintBoutiques();
 paintEnterHint();
 applyDom();
 if (state.selected) els.enter.disabled = false;
+void trackPageView();

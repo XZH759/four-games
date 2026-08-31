@@ -5,6 +5,7 @@
  */
 
 import { getStoredUserId, loadPortalUser } from "/js/portal-auth.js";
+import { logEvents } from "/js/event-log.js";
 
 const SESSION_KEY = "ailit_session_id";
 const LOGIN_KEY = "nn_login_avatar_v1";
@@ -103,7 +104,22 @@ export function logAnswers(payload, opts = {}) {
           console.warn("[answer-log] POST failed", res.status, text);
           return { ok: false, status: res.status };
         }
-        return res.json().catch(() => ({ ok: true }));
+        const data = await res.json().catch(() => ({ ok: true }));
+        void logEvents(
+          attempts.map((attempt) => ({
+            event_type: "game.answer",
+            category: "game",
+            payload: {
+              game: attempt.game,
+              question_id: attempt.question_id,
+              level_index: attempt.level_index,
+              correct: attempt.correct,
+              skipped: attempt.meta?.skipped === true,
+              dwell_ms: attempt.latency_ms ?? attempt.meta?.dwell_ms ?? null,
+            },
+          })),
+        );
+        return data;
       })
       .catch((err) => {
         console.warn("[answer-log] network error", err);

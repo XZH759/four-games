@@ -2,6 +2,9 @@ import { AI_QUESTIONS, isCorrectOption, localizeQuestion } from "/monopoly/quest
 import { initI18n, onLangChange, applyDom, getLang, t } from "/js/i18n.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
 import { logAnswer } from "/js/answer-log.js";
+import { createDwellTracker } from "/js/dwell-log.js";
+
+const dwell = createDwellTracker("monopoly");
 
 initI18n({ toggleHost: "#lang-host" });
 onLangChange(() => {
@@ -845,6 +848,10 @@ function openQuestion(playerIndex) {
   const question = nextQuestion();
   const order = shuffle(question.options.map((_, index) => index));
   activeQuestion = { question, order, answered: false, playerIndex };
+  dwell.beginQuestion(question.id || `monopoly-${state.questionCursor}`, {
+    round: state.round,
+    playerIndex,
+  });
   paintQuestionUi();
   els.answerFeedback.hidden = true;
   els.questionContinue.hidden = true;
@@ -889,17 +896,27 @@ function answerQuestion(optionIndex, selectedButton) {
   const delta = correct ? CORRECT_REWARD : -WRONG_PENALTY;
   player.money += delta;
 
+  const dwellMs =
+    dwell.endQuestion(question.id || `monopoly-${state.round}`, {
+      optionIndex,
+      correct,
+      playerIndex,
+      round: state.round,
+    }) ?? null;
+
   void logAnswer({
     game: "monopoly",
     question_id: question.id || `monopoly-${state.round}`,
     answer: { optionIndex },
     correct,
+    latency_ms: dwellMs,
     meta: {
       playerIndex,
       moneyDelta: delta,
       moneyAfter: player.money,
       round: state.round,
       domain: question.domain || null,
+      dwell_ms: dwellMs,
     },
   });
 

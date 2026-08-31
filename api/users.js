@@ -1,4 +1,10 @@
 import { neon } from "@neondatabase/serverless";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { insertEvents } from "./lib/event-log.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const COMPANIONS = new Set(["researcher", "explorer", "creator"]);
 
@@ -60,6 +66,30 @@ function normalizeCompanion(raw) {
 function normalizeParticipantId(raw) {
   const id = String(raw || "").trim().slice(0, 20);
   return id || null;
+}
+
+let allowedParticipantIds = null;
+
+function getAllowedParticipantIds() {
+  if (allowedParticipantIds) return allowedParticipantIds;
+  try {
+    const raw = readFileSync(join(__dirname, "../data/participant-ids.json"), "utf8");
+    const data = JSON.parse(raw);
+    const ids = Array.isArray(data?.ids)
+      ? data.ids.map((id) => String(id).trim()).filter(Boolean)
+      : [];
+    allowedParticipantIds = new Set(ids);
+  } catch (err) {
+    console.warn("[api/users] participant list unavailable", err?.message || err);
+    allowedParticipantIds = new Set();
+  }
+  return allowedParticipantIds;
+}
+
+function isParticipantAllowed(id) {
+  const allowed = getAllowedParticipantIds();
+  if (!allowed.size) return false;
+  return allowed.has(id);
 }
 
 /**
@@ -128,6 +158,28 @@ function normalizePortalLogin(raw) {
     session_id,
     profile: { ...profile, portal_step1: true },
   };
+}
+
+async function logPortalEvent(sql, row, { created, session_id }) {
+  try {
+    await insertEvents(sql, [
+      {
+        session_id: session_id || row.session_id || "server",
+        user_id: row.id,
+        participant_id: row.participant_id || null,
+        display_name: row.display_name || null,
+        event_type: created ? "portal.register" : "portal.login",
+        category: "portal",
+        page: "/portal/",
+        payload: {
+          companion: row.companion_id || null,
+          source: "api/users",
+        },
+      },
+    ]);
+  } catch (err) {
+    console.warn("[api/users] event_log insert failed", err?.message || err);
+  }
 }
 
 async function loginByParticipant(sql, login) {
@@ -243,7 +295,15 @@ export default async function handler(req, res) {
       // Prefer portal STEP 1 path when participant_id is present
       const portalLogin = normalizePortalLogin(body);
       if (portalLogin) {
+        if (!isParticipantAllowed(portalLogin.participant_id)) {
+          json(res, 403, { ok: false, error: "participant_id not allowed" });
+          return;
+        }
         const row = await loginByParticipant(sql, portalLogin);
+        await logPortalEvent(sql, row, {
+          created: !!row.created,
+          session_id: portalLogin.session_id,
+        });
         json(res, 200, {
           ok: true,
           created: !!row.created,

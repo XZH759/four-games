@@ -1,6 +1,7 @@
 import { getEquippedLoadout } from "/castle/castle.js";
 import { initI18n, t, onLangChange, setLang, getLang, applyDom } from "/js/i18n.js";
 import { isPortalLoggedIn, loadPortalUser, companionLabelKey, ONBOARDING_KEY, isProfileComplete } from "/js/portal-auth.js";
+import { trackPageView } from "/js/event-log.js";
 
 (() => {
   if (!isPortalLoggedIn()) {
@@ -14,6 +15,7 @@ import { isPortalLoggedIn, loadPortalUser, companionLabelKey, ONBOARDING_KEY, is
   }
 
   initI18n({ toggleHost: "#lang-host" });
+  void trackPageView();
 
   const ZONE_META = () => ({
     castle: {

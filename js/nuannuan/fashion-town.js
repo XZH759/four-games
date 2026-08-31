@@ -1,6 +1,7 @@
 /**
  * Fashion Town — role + companion → design fashion modules via correct answers → shared outfit.
  */
+import { logEvent } from "/js/event-log.js";
 export const FASHION_STORAGE = "nn_fashion_town_v1";
 export const ACTIVE_BOUTIQUE_KEY = "nn_fashion_active_boutique";
 
@@ -245,6 +246,19 @@ export function tryUnlockModule(
 
   const bondGained = companionId ? applyCompanionBond(state, companionId, 1) : 0;
   saveFashionState(state);
+  void logEvent({
+    event_type: "fashion.module_unlock",
+    category: "fashion",
+    payload: {
+      boutiqueId,
+      moduleId: next,
+      levelId,
+      challengeId: cid,
+      sharedOutfit: state.sharedOutfit,
+      bondGained,
+      companionId,
+    },
+  });
   return {
     boutiqueId,
     moduleId: next,
@@ -407,5 +421,17 @@ export function saveLookEntry({ name, modules, boutiqueId, score, rank }) {
   state.savedLooks.push(look);
   state.activeLookId = look.id;
   saveFashionState(state);
+  void logEvent({
+    event_type: "fashion.look_saved",
+    category: "fashion",
+    payload: {
+      lookId: look.id,
+      name: look.name,
+      boutiqueId: look.boutiqueId,
+      score: look.score,
+      rank: look.rank,
+      moduleCount: Object.keys(look.modules || {}).length,
+    },
+  });
   return { ok: true, look };
 }
