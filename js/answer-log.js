@@ -6,6 +6,15 @@
 
 import { getStoredUserId, loadPortalUser } from "/js/portal-auth.js";
 import { logEvents } from "/js/event-log.js";
+import { recordCastleActivityFromAttempts } from "/castle/castle.js";
+
+function trackActivityAttempts(attempts) {
+  try {
+    recordCastleActivityFromAttempts(attempts);
+  } catch {
+    /* castle wallet optional off-lobby */
+  }
+}
 
 const SESSION_KEY = "ailit_session_id";
 const LOGIN_KEY = "nn_login_avatar_v1";
@@ -90,6 +99,8 @@ export function logAnswers(payload, opts = {}) {
   const ctx = getStudentContext(opts);
   const attempts = list.map((item) => buildAttempt(item, ctx)).filter(Boolean);
   if (!attempts.length) return Promise.resolve({ ok: false, skipped: true });
+
+  trackActivityAttempts(attempts);
 
   try {
     return fetch("/api/answers", {

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/js/i18n.css?v=2" />
-  <link rel="stylesheet" href="/castle/castle.css?v=6" />
+  <link rel="stylesheet" href="/castle/castle.css?v=7" />
 </head>
 <body>
   <div class="wash" aria-hidden="true"></div>
@@ -33,6 +33,10 @@
         <div class="stat star">
           <span data-i18n="castle.pointsAvail">可用积分</span>
           <strong id="points-now">0</strong>
+        </div>
+        <div class="stat gem">
+          <span data-i18n="castle.diamondsAvail">可用钻石</span>
+          <strong id="diamonds-now">0</strong>
         </div>
         <div class="stat bar-stat">
           <span id="unlock-label">兑换等级 1</span>
@@ -97,6 +101,7 @@
           </div>
           <div class="toolbar">
             <div class="cats" id="cats"></div>
+            <div class="cats closet-subcats" id="closet-filters" hidden></div>
             <div class="toolbar-right">
               <label class="sort">
                 <select id="sort-by">
@@ -246,6 +251,18 @@
           </div>
           <div class="bag-grid" id="inventory"></div>
           <p class="empty-state" id="inv-empty" data-i18n="castle.invEmpty">背包还是空的</p>
+          <div class="bag-clothing card" id="bag-clothing">
+            <div class="bag-section-head">
+              <h3 data-i18n="castle.clothingTitle">服装栏</h3>
+              <p id="clothing-stats" data-i18n="castle.clothingStats">已收集 0 件</p>
+            </div>
+            <div class="clothing-equipped" id="clothing-equipped" data-i18n-aria="castle.clothingEquippedAria" aria-label="已装备服装"></div>
+            <div class="toolbar compact">
+              <div class="cats" id="clothing-filters"></div>
+            </div>
+            <div class="bag-grid clothing-grid" id="clothing-inventory"></div>
+            <p class="empty-state" id="clothing-empty" hidden data-i18n="castle.clothingEmpty">还没有服装，去星橱货架用积分兑换吧</p>
+          </div>
           <div class="bag-foot">
             <div class="card mini">
               <h4 data-i18n="castle.codex">图鉴进度</h4>
@@ -280,6 +297,7 @@
           <div class="card">
             <h2 data-i18n="castle.activityTitle">活动中心</h2>
             <ul class="tasks" id="task-list"></ul>
+            <div class="task-reward card nested" id="task-reward"></div>
             <div class="sprint card nested">
               <h3 data-i18n="castle.weekTitle">冲刺奖励</h3>
               <p data-i18n="castle.weekLead">本周累计获得积分</p>
@@ -323,7 +341,7 @@
       <div class="modal-ico" id="buy-ico">⭐</div>
       <h3 id="buy-title" data-i18n="castle.confirm">确认兑换</h3>
       <p id="buy-desc"></p>
-      <p class="buy-price"><span data-i18n="castle.buyCost">消耗</span> <strong id="buy-cost">0</strong> <span data-i18n="castle.pointsUnit">积分</span></p>
+      <p class="buy-price"><span data-i18n="castle.buyCost">消耗</span> <strong id="buy-cost">0</strong> <span id="buy-unit" data-i18n="castle.pointsUnit">积分</span></p>
       <div class="modal-actions">
         <button type="button" class="btn-ghost" id="buy-cancel" data-i18n="castle.cancel">取消</button>
         <button type="button" class="btn-go" id="buy-ok" data-i18n="castle.confirm">确认兑换</button>
@@ -343,6 +361,6 @@
     </div>
   </div>
 
-  <script type="module" src="/castle/castle.js?v=7"></script>
+  <script type="module" src="/castle/castle.js?v=8"></script>
 </body>
 </html>

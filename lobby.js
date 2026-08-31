@@ -1,4 +1,4 @@
-import { getEquippedLoadout } from "/castle/castle.js";
+import { getEquippedLoadout, getDailyLoginStatus, claimDailyLoginDiamonds, loadWallet } from "/castle/castle.js";
 import { initI18n, t, onLangChange, setLang, getLang, applyDom } from "/js/i18n.js";
 import { isPortalLoggedIn, loadPortalUser, companionLabelKey, ONBOARDING_KEY, isProfileComplete } from "/js/portal-auth.js";
 import { trackPageView } from "/js/event-log.js";
@@ -23,7 +23,6 @@ import { trackPageView } from "/js/event-log.js";
       ico: "/assets/park/clay/castle.png",
       links: [
         { href: "/castle", nameKey: "lobby.link.castleExchange", descKey: "lobby.link.castleExchangeDesc" },
-        { href: "/nuannuan", nameKey: "lobby.link.starCloset", descKey: "lobby.link.starClosetDesc" },
       ],
     },
     adventure: {
@@ -46,8 +45,8 @@ import { trackPageView } from "/js/event-log.js";
       titleKey: "lobby.zone.town",
       ico: "/assets/park/clay/town.png",
       links: [
-        { href: "/nuannuan/town", nameKey: "lobby.link.fashionTown", descKey: "lobby.link.fashionTownDesc" },
-        { href: "/nuannuan/login", nameKey: "lobby.link.login", descKey: "lobby.link.loginDesc" },
+        { href: "/nuannuan/town", nameKey: "lobby.link.buddyJourney", descKey: "lobby.link.buddyJourneyDesc" },
+        { href: "/nuannuan/partner", nameKey: "lobby.link.buddyHome", descKey: "lobby.link.buddyHomeDesc" },
       ],
     },
   });
@@ -257,7 +256,7 @@ import { trackPageView } from "/js/event-log.js";
       const name = document.getElementById("profile-name");
       const level = document.getElementById("profile-level");
       const points = document.getElementById("profile-points");
-      const coins = document.getElementById("profile-coins");
+      const diamonds = document.getElementById("profile-diamonds");
       if (avatar) avatar.textContent = load.frame?.icon || load.pet?.icon || "🧒";
       if (name) {
         name.removeAttribute("data-i18n");
@@ -273,10 +272,9 @@ import { trackPageView } from "/js/event-log.js";
             : t("lobby.levelExplorer", { n: lv });
       }
       if (points) points.textContent = String(Number(load.points) || 0);
-      if (coins) {
-        const petBits = load.pet ? 120 : 0;
-        const trailBits = load.trail ? 80 : 0;
-        coins.textContent = String(petBits + trailBits + Math.floor((Number(load.points) || 0) / 10));
+      if (diamonds) {
+        const wallet = loadWallet();
+        diamonds.textContent = String(Math.max(0, Number(wallet.diamonds) || 0));
       }
     } catch (_) {
       /* wallet optional */
@@ -284,30 +282,45 @@ import { trackPageView } from "/js/event-log.js";
   }
   renderProfile();
 
-  const WEEK_KEY = "nn_park_week_star";
-  let weekDays = 3;
-  try {
-    const saved = Number(localStorage.getItem(WEEK_KEY));
-    if (Number.isFinite(saved) && saved >= 0) weekDays = Math.min(5, saved);
-  } catch (_) {}
   const weekFill = document.getElementById("week-fill");
   const weekCount = document.getElementById("week-count");
+  const weekHint = document.querySelector("#week-star p");
+
   function renderWeek() {
-    if (weekFill) weekFill.style.setProperty("--p", `${(weekDays / 5) * 100}%`);
-    if (weekCount) weekCount.textContent = t("lobby.weekDays", { n: weekDays });
+    const status = getDailyLoginStatus();
+    const shown = status.claimedToday ? status.streakDay : status.streakDay;
+    const pct = Math.min(100, (shown / 7) * 100);
+    if (weekFill) weekFill.style.setProperty("--p", `${pct}%`);
+    if (weekCount) {
+      weekCount.textContent = status.claimedToday
+        ? t("lobby.weekDaysDone", { n: status.streakDay })
+        : t("lobby.weekDays", { n: shown });
+    }
+    if (weekHint && !status.claimedToday) {
+      weekHint.textContent =
+        status.nextBonus > 0
+          ? t("lobby.weekHintClaimBonus", { daily: status.nextDaily, bonus: status.nextBonus })
+          : t("lobby.weekHintClaim", { daily: status.nextDaily });
+    } else if (weekHint) {
+      weekHint.textContent = t("lobby.weekHintDone");
+    }
   }
   renderWeek();
   requestAnimationFrame(() => renderWeek());
 
   document.getElementById("week-gift")?.addEventListener("click", () => {
-    if (weekDays >= 5) {
+    const result = claimDailyLoginDiamonds();
+    if (result.alreadyClaimed) {
       announce(t("lobby.toast.giftDone"));
       return;
     }
-    weekDays = Math.min(5, weekDays + 1);
-    try { localStorage.setItem(WEEK_KEY, String(weekDays)); } catch (_) {}
     renderWeek();
-    announce(weekDays >= 5 ? t("lobby.toast.checkinDone") : t("lobby.toast.checkin", { n: weekDays }));
+    renderProfile();
+    if (result.bonus > 0) {
+      announce(t("lobby.toast.checkinWeekBonus", { daily: result.diamonds, bonus: result.bonus, total: result.total }));
+    } else {
+      announce(t("lobby.toast.checkinDiamond", { n: result.streakDay, daily: result.diamonds }));
+    }
   });
 
   document.getElementById("daily-banner")?.addEventListener("click", () => {

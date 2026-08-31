@@ -7,6 +7,15 @@ import { resolveEquipFx, poseLabelsForLoad } from "/castle/equip-fx.js?v=5";
 import { initI18n, onLangChange, applyDom, t, getLang } from "/js/i18n.js";
 import { mountLobbyExit } from "/js/lobby-exit.js";
 import { ITEM_EN } from "/castle/item-en.js";
+import {
+  allClothingItems,
+  findClothingItem,
+  clothingPrice,
+  sheetStyle,
+  migrateLegacyShopOwned,
+  CLOTHING_TYPE_IDS,
+  CLOTHING_EQUIP_SLOTS,
+} from "/castle/star-closet-data.js";
 
 initI18n({ toggleHost: "#lang-host" });
 onLangChange(() => {
@@ -27,7 +36,7 @@ const RARITY_COLOR = { c: "#7a8a96", r: "#3a8fd4", e: "#b45ad4", l: "#e8a020" };
  */
 const PRICE_BY_RARITY = { c: 240, r: 780, e: 3000, l: 12000 };
 const EQUIP_SLOTS = ["frame", "trail", "title", "pet", "decor"];
-const CAT_IDS = ["all", "frame", "trail", "title", "pet", "decor"];
+const CAT_IDS = ["all", "frame", "trail", "title", "pet", "decor", "closet"];
 
 const TIERS = [
   { level: 1, unlock: 0, cost: 40, weights: { c: 70, r: 25, e: 5, l: 0 }, box: "📦" },
@@ -43,6 +52,19 @@ function rarityLabel(k, short = false) {
 
 function catLabel(id) {
   return t(`castle.cat.${id}`);
+}
+
+function clothingTypeLabel(id) {
+  return t(`castle.clothingType.${id}`);
+}
+
+function isClothingId(id) {
+  return String(id || "").startsWith("sc-");
+}
+
+function resolveCatalogItem(id) {
+  if (isClothingId(id)) return findClothingItem(id);
+  return findItem(id);
 }
 
 function tierName(level) {
@@ -69,6 +91,139 @@ function displayName(w) {
 }
 
 const WEEK_MILESTONES = [1000, 2000, 3000, 5000];
+const TASK_CORRECT_NEED = 20;
+const TASK_MODES_NEED = 2;
+const TASK_MODE_CORRECT_NEED = 3;
+const TASK_REDEEM_NEED = 2;
+const ACTIVITY_DIAMOND_REWARD = 1200;
+
+const DAILY_LOGIN_BASE = 50;
+const DAILY_LOGIN_STEP = 10;
+const DAILY_LOGIN_CAP = 100;
+const WEEK_STREAK_DAYS = 7;
+const WEEK_STREAK_BONUS = 200;
+
+function localDateKey(d = new Date()) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function yesterdayDateKey() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return localDateKey(d);
+}
+
+function normalizeDailyLogin(raw) {
+  if (!raw || typeof raw !== "object") return { lastDate: null, streakDay: 0 };
+  return {
+    lastDate: raw.lastDate != null ? String(raw.lastDate) : null,
+    streakDay: Math.max(0, Math.min(WEEK_STREAK_DAYS, Number(raw.streakDay) || 0)),
+  };
+}
+
+function dailyLoginRewardForDay(streakDay) {
+  const day = Math.max(1, Math.min(WEEK_STREAK_DAYS, Number(streakDay) || 1));
+  return Math.min(DAILY_LOGIN_CAP, DAILY_LOGIN_BASE + (day - 1) * DAILY_LOGIN_STEP);
+}
+
+function normalizeModeProgress(rawModes) {
+  const out = {};
+  if (!rawModes || typeof rawModes !== "object") return out;
+  Object.entries(rawModes).forEach(([game, val]) => {
+    if (!game) return;
+    if (val === true) out[game] = TASK_MODE_CORRECT_NEED;
+    else out[game] = Math.max(0, Number(val) || 0);
+  });
+  return out;
+}
+
+function countParticipatedModes(modes) {
+  return Object.values(modes || {}).filter((n) => Number(n) >= TASK_MODE_CORRECT_NEED).length;
+}
+
+function normalizeTasks(raw = {}) {
+  const modes = normalizeModeProgress(raw.modes);
+  if (!Object.keys(modes).length && Number(raw.play) > 0) modes.parkour = TASK_MODE_CORRECT_NEED;
+  return {
+    correct: Math.max(0, Number(raw.correct ?? raw.quiz) || 0),
+    modes,
+    redeem: Math.max(0, Number(raw.redeem) || 0),
+    rewardClaimed: !!raw.rewardClaimed,
+  };
+}
+
+function activityProgress(w) {
+  const tasks = normalizeTasks(w.tasks);
+  const modeCount = countParticipatedModes(tasks.modes);
+  const correct = { cur: tasks.correct, need: TASK_CORRECT_NEED, done: tasks.correct >= TASK_CORRECT_NEED };
+  const modes = { cur: modeCount, need: TASK_MODES_NEED, done: modeCount >= TASK_MODES_NEED };
+  const redeem = { cur: tasks.redeem, need: TASK_REDEEM_NEED, done: tasks.redeem >= TASK_REDEEM_NEED };
+  return {
+    tasks,
+    correct,
+    modes,
+    redeem,
+    allDone: correct.done && modes.done && redeem.done,
+    rewardClaimed: tasks.rewardClaimed,
+  };
+}
+
+function allActivityTasksDone(w) {
+  return activityProgress(w).allDone;
+}
+
+function tryClaimActivityReward(w) {
+  if (normalizeTasks(w.tasks).rewardClaimed || !allActivityTasksDone(w)) return false;
+  w.tasks = normalizeTasks(w.tasks);
+  w.tasks.rewardClaimed = true;
+  w.diamonds = Math.max(0, Number(w.diamonds) || 0) + ACTIVITY_DIAMOND_REWARD;
+  return true;
+}
+
+/** Batch update from answer log (one save per answer submit). */
+export function recordCastleActivityFromAttempts(attempts = []) {
+  if (!attempts.length) return loadWallet();
+  const w = loadWallet();
+  w.tasks = normalizeTasks(w.tasks);
+  attempts.forEach((attempt) => {
+    if (attempt?.correct === true && attempt?.game) {
+      const game = String(attempt.game);
+      w.tasks.modes[game] = (Number(w.tasks.modes[game]) || 0) + 1;
+    }
+    if (attempt?.correct === true) w.tasks.correct += 1;
+  });
+  const claimed = tryClaimActivityReward(w);
+  saveWallet(w);
+  if (claimed && $("toast")) {
+    toast(t("castle.toast.activityReward", { n: ACTIVITY_DIAMOND_REWARD }));
+    burstFx();
+  }
+  return w;
+}
+
+/** @param {"correct"|"play"|"redeem"} kind */
+export function recordCastleActivity(kind, detail = {}) {
+  const w = loadWallet();
+  w.tasks = normalizeTasks(w.tasks);
+  if (kind === "correct") {
+    w.tasks.correct += Math.max(1, Number(detail.count) || 1);
+  } else if (kind === "play" && detail.game) {
+    const game = String(detail.game);
+    w.tasks.modes[game] = Math.max(Number(w.tasks.modes[game]) || 0, TASK_MODE_CORRECT_NEED);
+  } else if (kind === "redeem") {
+    w.tasks.redeem += Math.max(1, Number(detail.count) || 1);
+  }
+  const claimed = tryClaimActivityReward(w);
+  saveWallet(w);
+  if (claimed && $("toast")) {
+    toast(t("castle.toast.activityReward", { n: ACTIVITY_DIAMOND_REWARD }));
+    burstFx();
+  }
+  return w;
+}
 
 /**
  * wear 实装位：
@@ -159,7 +314,9 @@ const ITEM_ALIASES = {
 const state = {
   tab: "home",
   cat: "all",
+  closetFilter: "all",
   bagFilter: "all",
+  clothingBagFilter: "all",
   sort: "level",
   onlyCan: false,
   page: 0,
@@ -178,22 +335,35 @@ function loadWallet() {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     return migrateWallet({
       points: Math.max(0, Number(raw.points) || 0),
+      diamonds: Math.max(0, Number(raw.diamonds) || 0),
       lifetime: Math.max(0, Number(raw.lifetime) || 0),
       weekGain: Math.max(0, Number(raw.weekGain) || 0),
       inventory: raw.inventory && typeof raw.inventory === "object" ? { ...raw.inventory } : {},
+      clothingInventory:
+        raw.clothingInventory && typeof raw.clothingInventory === "object"
+          ? { ...raw.clothingInventory }
+          : {},
       equipped: raw.equipped && typeof raw.equipped === "object" ? { ...raw.equipped } : {},
+      equippedClothing:
+        raw.equippedClothing && typeof raw.equippedClothing === "object"
+          ? { ...raw.equippedClothing }
+          : {},
       pityBoost: Math.max(0, Number(raw.pityBoost) || 0),
       history: Array.isArray(raw.history) ? raw.history.slice(0, 40) : [],
-      tasks: raw.tasks && typeof raw.tasks === "object" ? { ...raw.tasks } : { quiz: 0, play: 0, redeem: 0 },
+      tasks: normalizeTasks(raw.tasks),
       name: raw.name || "乐园学员",
       uid: raw.uid || "10086",
       activitySeen: !!raw.activitySeen,
+      closetMigrated: !!raw.closetMigrated,
+      dailyLogin: normalizeDailyLogin(raw.dailyLogin),
     });
   } catch {
     return {
-      points: 0, lifetime: 0, weekGain: 0, inventory: {}, equipped: {},
-      pityBoost: 0, history: [], tasks: { quiz: 0, play: 0, redeem: 0 },
-      name: "乐园学员", uid: "10086", activitySeen: false,
+      points: 0, diamonds: 0, lifetime: 0, weekGain: 0, inventory: {}, clothingInventory: {},
+      equipped: {}, equippedClothing: {},
+      pityBoost: 0, history: [], tasks: normalizeTasks(),
+      name: "乐园学员", uid: "10086", activitySeen: false, closetMigrated: false,
+      dailyLogin: normalizeDailyLogin(),
     };
   }
 }
@@ -251,7 +421,7 @@ function findItem(id) {
   return locItem(raw);
 }
 
-/** 迁移旧物品 id，避免背包/装备指向失效 */
+/** 迁移旧物品 id，避免背包/装备指向失效；合并 legacy 星橱钻石购买记录 */
 function migrateWallet(w) {
   const inv = { ...w.inventory };
   Object.keys(inv).forEach((id) => {
@@ -265,7 +435,18 @@ function migrateWallet(w) {
     const id = equipped[slot];
     if (id && ITEM_ALIASES[id]) equipped[slot] = ITEM_ALIASES[id];
   });
-  return { ...w, inventory: inv, equipped };
+
+  const clothingInventory = { ...(w.clothingInventory || {}) };
+  let closetMigrated = !!w.closetMigrated;
+  if (!closetMigrated) {
+    try {
+      const shop = JSON.parse(localStorage.getItem("nn_shop_v1") || "{}");
+      Object.assign(clothingInventory, migrateLegacyShopOwned(Array.isArray(shop.owned) ? shop.owned : []));
+    } catch { /* ignore */ }
+    closetMigrated = true;
+  }
+
+  return { ...w, inventory: inv, equipped, clothingInventory, closetMigrated };
 }
 
 function itemPrice(it) {
@@ -342,13 +523,28 @@ function pushHistory(w, item, src) {
 }
 
 function showReveal(item, src) {
-  const it = locItem(item);
+  const clothing = isClothingId(item.id);
+  const it = clothing ? item : locItem(item);
   $("reveal").hidden = false;
-  $("reveal-ico").textContent = it.icon || "★";
+  const revealIco = $("reveal-ico");
+  if (clothing) {
+    revealIco.className = "reveal-ico clothing-thumb";
+    revealIco.textContent = "";
+    const style = sheetStyle(it.sheetIndex);
+    revealIco.style.backgroundImage = style.backgroundImage;
+    revealIco.style.backgroundSize = style.backgroundSize;
+    revealIco.style.backgroundPosition = style.backgroundPosition;
+  } else {
+    revealIco.className = "reveal-ico";
+    revealIco.style.backgroundImage = "";
+    revealIco.textContent = it.icon || "★";
+  }
   $("reveal-rarity").textContent = rarityLabel(it.rarity);
   $("reveal-rarity").style.color = RARITY_COLOR[it.rarity] || RARITY_COLOR.c;
   $("reveal-name").textContent = it.name;
-  $("reveal-desc").textContent = it.desc;
+  $("reveal-desc").textContent = clothing
+    ? `${clothingTypeLabel(it.clothingType)}${it.tags?.length ? ` · ${it.tags.join(" ")}` : ""}`
+    : it.desc;
   $("reveal-src").textContent = src || "";
   burstFx(innerWidth / 2, innerHeight * 0.42);
 }
@@ -374,6 +570,7 @@ function switchTab(tab) {
 }
 
 function filteredShelf(w) {
+  if (state.cat === "closet") return filteredCloset(w);
   const maxLv = unlockedLevel(w.lifetime);
   let items = allItems().filter((it) => it.level <= maxLv);
   if (state.cat !== "all") items = items.filter((it) => it.cat === state.cat);
@@ -383,6 +580,21 @@ function filteredShelf(w) {
     if (state.sort === "price") return itemPrice(a) - itemPrice(b);
     if (state.sort === "rarity") return rank[b.rarity] - rank[a.rarity];
     return a.level - b.level || rank[a.rarity] - rank[b.rarity];
+  });
+  return items;
+}
+
+function filteredCloset(w) {
+  let items = allClothingItems();
+  if (state.closetFilter !== "all") {
+    items = items.filter((it) => it.clothingType === state.closetFilter);
+  }
+  if (state.onlyCan) items = items.filter((it) => (Number(w.diamonds) || 0) >= clothingPrice(it));
+  const rank = { c: 0, r: 1, e: 2, l: 3 };
+  items.sort((a, b) => {
+    if (state.sort === "price") return clothingPrice(a) - clothingPrice(b);
+    if (state.sort === "rarity") return rank[b.rarity] - rank[a.rarity];
+    return rank[a.rarity] - rank[b.rarity] || clothingPrice(a) - clothingPrice(b);
   });
   return items;
 }
@@ -398,6 +610,8 @@ function renderHeader(w) {
     pts.classList.add("pulse");
   }
   $("lifetime-hint").textContent = String(w.lifetime);
+  const diamondsEl = $("diamonds-now");
+  if (diamondsEl) diamondsEl.textContent = String(Math.max(0, Number(w.diamonds) || 0));
   $("profile-name").textContent = displayName(w);
   $("profile-id").textContent = w.uid;
   const lv = playerLevel(w.lifetime);
@@ -521,9 +735,11 @@ export { loadWallet, findItem, STORAGE_KEY };
 export { resolveEquipFx, poseLabelsForLoad } from "/castle/equip-fx.js?v=5";
 
 function renderPreview(w) {
-  const it = state.selectedId ? findItem(state.selectedId) : null;
+  const it = state.selectedId ? resolveCatalogItem(state.selectedId) : null;
   const action = $("preview-action");
   if (!it) {
+    $("preview-ico").className = "preview-ico";
+    $("preview-ico").style.backgroundImage = "";
     $("preview-ico").textContent = "⭐";
     $("preview-name").textContent = t("castle.previewPick");
     $("preview-desc").textContent = t("castle.previewHint");
@@ -541,12 +757,19 @@ function renderPreview(w) {
     return;
   }
 
+  if (isClothingId(it.id)) {
+    renderClothingPreview(w, it, action);
+    return;
+  }
+
   const owned = w.inventory[it.id] || 0;
   const price = itemPrice(it);
   const maxLv = unlockedLevel(w.lifetime);
   const unlocked = it.level <= maxLv;
   const equipped = w.equipped[it.cat] === it.id;
 
+  $("preview-ico").className = "preview-ico";
+  $("preview-ico").style.backgroundImage = "";
   $("preview-ico").textContent = it.icon || "⭐";
   $("preview-name").textContent = it.name;
   const wearName = it.wear ? t(`castle.wear.${it.wear}`) : "";
@@ -592,6 +815,54 @@ function renderPreview(w) {
   }
 }
 
+function renderClothingPreview(w, it, action) {
+  const owned = (w.clothingInventory || {})[it.id] || 0;
+  const price = clothingPrice(it);
+  const style = sheetStyle(it.sheetIndex);
+  const equipped = (w.equippedClothing || {})[it.clothingType] === it.id;
+
+  $("preview-ico").className = "preview-ico clothing-thumb";
+  $("preview-ico").textContent = "";
+  $("preview-ico").style.backgroundImage = style.backgroundImage;
+  $("preview-ico").style.backgroundSize = style.backgroundSize;
+  $("preview-ico").style.backgroundPosition = style.backgroundPosition;
+  $("preview-name").textContent = it.name;
+  $("preview-desc").textContent = `${clothingTypeLabel(it.clothingType)}${it.tags?.length ? ` · ${it.tags.join(" ")}` : ""}`;
+  const stage = $("preview-stage");
+  if (stage) {
+    stage.dataset.rarity = it.rarity;
+    stage.dataset.cat = "closet";
+    stage.dataset.style = it.clothingType;
+  }
+  $("preview-meta").innerHTML = `
+    <div><dt>${t("castle.meta.rarity")}</dt><dd style="color:${RARITY_COLOR[it.rarity]}">${rarityLabel(it.rarity)}</dd></div>
+    <div><dt>${t("castle.meta.type")}</dt><dd>${clothingTypeLabel(it.clothingType)}</dd></div>
+    <div><dt>${t("castle.meta.owned")}</dt><dd>×${owned}</dd></div>`;
+  $("preview-price").textContent = String(price);
+
+  action.className = "btn-go";
+  if (state.tab === "bag" && owned > 0) {
+    action.disabled = false;
+    if (equipped) {
+      action.textContent = t("castle.unequip");
+      action.className = "btn-go unequip";
+      action.onclick = () => unequipClothing(it.id);
+    } else {
+      action.textContent = t("castle.equip");
+      action.className = "btn-go equip";
+      action.onclick = () => equipClothing(it.id);
+    }
+  } else {
+    action.onclick = () => openBuy(it.id);
+    action.disabled = (Number(w.diamonds) || 0) < price || owned > 0;
+    action.textContent = owned > 0
+      ? t("castle.ownedX", { n: owned })
+      : (Number(w.diamonds) || 0) < price
+        ? t("castle.toast.noDiamonds")
+        : t("castle.redeemClothing");
+  }
+}
+
 function renderGoodsCard(it, w, opts = {}) {
   const item = locItem(it);
   const price = itemPrice(item);
@@ -611,6 +882,47 @@ function renderGoodsCard(it, w, opts = {}) {
       </div>
       ${opts.bag ? `<div class="act${equipped ? " on" : ""}">${equipped ? t("castle.equipped") : t("castle.usable")}</div>` : ""}
     </button>`;
+}
+
+function renderClothingCard(it, w, opts = {}) {
+  const owned = (w.clothingInventory || {})[it.id] || 0;
+  const price = clothingPrice(it);
+  const can = (Number(w.diamonds) || 0) >= price;
+  const sel = state.selectedId === it.id ? " is-sel" : "";
+  const style = sheetStyle(it.sheetIndex);
+  const equipped = (w.equippedClothing || {})[it.clothingType] === it.id;
+  const typeLabel = clothingTypeLabel(it.clothingType);
+  return `
+    <button type="button" class="goods clothing${sel}" data-id="${it.id}" data-kind="clothing" ${opts.disableBuy && !can ? "disabled" : ""}>
+      <span class="tag ${it.rarity}">${rarityLabel(it.rarity, true)}</span>
+      <div class="ico clothing-thumb" style="background-image:${style.backgroundImage};background-size:${style.backgroundSize};background-position:${style.backgroundPosition}"></div>
+      <strong>${it.name}</strong>
+      <p class="desc">${typeLabel}${it.tags?.length ? ` · ${it.tags.join(" ")}` : ""}</p>
+      <div class="row">
+        <span class="price diamond">${price}</span>
+        <span class="owned">${owned > 0 ? t("castle.ownedX", { n: owned }) : typeLabel}</span>
+      </div>
+      ${opts.bag ? `<div class="act${equipped ? " on" : ""}">${equipped ? t("castle.equipped") : t("castle.usable")}</div>` : ""}
+    </button>`;
+}
+
+function renderClothingEquipped(w) {
+  const host = $("clothing-equipped");
+  if (!host) return;
+  const eq = w.equippedClothing || {};
+  host.innerHTML = CLOTHING_EQUIP_SLOTS.map((slot) => {
+    const id = eq[slot];
+    const item = id ? findClothingItem(id) : null;
+    const style = item ? sheetStyle(item.sheetIndex) : null;
+    const thumb = item
+      ? `<div class="thumb" style="background-image:${style.backgroundImage};background-size:${style.backgroundSize};background-position:${style.backgroundPosition}"></div>`
+      : `<div class="empty-dot">+</div>`;
+    return `<div class="clothing-slot${item ? " is-on" : ""}">
+      <span>${clothingTypeLabel(slot)}</span>
+      ${thumb}
+      <em>${item ? item.name : t("castle.clothingSlotEmpty")}</em>
+    </div>`;
+  }).join("");
 }
 
 function renderHome(w) {
@@ -865,16 +1177,37 @@ function renderCats() {
       renderAll();
     });
   });
+
+  const closetRow = $("closet-filters");
+  if (closetRow) {
+    const show = state.tab === "shelf" && state.cat === "closet";
+    closetRow.hidden = !show;
+    if (show) {
+      closetRow.innerHTML = CLOTHING_TYPE_IDS.map(
+        (id) => `<button type="button" class="cat-btn${state.closetFilter === id ? " is-on" : ""}" data-closet="${id}">${clothingTypeLabel(id)}</button>`,
+      ).join("");
+      closetRow.querySelectorAll(".cat-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.closetFilter = btn.dataset.closet;
+          state.page = 0;
+          renderAll();
+        });
+      });
+    }
+  }
 }
 
 function renderShelf(w) {
   renderCats();
   const items = filteredShelf(w);
+  const isCloset = state.cat === "closet";
   const pages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
   if (state.page >= pages) state.page = pages - 1;
   const slice = items.slice(state.page * PAGE_SIZE, state.page * PAGE_SIZE + PAGE_SIZE);
   $("shelf-empty").hidden = slice.length > 0;
-  $("shelf-grid").innerHTML = slice.map((it) => renderGoodsCard(it, w)).join("");
+  $("shelf-grid").innerHTML = slice
+    .map((it) => (isCloset ? renderClothingCard(it, w) : renderGoodsCard(it, w)))
+    .join("");
   $("shelf-grid").querySelectorAll(".goods").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.selectedId = btn.dataset.id;
@@ -1017,12 +1350,63 @@ function renderBag(w) {
   $("recent-list").innerHTML = recent.length
     ? recent
         .map((h) => {
-          const it = findItem(h.id);
+          const it = resolveCatalogItem(h.id);
           const mins = Math.max(0, Math.round((Date.now() - h.t) / 60000));
-          return `<li>${it.icon} ${it.name} · ${t("castle.recentMins", { n: mins })}</li>`;
+          const label = isClothingId(it?.id) ? it.name : (locItem(it)?.name || h.id);
+          const icon = isClothingId(it?.id) ? "👗" : (locItem(it)?.icon || "⭐");
+          return `<li>${icon} ${label} · ${t("castle.recentMins", { n: mins })}</li>`;
         })
         .join("")
     : `<li>${t("castle.recentNone")}</li>`;
+
+  renderClothingBag(w);
+}
+
+function renderClothingBag(w) {
+  const filters = CLOTHING_TYPE_IDS;
+  const filterHost = $("clothing-filters");
+  if (filterHost) {
+    filterHost.innerHTML = filters
+      .map(
+        (id) => `<button type="button" class="cat-btn${state.clothingBagFilter === id ? " is-on" : ""}" data-cf="${id}">${clothingTypeLabel(id)}</button>`,
+      )
+      .join("");
+    filterHost.querySelectorAll(".cat-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.clothingBagFilter = btn.dataset.cf;
+        renderAll();
+      });
+    });
+  }
+
+  let entries = Object.entries(w.clothingInventory || {}).filter(([, n]) => n > 0);
+  if (state.clothingBagFilter !== "all") {
+    entries = entries.filter(([id]) => findClothingItem(id)?.clothingType === state.clothingBagFilter);
+  }
+
+  const totalClothing = Object.values(w.clothingInventory || {}).reduce((s, n) => s + (n > 0 ? 1 : 0), 0);
+  const catalogClothing = allClothingItems().length;
+  const statsEl = $("clothing-stats");
+  if (statsEl) {
+    statsEl.textContent = t("castle.clothingStats", { owned: totalClothing, total: catalogClothing });
+  }
+
+  renderClothingEquipped(w);
+
+  const emptyEl = $("clothing-empty");
+  const gridEl = $("clothing-inventory");
+  if (emptyEl) emptyEl.hidden = entries.length > 0;
+  if (gridEl) {
+    gridEl.innerHTML = entries
+      .map(([id]) => renderClothingCard(findClothingItem(id), w, { bag: true }))
+      .join("");
+    gridEl.querySelectorAll(".goods").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.selectedId = btn.dataset.id;
+        renderAll();
+      });
+    });
+  }
 }
 
 function renderRules() {
@@ -1032,10 +1416,18 @@ function renderRules() {
 }
 
 function renderActivity(w) {
+  if (tryClaimActivityReward(w)) {
+    saveWallet(w);
+    if ($("toast")) {
+      toast(t("castle.toast.activityReward", { n: ACTIVITY_DIAMOND_REWARD }));
+      burstFx();
+    }
+  }
+  const prog = activityProgress(w);
   const tasks = [
-    { key: "quiz", label: t("castle.task.quiz"), need: 3, cur: w.tasks.quiz || 0, href: "/parkour/" },
-    { key: "play", label: t("castle.task.play"), need: 1, cur: w.tasks.play || 0, href: "/parkour/" },
-    { key: "redeem", label: t("castle.task.redeem"), need: 1, cur: w.tasks.redeem || 0, href: null },
+    { key: "correct", label: t("castle.task.correct"), need: prog.correct.need, cur: prog.correct.cur, href: "/parkour/" },
+    { key: "modes", label: t("castle.task.modes"), need: prog.modes.need, cur: prog.modes.cur, href: "/" },
+    { key: "redeem", label: t("castle.task.redeem"), need: prog.redeem.need, cur: prog.redeem.cur, href: null },
   ];
   $("task-list").innerHTML = tasks
     .map((task) => {
@@ -1050,6 +1442,21 @@ function renderActivity(w) {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
 
+  const rewardEl = $("task-reward");
+  if (rewardEl) {
+    const claimed = prog.rewardClaimed;
+    const ready = prog.allDone && !claimed;
+    rewardEl.innerHTML = `
+      <h3 data-i18n="castle.taskRewardTitle">全部完成奖励</h3>
+      <p class="task-reward-lead">${t("castle.taskRewardLead", { n: ACTIVITY_DIAMOND_REWARD })}</p>
+      <p class="task-reward-status ${claimed ? "is-claimed" : ready ? "is-ready" : ""}">${claimed
+        ? t("castle.taskRewardClaimed")
+        : ready
+          ? t("castle.taskRewardReady")
+          : t("castle.taskRewardLocked")}</p>
+      ${claimed ? "" : `<p class="task-reward-hint">${t("castle.taskRewardHint")}</p>`}`;
+  }
+
   const week = w.weekGain || 0;
   $("week-fill").style.width = `${Math.min(100, (week / 5000) * 100)}%`;
   $("week-text").textContent = `${week} / 5000`;
@@ -1060,6 +1467,35 @@ function renderActivity(w) {
 
 function openBuy(id) {
   const w = loadWallet();
+  if (isClothingId(id)) {
+    const it = findClothingItem(id);
+    if (!it) return;
+    const price = clothingPrice(it);
+    if ((w.clothingInventory || {})[it.id] > 0) {
+      toast(t("castle.toast.alreadyOwned"));
+      return;
+    }
+    if ((Number(w.diamonds) || 0) < price) {
+      toast(t("castle.toast.noDiamonds"));
+      return;
+    }
+    state.pendingBuy = { ...it, kind: "clothing" };
+    state.selectedId = it.id;
+    $("buy-ico").className = "modal-ico clothing-thumb";
+    $("buy-ico").textContent = "";
+    const style = sheetStyle(it.sheetIndex);
+    $("buy-ico").style.backgroundImage = style.backgroundImage;
+    $("buy-ico").style.backgroundSize = style.backgroundSize;
+    $("buy-ico").style.backgroundPosition = style.backgroundPosition;
+    $("buy-title").textContent = it.name;
+    $("buy-desc").textContent = `${clothingTypeLabel(it.clothingType)} · ${rarityLabel(it.rarity)}`;
+    $("buy-cost").textContent = String(price);
+    const unitEl = $("buy-unit");
+    if (unitEl) unitEl.textContent = t("castle.diamondsUnit");
+    $("buy-modal").hidden = false;
+    return;
+  }
+
   const it = findItem(id);
   const maxLv = unlockedLevel(w.lifetime);
   if (it.level > maxLv) {
@@ -1073,10 +1509,14 @@ function openBuy(id) {
   }
   state.pendingBuy = it;
   state.selectedId = it.id;
+  $("buy-ico").className = "modal-ico";
+  $("buy-ico").style.backgroundImage = "";
   $("buy-ico").textContent = it.icon || "⭐";
   $("buy-title").textContent = it.name;
   $("buy-desc").textContent = `${it.desc} · ${rarityLabel(it.rarity)}`;
   $("buy-cost").textContent = String(price);
+  const unitEl = $("buy-unit");
+  if (unitEl) unitEl.textContent = t("castle.pointsUnit");
   $("buy-modal").hidden = false;
 }
 
@@ -1084,6 +1524,31 @@ function confirmBuy() {
   const it = state.pendingBuy;
   if (!it) return;
   const w = loadWallet();
+
+  if (it.kind === "clothing" || isClothingId(it.id)) {
+    const price = clothingPrice(it);
+    if ((Number(w.diamonds) || 0) < price) {
+      toast(t("castle.toast.noDiamonds"));
+      $("buy-modal").hidden = true;
+      return;
+    }
+    w.diamonds = (Number(w.diamonds) || 0) - price;
+    w.clothingInventory = { ...(w.clothingInventory || {}) };
+    w.clothingInventory[it.id] = (w.clothingInventory[it.id] || 0) + 1;
+    w.tasks = normalizeTasks(w.tasks);
+    w.tasks.redeem += 1;
+    const claimed = tryClaimActivityReward(w);
+    pushHistory(w, it, t("castle.src.closet"));
+    saveWallet(w);
+    $("buy-modal").hidden = true;
+    state.pendingBuy = null;
+    showReveal(it, t("castle.src.fromCloset"));
+    toast(t("castle.toast.redeemDiamondOk", { n: price }));
+    if (claimed) toast(t("castle.toast.activityReward", { n: ACTIVITY_DIAMOND_REWARD }));
+    renderAll();
+    return;
+  }
+
   const price = itemPrice(it);
   if (w.points < price) {
     toast(t("castle.toast.noPoints"));
@@ -1092,7 +1557,9 @@ function confirmBuy() {
   }
   w.points -= price;
   w.inventory[it.id] = (w.inventory[it.id] || 0) + 1;
-  w.tasks.redeem = (w.tasks.redeem || 0) + 1;
+  w.tasks = normalizeTasks(w.tasks);
+  w.tasks.redeem += 1;
+  const claimed = tryClaimActivityReward(w);
   if (it.id === "l-charm-luck") w.pityBoost = (w.pityBoost || 0) + 8;
   pushHistory(w, it, t("castle.src.shelf"));
   saveWallet(w);
@@ -1100,6 +1567,10 @@ function confirmBuy() {
   state.pendingBuy = null;
   showReveal(it, t("castle.src.fromShelf"));
   toast(t("castle.toast.redeemOk", { n: price }));
+  if (claimed) {
+    toast(t("castle.toast.activityReward", { n: ACTIVITY_DIAMOND_REWARD }));
+    burstFx();
+  }
   renderAll();
 }
 
@@ -1122,6 +1593,35 @@ function unequipItem(id) {
   const it = findItem(id);
   if (w.equipped[it.cat] === id) {
     delete w.equipped[it.cat];
+    saveWallet(w);
+    toast(t("castle.toast.unequipped", { name: it.name }));
+  }
+  renderAll();
+}
+
+function equipClothing(id) {
+  const w = loadWallet();
+  const it = findClothingItem(id);
+  if (!it || !((w.clothingInventory || {})[id] > 0)) return;
+  w.equippedClothing = { ...(w.equippedClothing || {}) };
+  w.equippedClothing[it.clothingType] = id;
+  if (it.clothingType === "set") {
+    delete w.equippedClothing.top;
+    delete w.equippedClothing.bottom;
+  } else if (it.clothingType === "top" || it.clothingType === "bottom") {
+    delete w.equippedClothing.set;
+  }
+  saveWallet(w);
+  toast(t("castle.toast.equipped", { name: it.name }));
+  renderAll();
+}
+
+function unequipClothing(id) {
+  const w = loadWallet();
+  const it = findClothingItem(id);
+  if (!it) return;
+  if ((w.equippedClothing || {})[it.clothingType] === id) {
+    delete w.equippedClothing[it.clothingType];
     saveWallet(w);
     toast(t("castle.toast.unequipped", { name: it.name }));
   }
@@ -1165,6 +1665,11 @@ function doDraw() {
 
 function renderAll() {
   const w = loadWallet();
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    if (!raw.closetMigrated) saveWallet(w);
+  } catch { /* ignore */ }
+
   renderHeader(w);
   if (state.tab === "home") renderHome(w);
   if (state.tab === "shelf") renderShelf(w);
@@ -1175,20 +1680,81 @@ function renderAll() {
   renderPreview(w);
 }
 
+export function getDailyLoginStatus() {
+  const w = loadWallet();
+  const dl = normalizeDailyLogin(w.dailyLogin);
+  const today = localDateKey();
+  const claimedToday = dl.lastDate === today;
+  let streakDay = dl.streakDay;
+  if (!claimedToday && dl.lastDate && dl.lastDate !== yesterdayDateKey()) streakDay = 0;
+  const nextStreakDay =
+    claimedToday
+      ? dl.streakDay
+      : dl.lastDate === yesterdayDateKey()
+        ? (dl.streakDay >= WEEK_STREAK_DAYS ? 1 : dl.streakDay + 1)
+        : 1;
+  const nextDaily = dailyLoginRewardForDay(nextStreakDay);
+  const nextBonus = nextStreakDay === WEEK_STREAK_DAYS ? WEEK_STREAK_BONUS : 0;
+  return {
+    claimedToday,
+    streakDay,
+    nextStreakDay,
+    nextDaily,
+    nextBonus,
+    nextTotal: nextDaily + nextBonus,
+    canClaim: !claimedToday,
+  };
+}
+
+/** 主页「本周之星」每日领钻石；连续 7 天额外 +200 */
+export function claimDailyLoginDiamonds() {
+  const w = loadWallet();
+  const today = localDateKey();
+  w.dailyLogin = normalizeDailyLogin(w.dailyLogin);
+  if (w.dailyLogin.lastDate === today) {
+    return {
+      ok: false,
+      alreadyClaimed: true,
+      streakDay: w.dailyLogin.streakDay,
+      diamonds: 0,
+      bonus: 0,
+      total: 0,
+    };
+  }
+
+  let streakDay = 1;
+  if (w.dailyLogin.lastDate === yesterdayDateKey()) {
+    streakDay = w.dailyLogin.streakDay >= WEEK_STREAK_DAYS ? 1 : w.dailyLogin.streakDay + 1;
+  }
+
+  const diamonds = dailyLoginRewardForDay(streakDay);
+  const bonus = streakDay === WEEK_STREAK_DAYS ? WEEK_STREAK_BONUS : 0;
+  const total = diamonds + bonus;
+  w.diamonds = (Number(w.diamonds) || 0) + total;
+  w.dailyLogin = { lastDate: today, streakDay };
+  saveWallet(w);
+  return { ok: true, streakDay, diamonds, bonus, total };
+}
+
 export function addCastlePoints(n) {
   const w = loadWallet();
   const gain = Math.max(0, Math.floor(n));
   w.points += gain;
   w.lifetime += gain;
   w.weekGain = (w.weekGain || 0) + gain;
-  w.tasks.play = Math.max(w.tasks.play || 0, 1);
-  if (gain >= 40) w.tasks.quiz = (w.tasks.quiz || 0) + 1;
   saveWallet(w);
   return w;
 }
 
 /** 仅在商城页面挂载 UI（被冲刺/大厅 import 时不执行） */
 if ($("points-now") && document.querySelector(".side-nav")) {
+  const bootParams = new URLSearchParams(location.search);
+  const bootTab = bootParams.get("tab");
+  const bootCat = bootParams.get("cat");
+  if (bootTab) state.tab = bootTab;
+  if (bootCat) state.cat = bootCat;
+  if (location.hash === "#clothing") state.tab = "bag";
+
   document.querySelectorAll(".nav-btn").forEach((btn) => {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
@@ -1237,5 +1803,12 @@ if ($("points-now") && document.querySelector(".side-nav")) {
     });
   });
 
-  renderAll();
+  const initialTab = location.hash === "#clothing" ? "bag" : (bootTab || state.tab);
+  switchTab(initialTab);
+
+  if (location.hash === "#clothing") {
+    requestAnimationFrame(() => {
+      $("bag-clothing")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 }

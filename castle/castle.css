@@ -145,6 +145,7 @@ body {
   color: var(--castle);
 }
 .stat.trophy strong { color: var(--gold-dk); }
+.stat.gem strong { color: #6b4fd4; }
 .stat.star strong.pulse {
   animation: pulse-gold 0.55s ease;
 }
@@ -372,6 +373,7 @@ body {
   font-size: 0.95rem;
 }
 .goods .price::before { content: "★ "; color: var(--gold-dk); font-size: 0.8rem; }
+.goods .price.diamond::before { content: "💎 "; color: #6b4fd4; font-size: 0.8rem; }
 .goods .owned { font-size: 0.68rem; color: var(--moss); font-weight: 700; }
 .goods .act {
   margin-top: 0.2rem;
@@ -383,6 +385,75 @@ body {
   text-align: center;
 }
 .goods .act.on { background: var(--moss); }
+
+.closet-subcats { margin-top: 0.35rem; }
+.toolbar.compact { margin-top: 0.35rem; margin-bottom: 0.35rem; }
+
+.bag-clothing {
+  margin-top: 0.85rem;
+  padding: 0.85rem;
+  border: 3px solid var(--line);
+  background: linear-gradient(180deg, #fff9f0, #fff);
+}
+.bag-section-head {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline;
+  gap: 0.35rem; margin-bottom: 0.55rem;
+}
+.bag-section-head h3 { margin: 0; font-size: 1rem; color: var(--castle); }
+.bag-section-head p { margin: 0; font-size: 0.78rem; color: var(--muted); }
+
+.clothing-equipped {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-bottom: 0.55rem;
+}
+.clothing-slot {
+  border: 2px dashed var(--line);
+  background: #faf6ee;
+  padding: 0.35rem;
+  text-align: center;
+  min-height: 5.5rem;
+  display: grid; gap: 0.25rem; align-content: start;
+}
+.clothing-slot.is-on { border-style: solid; border-color: var(--gold); background: #fff; }
+.clothing-slot span { font-size: 0.65rem; color: var(--muted); font-weight: 700; }
+.clothing-slot em { font-size: 0.62rem; color: var(--castle); font-style: normal; line-height: 1.2; }
+.clothing-slot .thumb {
+  width: 100%; aspect-ratio: 197 / 245;
+  border: 2px solid #8a9ab0;
+  background-color: #2a3a58;
+  background-repeat: no-repeat;
+}
+.clothing-slot .empty-dot {
+  width: 100%; aspect-ratio: 197 / 245;
+  border: 2px dashed #c8b8a0;
+  display: grid; place-items: center;
+  color: #b0a090; font-size: 1.2rem;
+}
+
+.goods.clothing .ico.clothing-thumb,
+.preview-ico.clothing-thumb {
+  background-repeat: no-repeat;
+  background-color: #2a3a58;
+  font-size: 0;
+}
+.goods.clothing .ico.clothing-thumb { aspect-ratio: 197 / 245; }
+
+.modal-ico.clothing-thumb,
+.reveal-ico.clothing-thumb {
+  width: 100%;
+  max-width: 140px;
+  aspect-ratio: 197 / 245;
+  margin: 0 auto 0.5rem;
+  background-repeat: no-repeat;
+  background-color: #2a3a58;
+  border: 3px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .clothing-equipped { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 .tag {
   display: inline-block;
@@ -1815,6 +1886,16 @@ body {
   font-weight: 700; font-size: 0.75rem;
   padding: 0.3rem 0.5rem;
 }
+
+.task-reward h3 { margin: 0 0 0.35rem; font-size: 0.95rem; color: var(--castle); }
+.task-reward-lead { margin: 0 0 0.35rem; font-size: 0.82rem; }
+.task-reward-status {
+  margin: 0; font-weight: 700; font-size: 0.8rem; color: var(--muted);
+}
+.task-reward-status.is-ready { color: #6b4fd4; }
+.task-reward-status.is-claimed { color: var(--moss); }
+.task-reward-hint { margin: 0.35rem 0 0; font-size: 0.72rem; color: var(--muted); }
+
 .week-chests { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.45rem; }
 .week-chests span {
   border: 2px solid var(--line);
